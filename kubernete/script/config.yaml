@@ -1,0 +1,64 @@
+periodics:
+- interval: 1h
+  agent: kubernetes
+  name: elastifile-provision
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile-test:v20181011-f2a92fbd8
+      tty: true
+      stdin: true
+      command:
+      - sh
+      - -c
+      - "cd Terraform-Elastifile-GCP; gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json .; gcloud auth activate-service-account --key-file  cpe-performance-storage-b13c1a7348ad.json;terraform init; terraform  apply --auto-approve"
+
+
+
+
+- interval: 5m
+  agent: kubernetes
+  name: elastifile-perf-1
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/storage-test:v20181008-f2a92fbd8
+      tty: true
+      stdin: true
+      command:
+      - sh
+      - -c
+      - 'cd /mnt/elastifile; chmod 777 /workspace/storage-performance/quickfio.test.sh; /workspace/storage-performance/quickfio.test.sh'
+      volumeMounts:
+      # name must match the volume name below
+      - name: mynfs
+        mountPath: "/mnt/elastifile"
+    volumes:
+    - name: mynfs
+      persistentVolumeClaim:
+        claimName: elastifile-vol-1
+
+
+postsubmits:
+  minzhuogoogle/storage-performance:
+  - name: elastifile-perf-regression 
+    agent: kubernetes
+    branches:
+    - master
+    max_concurrency: 1
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/storage-test:v20181008-f2a92fbd8
+        tty: true
+        stdin: true
+        command:
+        - sh
+        - -c
+        - 'mkdir -p /mnt/qtest; cd /mnt/qtest; /workspace/storage-performance/quickfio.test.sh'
+        volumeMounts:
+        # name must match the volume name below
+        - name: mynfs
+          mountPath: "/mnt"
+      volumes:
+      - name: mynfs
+        persistentVolumeClaim:
+          claimName: elastifile-vol-1
+
