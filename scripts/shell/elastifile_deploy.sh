@@ -4,7 +4,7 @@ gcloud auth activate-service-account --key-file elastifile.json
 project='cpe-performance-storage'
 zone='us-east1-b'
 
-for i in `gcloud compute instances list --project $project --filter='test-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone; done
+for i in `gcloud compute instances list --project $project --filter='test-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 terraform init
 terraform  apply --auto-approve
 NOW=$(date +"%m.%d.%Y")
