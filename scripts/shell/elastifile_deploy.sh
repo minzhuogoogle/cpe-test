@@ -1,11 +1,11 @@
-cd Terraform-Elastifile-GCP/ 
-gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json 
-gcloud auth activate-service-account --key-file elastifile.json
-terraform init
-terraform  apply --auto-approve
-NOW=$(date +"%m.%d.%Y")
-HOSTNAME=$(hostname)
-gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$HOSTNAME.$NOW.log
+#cd Terraform-Elastifile-GCP/ 
+#gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json 
+#gcloud auth activate-service-account --key-file elastifile.json
+#terraform init
+#terraform  apply --auto-approve
+#NOW=$(date +"%m.%d.%Y")
+#HOSTNAME=$(hostname)
+#gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$HOSTNAME.$NOW.log
 
 project='cpe-performace-storage'
 instance_name=vm_$HOSTNAME_$NOW
