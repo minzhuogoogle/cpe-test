@@ -1,0 +1,15 @@
+# This is to provision an Elastifile instance 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: elastifile-cluster
+spec:
+  containers:
+  - image: gcr.io/cpe-performance-storage/elastifile:v20181012-f8c6bc0
+    name: elastifile-cluster
+    tty: true
+    stdin: true
+    command:
+      - sh
+      - -c
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elastifile_deploy.sh; chmod 777 elastifile_deploy.sh; ./elastifile_deploy.sh'
