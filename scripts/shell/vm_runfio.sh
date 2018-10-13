@@ -12,7 +12,7 @@ NOW=$(date +"%Y.%m.%d")
 HOSTNAME=$(hostname)
 sudo fio fio.profile  --refill_buffers --norandommap --time_based --output-format=json --output elastifile.$HOSTNAME.$NOW.json
 gsutil cp elastifile.$HOSTNAME.$NOW.json gs://cpe-performance-storage/test_result/elastifile.$HOSTNAME.$NOW.json
-
+sudo rm *.*
 project='cpe-performance-storage'
 zone='us-east1-b'
 
