@@ -4,7 +4,7 @@ size=128M
 directory=/mnt/elastifile/
 iodepth=16
 direct=1
-numjobs=8
+numjobs=1
 randrepeat=0
 runtime=10
 
