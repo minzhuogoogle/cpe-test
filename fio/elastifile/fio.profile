@@ -6,7 +6,7 @@ iodepth=16
 direct=1
 numjobs=1
 randrepeat=0
-runtime=10
+runtime=300
 
 [readbw]
 rw=read
