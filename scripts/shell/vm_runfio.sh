@@ -10,3 +10,8 @@ NOW=$(date +"%m.%d.%Y")
 HOSTNAME=$(hostname)
 fio fio.perf.profile --output-format=json --output elastifile.$HOSTNAME.$NOW.json
 gsutil cp elastifile.$HOSTNAME.$NOW.json gs://cpe-performance-storage/test_result/elastifile.$HOSTNAME.$NOW.json
+
+project='cpe-performace-storage'
+zone='us-east1-b'
+
+for i in `gcloud compute instances list --project $project --filter='test-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone; done
