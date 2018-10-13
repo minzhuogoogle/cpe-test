@@ -8,7 +8,7 @@ cd /mnt/elastifile
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/storage-performance/master/fio.perf.profile
 NOW=$(date +"%m.%d.%Y")
 HOSTNAME=$(hostname)
-fio fio.perf.profile --output-format=json --output elastifile.$HOSTNAME.$NOW.json
+fio fio.perf.profile  --refill_buffers --norandommap --time_based --output-format=json --output elastifile.$HOSTNAME.$NOW.json
 gsutil cp elastifile.$HOSTNAME.$NOW.json gs://cpe-performance-storage/test_result/elastifile.$HOSTNAME.$NOW.json
 
 project='cpe-performace-storage'
