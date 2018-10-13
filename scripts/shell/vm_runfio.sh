@@ -10,7 +10,7 @@ gcloud auth activate-service-account --key-file elastifile.json
 sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.profile
 NOW=$(date +"%Y.%m.%d")
 HOSTNAME=$(hostname)
-sudo fio fio.profile  --refill_buffers --norandommap --time_based --output-format=json --output elastifile.$HOSTNAME.$NOW.json
+sudo fio fio.profile  --refill_buffers --norandommap --time_based  --group_reporting  --output elastifile.$HOSTNAME.$NOW.json
 gsutil cp elastifile.$HOSTNAME.$NOW.json gs://cpe-performance-storage/test_result/elastifile.$HOSTNAME.$NOW.json
 sudo rm *.*
 project='cpe-performance-storage'
