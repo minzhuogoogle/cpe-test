@@ -3,7 +3,7 @@ cd Terraform-Elastifile-GCP/
 gsutil cp gs://elastifile_test/elastifile.json elastifile.json 
 gcloud auth activate-service-account --key-file elastifile.json
 project='gtp-cpe-integration-testing'
-zone='us-central1-c'
+zone='us-west1-a'
 
 for i in `gcloud compute instances list --project $project --filter='evm-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 for i in `gcloud compute instances list --project $project --filter='test-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
