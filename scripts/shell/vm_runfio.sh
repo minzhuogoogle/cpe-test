@@ -5,7 +5,7 @@
 sudo mkdir -p /mnt/elastifile
 sudo mount -o nolock 10.99.0.2:/DC01/root /mnt/elastifile
 cd /mnt/elastifile
-gsutil cp gs://elastifile_test/elastifile.json elastifile.json 
+gsutil cp gs://elastifile_test/nelastifile.json elastifile.json 
 gcloud auth activate-service-account --key-file elastifile.json
 sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.profile
 NOW=$(date +"%Y.%m.%d")
