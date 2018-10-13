@@ -1,40 +1,38 @@
 periodics:
-- interval: 1h
+- interval: 24h
   agent: kubernetes
-  name: elastifile-provision
+  name: elastifile-deployer
   spec:
     containers:
-    - image: gcr.io/cpe-performance-storage/elastifile-test:v20181011-f2a92fbd8
+    - image: gcr.io/cpe-performance-storage/elastifile:v20181012-f8c6bc0
       tty: true
       stdin: true
       command:
       - sh
       - -c
-      - "cd Terraform-Elastifile-GCP; gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json .; gcloud auth activate-service-account --key-file  cpe-performance-storage-b13c1a7348ad.json;terraform init; terraform  apply --auto-approve"
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elastifile_deploy.sh; chmod 777 elastifile_deploy.sh; ./elastifile_deploy.sh'
 
 
-
-
-- interval: 5m
+- interval: 6h
   agent: kubernetes
-  name: elastifile-perf-1
+  name: elastifile-io-test
   spec:
     containers:
-    - image: gcr.io/cpe-performance-storage/storage-test:v20181008-f2a92fbd8
+    - image: gcr.io/cpe-performance-storage/elastifile:v20181012-f8c6bc0
       tty: true
       stdin: true
       command:
       - sh
       - -c
-      - 'cd /mnt/elastifile; chmod 777 /workspace/storage-performance/quickfio.test.sh; /workspace/storage-performance/quickfio.test.sh'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/pod_runfio.sh; chmod 777 pod_runfio.sh; ./pod_runfio.sh'
       volumeMounts:
-      # name must match the volume name below
+        # name must match the volume name below
+        - name: mynfs
+          mountPath: "/mnt/elastifile"
+      volumes:
       - name: mynfs
-        mountPath: "/mnt/elastifile"
-    volumes:
-    - name: mynfs
-      persistentVolumeClaim:
-        claimName: elastifile-vol-1
+        persistentVolumeClaim:
+          claimName: elastifile-data-1
 
 
 postsubmits:
