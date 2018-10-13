@@ -32,6 +32,6 @@ rwmixwrite=30
 
 [randrwiops]
 rw=randrw
-blocksize=16k
+blocksize=4k
 rwmixread=70
 rwmixwrite=30
