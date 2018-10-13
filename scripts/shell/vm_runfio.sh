@@ -5,6 +5,8 @@ sudo apt install nfs-common -y
 sudo mkdir -p /mnt/elastifile
 sudo mount -o nolock 10.99.0.2:/DC01/root /mnt/elastifile
 cd /mnt/elastifile
+gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json 
+gcloud auth activate-service-account --key-file elastifile.json
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.profile
 NOW=$(date +"%m.%d.%Y")
 HOSTNAME=$(hostname)
