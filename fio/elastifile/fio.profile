@@ -1,11 +1,12 @@
 ## Run fio :  fio trial.fio --output-format=json --output test.log
 [global]
-size=128m
+size=2048M
 directory=/mnt/elastifile/
 iodepth=16
 direct=1
 numjobs=8
 randrepeat=0
+runtime=300
 
 [readbw]
 rw=read
@@ -31,6 +32,6 @@ rwmixwrite=30
 
 [randrwiops]
 rw=randrw
-blocksize=4k
+blocksize=16k
 rwmixread=70
 rwmixwrite=30
