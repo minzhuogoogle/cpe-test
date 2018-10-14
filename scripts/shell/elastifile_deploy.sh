@@ -15,9 +15,9 @@ zone='us-east1-b'
 for i in `gcloud compute instances list --project $project --filter='evm-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 for i in `gcloud compute instances list --project $project --filter='test-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 date
-cd Terraform-Elastifile-GCP/ 
-terraform init
-terraform  apply --auto-approve
+#cd Terraform-Elastifile-GCP/ 
+#terraform init
+#terraform  apply --auto-approve
 date
 NOW=$(date +"%Y%m%d")
 #NOW=`date +%m.%d.%Y.%H.%M.%S`
