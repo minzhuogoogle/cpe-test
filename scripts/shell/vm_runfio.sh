@@ -1,5 +1,5 @@
 #!/bin/bash
-nfs_server_ip=10.142.0.5
+nfs_server_ip=10.142.0.6
 nfs_data_container='ZMDATA'
 ping_retry=30
 repeat=10
