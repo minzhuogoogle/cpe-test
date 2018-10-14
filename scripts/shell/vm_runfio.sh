@@ -23,7 +23,7 @@ done
 
 if [ $count -eq $ping_retry ]
 then
-    echo "Fail to connect to NFS servver."    
+    echo "Fail to connect to NFS server."    
 elif   
     echo "Start fio on Elastifile datacontainer."
     sudo mount -o nolock $nsf_server_ip:/$nfs_data_container/root /mnt/elastifile
