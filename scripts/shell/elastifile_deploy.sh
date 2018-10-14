@@ -1,5 +1,7 @@
 date
 cd Terraform-Elastifile-GCP/ 
+gsutil cp gs://elastifile_test/nelastifile.json elastifile.json
+
 project='gtp-cpe-integration-testing'
 zone='us-west1-b'
 
