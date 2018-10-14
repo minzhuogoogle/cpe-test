@@ -1,7 +1,5 @@
 date
 cd Terraform-Elastifile-GCP/ 
-gsutil cp gs://elastifile_test/nelastifile.json elastifile.json 
-#gcloud auth activate-service-account --key-file elastifile.json
 project='gtp-cpe-integration-testing'
 zone='us-west1-b'
 
