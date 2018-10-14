@@ -4,7 +4,7 @@ git clone https://github.com/minzhuogoogle/Terraform-Elastifile-GCP.git
 echo sunnydog > Terraform-Elastifile-GCP/password.txt
 cd Terraform-Elastifile-GCP/ 
 #gsutil cp gs://elastifile_test/nelastifile.json elastifile.json
-gsutil cp gs:/cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
+gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
 #project='gtp-cpe-integration-testing'
 #zone='us-west1-b'
