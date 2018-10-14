@@ -3,7 +3,7 @@ sudo apt-get update
 sudo apt install fio -y
 sudo apt install nfs-common -y
 sudo mkdir -p /mnt/elastifile
-sudo mount -o nolock 10.99.0.2:/DC01/root /mnt/elastifile
+sudo mount -o nolock 10.99.0.2:/ZMDATA/root /mnt/elastifile
 cd /mnt/elastifile
 #gsutil cp gs://elastifile_test/nelastifile.json elastifile.json 
 #gcloud auth activate-service-account --key-file elastifile.json
