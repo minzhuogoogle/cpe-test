@@ -1,5 +1,5 @@
 date
-rmdir -rf Terraform-Elastifile-GCP
+rm -rf Terraform-Elastifile-GCP
 git clone https://github.com/minzhuogoogle/Terraform-Elastifile-GCP.git
 echo sunnydog > Terraform-Elastifile-GCP/password.txt
 cd Terraform-Elastifile-GCP/ 
