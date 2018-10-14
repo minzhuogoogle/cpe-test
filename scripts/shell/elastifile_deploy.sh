@@ -2,7 +2,7 @@ date
 rmdir -rf Terraform-Elastifile-GCP
 git clone https://github.com/minzhuogoogle/Terraform-Elastifile-GCP.git
 echo sunnydog > Terraform-Elastifile-GCP/password.txt
-
+cd Terraform-Elastifile-GCP/ 
 #gsutil cp gs://elastifile_test/nelastifile.json elastifile.json
 gsutil cp gs:/cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
