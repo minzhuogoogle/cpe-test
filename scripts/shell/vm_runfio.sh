@@ -5,6 +5,7 @@ ping_retry=30
 repeat=10
 interval=60
 sudo apt-get update
+sudo apt-get git
 sudo apt-get iputils-ping
 sudo apt install fio -y
 sudo apt install nfs-common -y
@@ -15,45 +16,55 @@ gcloud auth activate-service-account --key-file  elastifile.json
 
 start_fio() 
 {
-      sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$i
+      iotype=$1	
+      echo $iotype
+      sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       NOW=`date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      sudo fio fio.$i  --refill_buffers --norandommap --time_based --output-format=json --output elastifile.fio.$i.$NOW.log
-      gsutil cp elastifile.fio.$i.$NOW.log gs://elastifile_test/test_result/elastifile.fio.$i.$NOW.log
+      logfile=elastifile.fio.$iotype.$NOW
+      echo $logfile
+      sudo fio fio.$iotype  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
+      gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
       sudo rm *.*.*
 }
 
 
 export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
 check_result=${#nfs_server_reachable}
+echo $check_result
 
-count=1
-while [[ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ]]
+count=0
+while [ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ] 
 do
    sleep 1
    export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
    check_result=${#nfs_server_reachable}
-   count=`expr $count+1`
+   count=$((count+1))
 done    
 
-if [ $count -eq $ping_retry ]
+echo "ping succeeds"
+echo $count
+if [ $count -lt $ping_retry ]
 then
-    echo "Fail to connect to NFS server."    
-elif   
     echo "Start fio on Elastifile datacontainer."
-    sudo mount -o nolock $nsf_server_ip:/$nfs_data_container/root /mnt/elastifile
+    sudo mount -o nolock $nfs_server_ip:/$nfs_data_container/root /mnt/elastifile
     cd /mnt/elastifile
-    sudo git clone git@github.com:minzhuogoogle/cpe-test.git
-    cd cpe-test/fio/elastifile
-    declare -a iotype=('readbw', 'readiops', 'writebw', 'writeiops', 'randrwbw', 'randrwiops')
-    fio_number=1
-    while [ $fio_number -lt $repeat] 
+    declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
+#    declare -a iotype=('writebw' 'randrwbw')
+    number=0
+    while [ $number -lt $repeat ] 
     do 
-      for i in "${arr[@]}"
-      do
-         start_fio
+      for i in "${iotype[@]}"
+      do 
+	 echo $i     
+         start_fio $i
       done
-      fio_number=`expr $fio_number+1`
+      echo $number
+
+      number=$((number+1))
       sleep $interval
-    done  
-fi    
+      echo $number
+    done
+else
+   echo "Can not reach NFS server."
+fi
