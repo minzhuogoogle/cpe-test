@@ -4,7 +4,7 @@
     "writebw": "44638.32786885246",
     "writeiops": "43.592603819672135",
     "writelatency": "11639.6109882459",
-    "readebw": "104348.70491803279",
+    "readbw": "104348.70491803279",
     "readiops": "101.90348724590167",
     "readlatency": "4809.971902393442"
   },
@@ -13,7 +13,7 @@
     "writebw": "85139.49122807017",
     "writeiops": "83.14448033333335",
     "writelatency": "11811.105559508766",
-    "readebw": "0.0",
+    "readbw": "0.0",
     "readiops": "0.0",
     "readlatency": "0.0"
   },
@@ -22,7 +22,7 @@
     "writebw": "2334.6",
     "writeiops": "583.7721238250001",
     "writelatency": "1733.96924855",
-    "readebw": "0.0",
+    "readbw": "0.0",
     "readiops": "0.0",
     "readlatency": "0.0"
   },
@@ -31,7 +31,7 @@
     "writebw": "681.56",
     "writeiops": "170.52225313333338",
     "writelatency": "1957.6334181866662",
-    "readebw": "1591.36",
+    "readbw": "1591.36",
     "readiops": "397.9728403733334",
     "readlatency": "1706.0674796666667"
   },
@@ -40,7 +40,7 @@
     "writebw": "0.0",
     "writeiops": "0.0",
     "writelatency": "0.0",
-    "readebw": "225503.61904761905",
+    "readbw": "225503.61904761905",
     "readiops": "220.21884471428572",
     "readlatency": "4581.833050761905"
   },
@@ -49,7 +49,7 @@
     "writebw": "0.0",
     "writeiops": "0.0",
     "writelatency": "0.0",
-    "readebw": "2572.981818181818",
+    "readbw": "2572.981818181818",
     "readiops": "643.3775408363637",
     "readlatency": "1584.437559018182"
   }
