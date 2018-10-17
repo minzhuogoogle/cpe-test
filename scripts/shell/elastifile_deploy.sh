@@ -18,9 +18,9 @@ for i in `gcloud compute instances list --project $project --filter='evm-' | gre
 date
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars
 
-echo "Bypassing elastifile provisioning due to fatal problem..........."
-#terraform init
-#terraform  apply --auto-approve
+#echo "Bypassing elastifile provisioning due to fatal problem..........."
+terraform init
+terraform  apply --auto-approve
 date
 NOW=$(date +"%Y%m%d")
 #NOW=`date +%m.%d.%Y.%H.%M.%S`
