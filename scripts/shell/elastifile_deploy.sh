@@ -17,6 +17,8 @@ for i in `gcloud compute instances list --project $project --filter='evm-' | gre
 #for i in `gcloud compute instances list --project $project --filter='try-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 date
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars
+
+echo "Bypassing elastifile provisioning due to fatal problem..........."
 #terraform init
 #terraform  apply --auto-approve
 date
