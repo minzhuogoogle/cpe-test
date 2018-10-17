@@ -21,7 +21,7 @@ start_fio()
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       NOW=`date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=elfs.fio.$iotype.$NOW.hdd
+      logfile=elfs.fio.$iotype.$NOW.hdd.txt
       echo $logfile
       sudo fio fio.$iotype  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
