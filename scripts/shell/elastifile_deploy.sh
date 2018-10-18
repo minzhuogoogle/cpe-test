@@ -24,8 +24,8 @@ date
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars
 
 echo "Bypassing elastifile provisioning due to fatal problem..........."
-#terraform init
-#terraform  apply --auto-approve
+terraform init
+terraform  apply --auto-approve
 date
 
 
