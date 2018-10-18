@@ -1,4 +1,4 @@
-ate
+date
 rm -rf Terraform-Elastifile-GCP
 #git clone https://github.com/minzhuogoogle/Terraform-Elastifile-GCP.git
 git clone https://github.com/Elastifile/gcp-automation.git
