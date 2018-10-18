@@ -21,7 +21,7 @@ instance_name=eps-$HOSTNAME-$HNOW
 for i in `gcloud compute instances list --project $project --filter='eps-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 for i in `gcloud compute instances list --project $project --filter='ps-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 date
-curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/nterraform.tfvars
+curl -OL https://raw.githubusercontent.com/minzhuogoogle/Terraform-Elastifile-GCP/master/nterraform.tfvars
 cp nterraform.tfvars terraform.tfvars
 
 #echo "Bypassing elastifile provisioning due to fatal problem..........."
