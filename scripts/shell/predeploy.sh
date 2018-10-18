@@ -25,8 +25,8 @@ curl -OL https://raw.githubusercontent.com/minzhuogoogle/Terraform-Elastifile-GC
 cp nterraform.tfvars terraform.tfvars
 
 #echo "Bypassing elastifile provisioning due to fatal problem..........."
-#terraform init
-#terraform  apply --auto-approve
+terraform init
+terraform  apply --auto-approve
 date
 
 
