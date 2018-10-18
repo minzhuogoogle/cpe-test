@@ -1,9 +1,9 @@
 date
-#rm -rf Terraform-Elastifile-GCP
+rm -rf Terraform-Elastifile-GCP
 #git clone https://github.com/minzhuogoogle/Terraform-Elastifile-GCP.git
-#git clone https://github.com/Elastifile/gcp-automation.git
-#echo sunnydog > gcp-automation/password.txt
-#cd gcp-automation/ 
+git clone https://github.com/Elastifile/gcp-automation.git
+echo sunnydog > gcp-automation/password.txt
+cd gcp-automation/ 
 #gsutil cp gs://elastifile_test/nelastifile.json elastifile.json
 gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
@@ -21,12 +21,12 @@ instance_name=eps-$HOSTNAME
 for i in `gcloud compute instances list --project $project --filter='eps-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 for i in `gcloud compute instances list --project $project --filter='ps-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 date
-#curl -OL https://raw.githubusercontent.com/minzhuogoogle/Terraform-Elastifile-GCP/master/nterraform.tfvars
-#cp nterraform.tfvars terraform.tfvars
+curl -OL https://raw.githubusercontent.com/minzhuogoogle/Terraform-Elastifile-GCP/master/nterraform.tfvars
+cp nterraform.tfvars terraform.tfvars
 
 #echo "Bypassing elastifile provisioning due to fatal problem..........."
-#terraform init
-#terraform  apply --auto-approve
+terraform init
+terraform  apply --auto-approve
 date
 
 
