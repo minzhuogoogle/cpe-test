@@ -13,6 +13,11 @@ gcloud auth activate-service-account --key-file  elastifile.json
 project='cpe-performance-storage'
 zone='us-east1-b'
 
+HNOW=$(date +"%Y%m%d")
+NOW=`date +%m.%d.%Y.%H.%M.%S`
+HOSTNAME=$(hostname)
+instance_name=evm-$HOSTNAME-$HNOW
+
 for i in `gcloud compute instances list --project $project --filter='evm-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 for i in `gcloud compute instances list --project $project --filter='try-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 date
@@ -22,10 +27,7 @@ curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastif
 terraform init
 terraform  apply --auto-approve
 date
-HNOW=$(date +"%Y%m%d")
-NOW=`date +%m.%d.%Y.%H.%M.%S`
-HOSTNAME=$(hostname)
-instance_name=evm-$HOSTNAME-$HNOW
+
 
 #gsutil cp create_vheads.log gs://elastifile_test/test_result/create_vheads.$HOSTNAME.$NOW.log
 gsutil cp create_vheads.log gs:/cpe-performance-storage/test_result/create_vheads.$HOSTNAME.$NOW.txt
