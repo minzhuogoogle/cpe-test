@@ -22,8 +22,8 @@ curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastif
 terraform init
 terraform  apply --auto-approve
 date
-NOW=$(date +"%Y%m%d")
-#NOW=`date +%m.%d.%Y.%H.%M.%S`
+#NOW=$(date +"%Y%m%d")
+NOW=`date +%m.%d.%Y.%H.%M.%S`
 HOSTNAME=$(hostname)
 instance_name=evm-$HOSTNAME-$NOW
 
