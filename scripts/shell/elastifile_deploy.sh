@@ -16,7 +16,7 @@ zone='us-east1-b'
 HNOW=$(date +"%Y%m%d")
 NOW=`date +%m.%d.%Y.%H.%M.%S`
 HOSTNAME=$(hostname)
-instance_name=evm-$HOSTNAME-$HNOW
+instance_name=evm-$HOSTNAME
 
 for i in `gcloud compute instances list --project $project --filter='evm-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 for i in `gcloud compute instances list --project $project --filter='try-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
