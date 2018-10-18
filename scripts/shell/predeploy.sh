@@ -23,6 +23,8 @@ instance_name=evm-$HOSTNAME-$HNOW
 date
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/nterraform.tfvars
 
+cp nterraform.tfvars terraform.tfvars
+
 #echo "Bypassing elastifile provisioning due to fatal problem..........."
 terraform init
 terraform  apply --auto-approve
