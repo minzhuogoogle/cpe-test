@@ -16,13 +16,12 @@ zone='us-east1-b'
 HNOW=$(date +"%Y%m%d")
 NOW=`date +%m.%d.%Y.%H.%M.%S`
 HOSTNAME=$(hostname)
-instance_name=evm-$HOSTNAME-$HNOW
+instance_name=eps-$HOSTNAME-$HNOW
 
-#for i in `gcloud compute instances list --project $project --filter='evm-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
-#for i in `gcloud compute instances list --project $project --filter='try-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
+for i in `gcloud compute instances list --project $project --filter='eps-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
+for i in `gcloud compute instances list --project $project --filter='ps-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 date
 curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/nterraform.tfvars
-
 cp nterraform.tfvars terraform.tfvars
 
 #echo "Bypassing elastifile provisioning due to fatal problem..........."
