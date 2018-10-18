@@ -22,10 +22,10 @@ curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastif
 terraform init
 terraform  apply --auto-approve
 date
-#NOW=$(date +"%Y%m%d")
+HNOW=$(date +"%Y%m%d")
 NOW=`date +%m.%d.%Y.%H.%M.%S`
 HOSTNAME=$(hostname)
-instance_name=evm-$HOSTNAME-$NOW
+instance_name=evm-$HOSTNAME-$HNOW
 
 #gsutil cp create_vheads.log gs://elastifile_test/test_result/create_vheads.$HOSTNAME.$NOW.log
 gsutil cp create_vheads.log gs:/cpe-performance-storage/test_result/create_vheads.$HOSTNAME.$NOW.txt
