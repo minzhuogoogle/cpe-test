@@ -1,4 +1,5 @@
 #!/bin/bash
+test_disk = $1
 nfs_data_container='DC01'
 ping_retry=30
 repeat=1
@@ -30,9 +31,7 @@ start_fio()
 
 disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
 
-for i in "${disktype[@]}"
-do
-    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$i-elfs --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$test_disk-elfs --format="value(networkInterfaces[0].networkIP)" | head -n 1`
     echo $nfs_server_ip
       
     export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
@@ -72,5 +71,4 @@ do
     else
          echo "Can not reach NFS server."
     fi
- done   
-	
+
