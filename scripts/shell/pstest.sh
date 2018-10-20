@@ -2,13 +2,13 @@ disktype=$1
 echo $disktype
 echo `date`
 cd gcp-automation/ 
-curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.lssd 
-curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.pssd
-curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.phdd 
+
 gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
 
 cp terraform.tfvars.$disktype terraform.tfvars
+cat terraform.tfvars
+
 export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
 zone=${zone:1:-1}
 export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
