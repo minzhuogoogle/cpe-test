@@ -21,8 +21,7 @@ HOSTNAME=$(hostname)
 instance_name=$disktype-$HOSTNAME
 
 for i in `gcloud compute instances list --project $project --filter='$disktype' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
-
-terraform init
+for i in `gcloud compute instances list --project $project --filter='$disk' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; doneterraform init
 terraform apply --auto-approve
 
 echo `date`
