@@ -1,5 +1,5 @@
 #!/bin/bash
-nfs_data_container='ZMDATA'
+nfs_data_container='DC01'
 ping_retry=30
 repeat=1
 interval=60
