@@ -4,7 +4,7 @@ NUM_OF_VMS = "3"
 USE_LB = "true"
 DISK_TYPE = "ssd"
 #local,ssd,hdd
-VM_CONFIG = "4_32"
+VM_CONFIG = "4_42"
 # <cpucores>_<ram> default: 4_42
 DISK_CONFIG = "4_1000"
 # <num_of_disks>_<disk_size>
