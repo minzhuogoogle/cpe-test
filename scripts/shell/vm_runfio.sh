@@ -22,7 +22,7 @@ start_fio()
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       NOW=`date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
+      logfile=elfs.fio.$disktype.$iotype.$HOSTNAME.$NOW.txt
       echo $logfile
       sudo fio fio.$iotype  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
@@ -61,7 +61,7 @@ disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
          for j in "${iotype[@]}"
          do 
 	     echo $j     
-             start_fio $testtype $j
+             start_fio $j $testtype
          done
          echo $number
          number=$((number+1))
