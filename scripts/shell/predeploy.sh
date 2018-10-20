@@ -1,7 +1,7 @@
 date
-wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_amd64.zip
-unzip terraform_0.11.8_linux_amd64.zip
-cp terraform /usr/local/bin/. 
+#wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_amd64.zip
+#unzip terraform_0.11.8_linux_amd64.zip
+#cp terraform /usr/local/bin/. 
 git clone https://github.com/Elastifile/gcp-automation.git
 echo sunnydog > gcp-automation/password.txt
 
