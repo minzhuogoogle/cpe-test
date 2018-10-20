@@ -1,7 +1,7 @@
 MPLATE_TYPE = "small"
 #small,medium,standard,custom
 NUM_OF_VMS = "3"
-USE_LB = "true"
+USE_LB = "false"
 DISK_TYPE = "hdd"
 #local,ssd,hdd
 VM_CONFIG = "4_42"
