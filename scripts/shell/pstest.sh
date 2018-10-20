@@ -1,4 +1,5 @@
 disktype=$1
+echo $disktype
 echo `date`
 cd gcp-automation/ 
 gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
