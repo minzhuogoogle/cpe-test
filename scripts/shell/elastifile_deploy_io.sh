@@ -23,9 +23,11 @@ HNOW=$(date +"%Y%m%d")
 NOW=`date +%m.%d.%Y.%H.%M.%S`
 HOSTNAME=$(hostname)
 instance_name=$disktype-$HOSTNAME
+echo $instance_name
 
-for i in `gcloud compute instances list --project $project --filter='$disktype' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
-for i in `gcloud compute instances list --project $project --filter='$disk' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; doneterraform init
+for i in `gcloud compute instances list --project $project --filter="$disktype" | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
+
+terraform init
 terraform apply --auto-approve
 
 echo `date`
@@ -38,3 +40,4 @@ HOSTNAME=$(hostname)
 gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$HOSTNAME.$NOW.txt
 machine_type='n1-standard-4'
 gcloud compute --project=$project instances create $instance_name  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh  
+
