@@ -8,6 +8,7 @@ gcloud auth activate-service-account --key-file  elastifile.json
 
 cp terraform.tfvars.$disktype terraform.tfvars
 cat terraform.tfvars
+sed 's/true/false/' terraform.tfvars
 
 export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
 zone=${zone:1:-1}
