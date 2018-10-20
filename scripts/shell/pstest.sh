@@ -27,6 +27,7 @@ echo $instance_name
 
 for i in `gcloud compute instances list --project $project --filter="$disktype" | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 
+terraform init
 terraform apply --auto-approve
 
 echo `date`
