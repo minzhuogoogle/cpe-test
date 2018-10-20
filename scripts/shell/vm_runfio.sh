@@ -32,7 +32,7 @@ disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
 
 for i in "${disktype[@]}"
 do
-    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$i --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$i-elfs --format="value(networkInterfaces[0].networkIP)" | head -n 1`
     echo $nfs_server_ip
       
     export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
