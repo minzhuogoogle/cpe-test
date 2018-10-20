@@ -10,8 +10,7 @@ NOW=`date +%m.%d.%Y.%H.%M.%S`
 HOSTNAME=$(hostname)
 instance_name=evm-$HOSTNAME
 
-for i in `gcloud compute instances list --project $project --filter='evm-' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
-for i in `gcloud compute instances list --project $project --filter='lssd-elastifile-storage' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
+for i in `gcloud compute instances list --project $project --filter='elfs' | grep -v NAME | cut -d ' ' -f1`; do gcloud compute instances delete $i --project $project --zone $zone -q; done
 
 date
 cd gcp-automation/ 
@@ -34,7 +33,7 @@ do
    HNOW=$(date +"%Y%m%d")
    NOW=`date +%m.%d.%Y.%H.%M.%S`
    HOSTNAME=$(hostname)
-   instance_name=$disk-$HOSTNAME
+   instance_name=elfs-$disk-$HOSTNAME
    echo $instance_name
    cat $i >> create_vheads.log 
    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$HOSTNAME.$NOW.txt
