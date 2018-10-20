@@ -6,10 +6,13 @@ gcloud auth activate-service-account --key-file  elastifile.json
 
 cp terraform.tfvars.$disktype terraform.tfvars
 export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
+zone=${zone:1:-1}
 export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
+project=${project:1:-1}
 export cluster_name=`grep CLUSTER_NAME terraform.tfvars | awk -v N=3 '{print $N}'`
+cluster_name=${cluster_name:1:-1}
 export disk=`grep DISK_TYPE terraform.tfvars | awk -v N=3 '{print $N}'`
-
+disk=${disk:1:-1}
 echo $project, $zone, $cluster, $disk
 
 HNOW=$(date +"%Y%m%d")
