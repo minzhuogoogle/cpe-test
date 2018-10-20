@@ -1,8 +1,7 @@
 #!/bin/bash
-nfs_server_ip=10.142.0.6
 nfs_data_container='ZMDATA'
 ping_retry=30
-repeat=10
+repeat=1
 interval=60
 sudo apt-get update
 sudo apt-get git
@@ -14,14 +13,17 @@ sudo mkdir -p /mnt/elastifile
 gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
 
+disktypes=('lssd-elfs' 'ssd-elfs' 'hhd-elfs')
+
 start_fio() 
 {
-      iotype=$1	
+      iotype=$1
+      disktype=$2
       echo $iotype
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       NOW=`date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.hdd.txt
+      logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
       sudo fio fio.$iotype  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
@@ -47,24 +49,28 @@ echo $count
 if [ $count -lt $ping_retry ]
 then
     echo "Start fio on Elastifile datacontainer."
-    sudo mount -o nolock $nfs_server_ip:/$nfs_data_container/root /mnt/elastifile
-    cd /mnt/elastifile
-    declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
-#    declare -a iotype=('writebw' 'randrwbw')
-    number=0
-    while [ $number -lt $repeat ] 
-    do 
-      for i in "${iotype[@]}"
+    
+    for i in "${disktype[@]}"
+    do
+      export nfs__server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter="name:$i" --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+      echo $nfs__server_ip
+      sudo mount -o nolock $nfs_server_ip:/$nfs_data_container/root /mnt/elastifile
+      cd /mnt/elastifile
+      declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
+      number=0
+      while [ $number -lt $repeat ] 
       do 
-	 echo $i     
-         start_fio $i
+         for j in "${iotype[@]}"
+         do 
+	     echo $j     
+             start_fio $i, $j
+         done
+         echo $number
+         number=$((number+1))
+         sleep $interval
+         echo $number
       done
-      echo $number
-
-      number=$((number+1))
-      sleep $interval
-      echo $number
-    done
+    done 
 else
    echo "Can not reach NFS server."
 fi
