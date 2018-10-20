@@ -61,7 +61,7 @@ disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
          for j in "${iotype[@]}"
          do 
 	     echo $j     
-             start_fio $testtype, $j
+             start_fio $testtype $j
          done
          echo $number
          number=$((number+1))
