@@ -13,8 +13,6 @@ sudo mkdir -p /mnt/elastifile
 gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
 
-disktypes=('lssd-elfs' 'ssd-elfs' 'hhd-elfs')
-
 start_fio() 
 {
       iotype=$1
@@ -30,30 +28,31 @@ start_fio()
       sudo rm *.*.*
 }
 
+disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
 
-export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
-check_result=${#nfs_server_reachable}
-echo $check_result
-
-count=0
-while [ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ] 
+for i in "${disktype[@]}"
 do
-   sleep 1
-   export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
-   check_result=${#nfs_server_reachable}
-   count=$((count+1))
-done    
-
-echo "ping succeeds"
-echo $count
-if [ $count -lt $ping_retry ]
-then
-    echo "Start fio on Elastifile datacontainer."
-    
-    for i in "${disktype[@]}"
+    export nfs__server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$i --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+    echo $nfs__server_ip
+      
+    export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
+    check_result=${#nfs_server_reachable}
+    echo $check_result
+      
+    count=0
+    while [ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ] 
     do
-      export nfs__server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter="name:$i" --format="value(networkInterfaces[0].networkIP)" | head -n 1`
-      echo $nfs__server_ip
+        sleep 1
+        export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
+        check_result=${#nfs_server_reachable}
+        count=$((count+1))
+    done    
+
+    echo "ping succeeds"
+    echo $count      
+    if [ $count -lt $ping_retry ]
+    then
+      echo "Start fio on Elastifile datacontainer."
       sudo mount -o nolock $nfs_server_ip:/$nfs_data_container/root /mnt/elastifile
       cd /mnt/elastifile
       declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
@@ -70,7 +69,8 @@ then
          sleep $interval
          echo $number
       done
-    done 
-else
-   echo "Can not reach NFS server."
-fi
+    else
+         echo "Can not reach NFS server."
+    fi
+ done   
+	
