@@ -3,7 +3,7 @@
 disktype_check() 
 {
     disktype=$1
-    valid=(lssd, pssd, phdd)
+    valid=(lssd pssd phdd)
     ok=-1
     for x in "${valid[@]}" ; do 
          if [ "$disktype" = "$x" ]; then
