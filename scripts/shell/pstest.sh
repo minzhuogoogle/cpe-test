@@ -64,23 +64,10 @@ provision_elastifile() {
     else
         retval=0
     fi
-
-    
-    #while [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -lt 60 ]; do
-    #while [ $notdone -eq 1 ] && [ count -lt 60 ]; do
-    #     echo "PROCESS IS RUNNING"
-    #     count=$((count+1))
- 
-    #     sleep 60
-    #done
-    
-    #if [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -eq 60 ]; then
-    #     echo "It takes too long to finish ELFS provisioning, kill it."
-    #     kill -9 "$PROC_ID"
-    #fi
-
-    #retval=$?
-    if [ $retval -ne 0 ]; then
+  
+    process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
+    status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
+    if [ $retval -ne 0 ] || [ "$status" = "Failed." ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
        gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$testname.$NOW.txt
@@ -89,6 +76,11 @@ provision_elastifile() {
        cleanup $project $zone $name
        exit -1
     fi
+    
+    failed=$( grep  Failed  create_vheads.log )
+    
+    
+    
     NOW=`date +%m.%d.%Y.%H.%M.%S`
    
     gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$testname.$NOW.txt
