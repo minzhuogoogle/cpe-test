@@ -89,8 +89,8 @@ test_done() {
 
 delete_vm() {
     project=$1
-    vm_name=$1
-    zone=$2
+    vm_name=$2
+    zone=$3
     for i in `gcloud compute instances list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
     do 
        gcloud compute instances delete $i --project $project --zone $zone -q; 
