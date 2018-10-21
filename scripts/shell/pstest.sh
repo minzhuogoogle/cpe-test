@@ -90,11 +90,23 @@ delete_vm() {
     done
 }
 
+
+
+delete_routers() {
+    project=$1
+    vm_name=$1
+    zone=$2
+    for i in `gcloud compute network list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
+    do 
+       gcloud compute instances delete $i --project $project --zone $zone -q; 
+    done
+}
+
 cleanup() {
     echo "start cleanup....."
     project=$1
-    ems_vm_name=$1
-    zone=$2
+    vm_name=$2
+    zone=$3
     delete_vm $project $vm_name $zone
     #delete_traffic_node()
     #delete_routers()
@@ -141,3 +153,6 @@ do
    test_done=`is_test_done 6`
    count=$((count+1))
 done
+
+name=$disktype-elfs
+cleanup $project $name $zone
