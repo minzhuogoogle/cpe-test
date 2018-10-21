@@ -45,20 +45,20 @@ provision_elastifile() {
     retval=$?
     if [ $retval -ne 0 ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
-       HOSTNAME=$(hostname)
-       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$HOSTNAME.$NOW.txt
-       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$HOSTNAME.$NOW.txt
+       hostname=$(hostname)
+       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
+       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
        exit -1
     fi
     NOW=`date +%m.%d.%Y.%H.%M.%S`
-    HOSTNAME=$(hostname)
-    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$HOSTNAME.$NOW.txt
-    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$HOSTNAME.$NOW.txt
+   
+    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
+    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
 }
 
 start_vm() {
      project=$1
-     hostname=$(hostname)
+ 
      zone=$2
      disktype=$3
      vm_name=$disktype-$hostname
@@ -120,6 +120,7 @@ cleanup() {
 project=''
 zone=''
 edisk=''
+hostname=''
 disktype=$1
 disktype_check $disktype
 retval=$?
@@ -156,6 +157,8 @@ do
 done
 
 name=$disktype-elfs
+cleanup $project $name $zone
+name=$disktype-$hostname
 cleanup $project $name $zone
 
 if [ $count -eq 10]; then
