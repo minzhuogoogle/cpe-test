@@ -45,20 +45,22 @@ provision_elastifile() {
     retval=$?
     if [ $retval -ne 0 ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
-       HOSTNAME=$(hostname)
-       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$HOSTNAME.$NOW.txt
-       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$HOSTNAME.$NOW.txt
+       hostname=$(hostname)
+       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
+       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
+       name=$disktype-elfs
+       cleanup $project $name $zone
        exit -1
     fi
     NOW=`date +%m.%d.%Y.%H.%M.%S`
-    HOSTNAME=$(hostname)
-    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$HOSTNAME.$NOW.txt
-    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$HOSTNAME.$NOW.txt
+   
+    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
+    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
 }
 
 start_vm() {
      project=$1
-     hostname=$(hostname)
+ 
      zone=$2
      disktype=$3
      vm_name=$disktype-$hostname
@@ -66,6 +68,10 @@ start_vm() {
      gcloud compute --project=$project instances create $vm_name  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
      retval=$?
      if [ $retval -ne 0 ]; then
+        name=$disktype-elfs
+        cleanup $project $name $zone
+        name=$disktype-$hostname
+        cleanup $project $name $zone
         exit -1
      fi
 }
@@ -73,6 +79,7 @@ start_vm() {
 test_done() {
    expected_files=$1
    export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $hostname | grep elfs | grep fio | wc -l`
+   echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
        return -1
@@ -82,8 +89,8 @@ test_done() {
 
 delete_vm() {
     project=$1
-    vm_name=$1
-    zone=$2
+    vm_name=$2
+    zone=$3
     for i in `gcloud compute instances list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
     do 
        gcloud compute instances delete $i --project $project --zone $zone -q; 
@@ -94,8 +101,8 @@ delete_vm() {
 
 delete_routers() {
     project=$1
-    vm_name=$1
-    zone=$2
+    vm_name=$2
+    zone=$3
     for i in `gcloud compute network list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
     do 
        gcloud compute instances delete $i --project $project --zone $zone -q; 
@@ -119,6 +126,7 @@ cleanup() {
 project=''
 zone=''
 edisk=''
+hostname=''
 disktype=$1
 disktype_check $disktype
 retval=$?
@@ -144,15 +152,22 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-sleep 1400
+sleep 1850
 test_done=`test_done 6`
 count=0
-while [ $test_done -eq -1 ] && [ $count -lt 200 ] 
+while [ $test_done -eq -1 ] && [ $count -lt 10 ] 
 do
-   sleep 10
+   sleep 60
    test_done=`is_test_done 6`
    count=$((count+1))
 done
 
 name=$disktype-elfs
 cleanup $project $name $zone
+name=$disktype-$hostname
+cleanup $project $name $zone
+
+if [ $test_done -eq -1 ]; then
+    echo "io testing might have problem"
+    exit -1
+fi   
