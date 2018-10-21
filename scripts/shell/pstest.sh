@@ -41,7 +41,21 @@ provision_elastifile() {
     if [ $retval -ne 0 ]; then
        exit -1
     fi
-    terraform apply --auto-approve
+    terraform apply --auto-approve &
+    PROC_ID=$!
+    count=0
+    
+    while [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -lt 60 ]; do
+         echo "PROCESS IS RUNNING"
+         count=$((count+1))
+         sleep 60
+    done
+    
+    if [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -eq 60 ]; do
+         echo "It takes too long to finish ELFS provisioning, kill it."
+         kill -9 "$PROC_ID"
+    done
+
     retval=$?
     if [ $retval -ne 0 ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
@@ -78,7 +92,7 @@ start_vm() {
      fi
 }
 
-test_done() {
+is_test_done() {
    expected_files=$1
    export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
    echo "Found $number_logfiles io logfile uploaded."
@@ -142,7 +156,6 @@ if [ $retval -ne 0 ]; then
 fi
 
 initialization
-
     
 echo "project = $project"
 echo "zone = $zone"
@@ -160,12 +173,14 @@ if [ $retval -ne 0 ]; then
 fi
 
 sleep 1850
-test_done=`test_done 6`
+test_done=`is_test_done 6`
+echo "test_done is $test_done"
 count=0
 while [ $test_done -eq -1 ] && [ $count -lt 10 ] 
 do
    sleep 60
    test_done=`is_test_done 6`
+   echo "test_done is $test_done"
    count=$((count+1))
 done
 
