@@ -144,15 +144,20 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-sleep 1400
+sleep 1850
 test_done=`test_done 6`
 count=0
-while [ $test_done -eq -1 ] && [ $count -lt 200 ] 
+while [ $test_done -eq -1 ] && [ $count -lt 10 ] 
 do
-   sleep 10
+   sleep 60
    test_done=`is_test_done 6`
    count=$((count+1))
 done
 
 name=$disktype-elfs
 cleanup $project $name $zone
+
+if [ $count -eq 10]; then
+    echo "io testing might have problem"
+    exit -1
+fi   
