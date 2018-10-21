@@ -46,7 +46,8 @@ provision_elastifile() {
     COUNT=0
     until [ $COUNT -gt $MAX ] ; do
         echo -ne "."
-        PROCESS_NUM=$(ps -ef | grep "terraform" | grep -v `basename $0` | grep -v "grep" | wc -l)
+        PROCESS_NUM=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
+      
         echo "processs is $PROCESS_NUM"
         if [ $PROCESS_NUM -gt 0 ]; then
             echo "still running"
