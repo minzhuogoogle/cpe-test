@@ -13,7 +13,7 @@ disktype_check()
     return $ok
 }
 
-initializtion() 
+initialization() 
 {
    cd gcp-automation/ 
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
@@ -30,8 +30,8 @@ initializtion()
    export cluster_name=`grep CLUSTER_NAME terraform.tfvars | awk -v N=3 '{print $N}'`
    cluster_name=${cluster_name:1:-1}
    export disk=`grep DISK_TYPE terraform.tfvars | awk -v N=3 '{print $N}'`
-   disk=${disk:1:-1}
-   echo "$project,$zone,$cluster_name,$disk"
+   edisk=${disk:1:-1}
+   echo $project,$zone,$cluster_name,$edisk
 }
 
 provision_elastifile() {
@@ -99,6 +99,10 @@ cleanup() {
 }
 
 # Start here
+
+project=''
+zone=''
+edisk=''
 disktype=$1
 disktype_check $disktype
 retval=$?
@@ -107,15 +111,12 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-results=`initializtion`
-project=`get_rtrn $results 1`
-zone=`get_rtrn $results 2`
-cluster=`get_rtrn $results 3`
-ttype=`get_rtrn $results 4`
+initialization
+
     
 echo "project = $project"
 echo "zone = $zone"
-echo "terraform type = $ttype"
+echo "terraform type = $edisk"
 provision_elastifile $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
