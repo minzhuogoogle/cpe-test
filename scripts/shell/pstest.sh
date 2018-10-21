@@ -49,7 +49,7 @@ provision_elastifile() {
        gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
        name=$disktype-elfs
-       cleanup $project $name $zone
+       cleanup $project $zone $name
        exit -1
     fi
     NOW=`date +%m.%d.%Y.%H.%M.%S`
@@ -60,18 +60,20 @@ provision_elastifile() {
 
 start_vm() {
      project=$1
- 
      zone=$2
      disktype=$3
-     vm_name=$disktype-$hostname
+     vmname=$disktype-$hostname
+     echo "vm_name = $vm_name"
+     echo "project = $project"
+     echo "zone = $zone"
      machine_type='n1-standard-4'
-     gcloud compute --project=$project instances create $vm_name  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
+     gcloud compute --project=$project instances create $vmname  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
      retval=$?
      if [ $retval -ne 0 ]; then
         name=$disktype-elfs
-        cleanup $project $name $zone
+        cleanup $project $zone $name
         name=$disktype-$hostname
-        cleanup $project $name $zone
+        cleanup $project $zone $name
         exit -1
      fi
 }
@@ -89,10 +91,11 @@ test_done() {
 
 delete_vm() {
     project=$1
-    vm_name=$2
-    zone=$3
-    for i in `gcloud compute instances list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
+    zone=$2
+    vmname=$3
+    for i in `gcloud compute instances list --project $project --filter=$vmname | grep -v NAME | cut -d ' ' -f1`; 
     do 
+       echo "vm to be deleted: $i, $project, $zone"
        gcloud compute instances delete $i --project $project --zone $zone -q; 
     done
 }
@@ -101,8 +104,9 @@ delete_vm() {
 
 delete_routers() {
     project=$1
-    vm_name=$2
-    zone=$3
+    zone=$2
+    vm_name=$3
+
     for i in `gcloud compute network list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
     do 
        gcloud compute instances delete $i --project $project --zone $zone -q; 
@@ -112,9 +116,9 @@ delete_routers() {
 cleanup() {
     echo "start cleanup....."
     project=$1
-    vm_name=$2
-    zone=$3
-    delete_vm $project $vm_name $zone
+    zone=$2
+    vmname=$3
+    delete_vm $project $zone $vmname
     #delete_traffic_node()
     #delete_routers()
     #delete_firewalls()
@@ -140,6 +144,7 @@ initialization
     
 echo "project = $project"
 echo "zone = $zone"
+echo "disktype = $disktype"
 echo "terraform type = $edisk"
 provision_elastifile $disktype
 retval=$?
@@ -163,9 +168,9 @@ do
 done
 
 name=$disktype-elfs
-cleanup $project $name $zone
+cleanup $project $zone $name
 name=$disktype-$hostname
-cleanup $project $name $zone
+cleanup $project  $zone $name
 
 if [ $test_done -eq -1 ]; then
     echo "io testing might have problem"
