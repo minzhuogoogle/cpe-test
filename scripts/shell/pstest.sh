@@ -167,7 +167,7 @@ cleanup $project $name $zone
 name=$disktype-$hostname
 cleanup $project $name $zone
 
-if [ $count -eq 10]; then
+if [ $test_done -eq -1 ]; then
     echo "io testing might have problem"
     exit -1
 fi   
