@@ -51,10 +51,10 @@ provision_elastifile() {
          sleep 60
     done
     
-    if [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -eq 60 ]; do
+    if [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -eq 60 ]; then
          echo "It takes too long to finish ELFS provisioning, kill it."
          kill -9 "$PROC_ID"
-    done
+    fi
 
     retval=$?
     if [ $retval -ne 0 ]; then
