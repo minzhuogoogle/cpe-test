@@ -1,6 +1,7 @@
 #!/bin/bash
 
-disktype_check() {
+disktype_check() 
+{
     disktype=$1
     valid=(lssd, pssd, phdd)
     ok=-1
@@ -12,13 +13,16 @@ disktype_check() {
     return $ok
 }
 
-initializtion() {
+initializtion() 
+{
    cd gcp-automation/ 
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
    cat terraform.tfvars
+   # temporarily disable load-balancing
    sed 's/true/false/' terraform.tfvars
+   
    export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
    zone=${zone:1:-1}
    export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
@@ -42,9 +46,9 @@ provision_elastifile() {
     if [ $retval -ne 0 ]; then
        exit -1
     fi
-    HNOW=$(date +"%Y%m%d")
     NOW=`date +%m.%d.%Y.%H.%M.%S`
     HOSTNAME=$(hostname)
+    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$HOSTNAME.$NOW.txt
     gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$HOSTNAME.$NOW.txt
 }
 
@@ -72,18 +76,34 @@ test_done(){
    return 1
 }
 
-cleanup() {
-    delete_elfs_nodes()
-    delete_traffic_node()
-    delete_routers()
-    delete_firewalls()
-    delete_subnetworks()
+delete_vm() {
+    project=$1
+    vm_name=$1
+    zone=$2
+    for i in `gcloud compute instances list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
+    do 
+       gcloud compute instances delete $i --project $project --zone $zone -q; 
+    done
 }
 
+cleanup() {
+    echo "start cleanup....."
+    project=$1
+    ems_vm_name=$1
+    zone=$2
+    delete_vm $project $vm_name $zone
+    #delete_traffic_node()
+    #delete_routers()
+    #delete_firewalls()
+    #delete_subnetworks()
+}
+
+# Start here
 disktype=$1
 disktype_check $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
+    echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
     exit -1
 fi
 
@@ -108,10 +128,11 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-test_done=`is_test_done`
-while [ test_done ] && [ $count < 200 ]
-count=1
+test_done=`is_test_done 6`
+count=0
+while [ $test_done -eq -1 ] && [ $count -lt 200 ] 
 do
-    sleep 10
-    count=`expr $count+1`
+   sleep 10
+   test_done=`is_test_done 6`
+   count=$((count+1))
 done
