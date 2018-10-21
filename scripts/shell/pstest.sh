@@ -41,44 +41,32 @@ provision_elastifile() {
     if [ $retval -ne 0 ]; then
        exit -1
     fi
-    terraform apply --auto-approve &
-    PROC_ID=$!
-    count=0
-    
-    notdone=1
-    
+    terraform apply --auto-approve &  
     MAX=15
     COUNT=0
-
     until [ $COUNT -gt $MAX ] ; do
         echo -ne "."
         PROCESS_NUM=$(ps -ef | grep "terraform" | grep -v `basename $0` | grep -v "grep" | wc -l)
+        echo "processs is $PROCESS_NUM"
         if [ $PROCESS_NUM -gt 0 ]; then
-            #runs
+            echo "still running"
             RET=1
         else
-            #stopped
+            echo "stopped"
             RET=0
         fi
 
-        if [ $RET -eq $START_OR_STOP ]; then
+        if [ $RET -eq 1 ]; then
             sleep 60 #wait...
-        else
-            if [ $START_OR_STOP -eq 1 ]; then
-                    echo -ne " stopped"
-            else
-                    echo -ne " started"
-            fi
-            echo
-            exit 0
         fi
         let COUNT=COUNT+1
     done
 
-    if [ $START_OR_STOP -eq 1 ]; then
+    if [ $COUNT -eq $MAX ]; then
         echo -ne " failed to stop!! "
+        retval=-1
     else
-        echo -ne " failed to start!!"
+        retval=0
     fi
 
     
@@ -95,7 +83,7 @@ provision_elastifile() {
     #     kill -9 "$PROC_ID"
     #fi
 
-    retval=$?
+    #retval=$?
     if [ $retval -ne 0 ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
