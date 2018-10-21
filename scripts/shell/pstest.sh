@@ -45,16 +45,55 @@ provision_elastifile() {
     PROC_ID=$!
     count=0
     
-    while [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -lt 60 ]; do
-         echo "PROCESS IS RUNNING"
-         count=$((count+1))
-         sleep 60
-    done
+    notdone=1
     
-    if [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -eq 60 ]; then
-         echo "It takes too long to finish ELFS provisioning, kill it."
-         kill -9 "$PROC_ID"
+    MAX=15
+    COUNT=0
+
+    until [ $COUNT -gt $MAX ] ; do
+        echo -ne "."
+        PROCESS_NUM=$(ps -ef | grep "terraform" | grep -v `basename $0` | grep -v "grep" | wc -l)
+        if [ $PROCESS_NUM -gt 0 ]; then
+            #runs
+            RET=1
+        else
+            #stopped
+            RET=0
+        fi
+
+        if [ $RET -eq $START_OR_STOP ]; then
+            sleep 60 #wait...
+        else
+            if [ $START_OR_STOP -eq 1 ]; then
+                    echo -ne " stopped"
+            else
+                    echo -ne " started"
+            fi
+            echo
+            exit 0
+        fi
+        let COUNT=COUNT+1
+    done
+
+    if [ $START_OR_STOP -eq 1 ]; then
+        echo -ne " failed to stop!! "
+    else
+        echo -ne " failed to start!!"
     fi
+
+    
+    #while [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -lt 60 ]; do
+    #while [ $notdone -eq 1 ] && [ count -lt 60 ]; do
+    #     echo "PROCESS IS RUNNING"
+    #     count=$((count+1))
+ 
+    #     sleep 60
+    #done
+    
+    #if [ kill -0 "$PROC_ID" >/dev/null 2>&1 ] && [ count -eq 60 ]; then
+    #     echo "It takes too long to finish ELFS provisioning, kill it."
+    #     kill -9 "$PROC_ID"
+    #fi
 
     retval=$?
     if [ $retval -ne 0 ]; then
