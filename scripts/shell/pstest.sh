@@ -145,7 +145,7 @@ if [ $retval -ne 0 ]; then
 fi
 
 sleep 1400
-test_done=`is_test_done 6`
+test_done=`test_done 6`
 count=0
 while [ $test_done -eq -1 ] && [ $count -lt 200 ] 
 do
