@@ -73,6 +73,7 @@ start_vm() {
 test_done() {
    expected_files=$1
    export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $hostname | grep elfs | grep fio | wc -l`
+   echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
        return -1
