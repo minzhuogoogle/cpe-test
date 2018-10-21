@@ -48,6 +48,8 @@ provision_elastifile() {
        hostname=$(hostname)
        gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
+       name=$disktype-elfs
+       cleanup $project $name $zone
        exit -1
     fi
     NOW=`date +%m.%d.%Y.%H.%M.%S`
@@ -66,6 +68,10 @@ start_vm() {
      gcloud compute --project=$project instances create $vm_name  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
      retval=$?
      if [ $retval -ne 0 ]; then
+        name=$disktype-elfs
+        cleanup $project $name $zone
+        name=$disktype-$hostname
+        cleanup $project $name $zone
         exit -1
      fi
 }
