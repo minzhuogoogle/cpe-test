@@ -45,42 +45,42 @@ provision_elastifile() {
     retval=$?
     if [ $retval -ne 0 ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
-       hostname=$(hostname)
-       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
-       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
+       testname=$(hostname)
+       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$testname.$NOW.txt
+       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$testname.$NOW.txt
        name=$disktype-elfs
        cleanup $project $zone $name
        exit -1
     fi
     NOW=`date +%m.%d.%Y.%H.%M.%S`
    
-    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$hostname.$NOW.txt
-    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$hostname.$NOW.txt
+    gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$testname.$NOW.txt
+    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$testname.$NOW.txt
 }
 
 start_vm() {
      project=$1
      zone=$2
      disktype=$3
-     vmname=$disktype-$hostname
-     echo "vm_name = $vm_name"
+     vmname=$disktype-$(hostname)
+     echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
      machine_type='n1-standard-4'
      gcloud compute --project=$project instances create $vmname  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
      retval=$?
      if [ $retval -ne 0 ]; then
-        name=$disktype-elfs
-        cleanup $project $zone $name
-        name=$disktype-$hostname
-        cleanup $project $zone $name
+        elfsname=$disktype-elfs
+        cleanup $project $zone $elfsname
+        vmname=$disktype-$(hostname)
+        cleanup $project $zone $vmname
         exit -1
      fi
 }
 
 test_done() {
    expected_files=$1
-   export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $hostname | grep elfs | grep fio | wc -l`
+   export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
    echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
@@ -130,7 +130,9 @@ cleanup() {
 project=''
 zone=''
 edisk=''
-hostname=''
+elfsname=''
+vmname=''
+testnam=''
 disktype=$1
 disktype_check $disktype
 retval=$?
@@ -167,10 +169,10 @@ do
    count=$((count+1))
 done
 
-name=$disktype-elfs
-cleanup $project $zone $name
-name=$disktype-$hostname
-cleanup $project  $zone $name
+elfsname=$disktype-elfs
+cleanup $project $zone $elfsname
+vmname=$disktype-$(hostname)
+cleanup $project $zone $vmname
 
 if [ $test_done -eq -1 ]; then
     echo "io testing might have problem"
