@@ -67,7 +67,9 @@ provision_elastifile() {
   
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
     status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
-    if [ $retval -ne 0 ] || [ "$status" = "Failed." ]; then
+    echo "process = $process, status=$status"
+    
+    if [ $retval -eq -1 ] || [ "$status" = "Failed." ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
        gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$testname.$NOW.txt
@@ -76,10 +78,6 @@ provision_elastifile() {
        cleanup $project $zone $name
        exit -1
     fi
-    
-    failed=$( grep  Failed  create_vheads.log )
-    
-    
     
     NOW=`date +%m.%d.%Y.%H.%M.%S`
    
