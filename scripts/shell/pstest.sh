@@ -79,8 +79,9 @@ provision_elastifile() {
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
-       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/terraform.tfvars.$disktype.$testname.$NOW.txt
-       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/create_vheads.$disktype.$testname.$NOW.txt
+       cat terraform.tfvars >> cp create_vheads.log
+       gsutil cp terraform.tfvars gs://cpe-performance-storage/test_result/elfs.terraform.provision.$testname.$NOW.$disktype.txt
+       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/elfs.terraform.provision.$testname.$NOW.$disktype.txt
        name=$disktype-elfs
        cleanup $project $zone $name
        exit -1
