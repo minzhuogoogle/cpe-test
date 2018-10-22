@@ -96,7 +96,7 @@ start_vm() {
      project=$1
      zone=$2
      disktype=$3
-     vmname=$disktype-$(hostname)
+     vmname=$(hostname)
      echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
