@@ -41,22 +41,25 @@ provision_elastifile() {
     if [ $retval -ne 0 ]; then
        exit -1
     fi
+    echo "run terraform apply to start elfs instance"
     terraform apply --auto-approve &  
-    MAX=30
-    COUNT=0
-    while [ $COUNT -lt $MAX ] && [ $RET -eq 1 ]; do
-        PROCESS_NUM=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
-        echo "processs is $PROCESS_NUM"
-        if [ $PROCESS_NUM -gt 0 ]; then
+    
+    maxcount=30
+    count=0
+    ret=1
+    while [ $count -lt $maxcount ] && [ $ret -eq 1 ]; do
+        num_terraform_proc=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
+        echo "processs is $num_terrform_proc"
+        if [ $num_terraform_proc -gt 0 ]; then
             echo "still running"
-            RET=1
+            ret=1
             sleep 30
         else
             echo "stopped"
-            RET=0
+            ret=0
         fi
-        let COUNT=COUNT+1
-        echo "count =$COUNT"
+        let count=count+1
+        echo "count =$count"
     done
 
     if [ $COUNT -eq $MAX ] && [ $RET -eq 1 ]; then
@@ -68,7 +71,7 @@ provision_elastifile() {
     fi
     
     echo "retval=$retval"
-  
+    echo $(tail -5 create_vheads.log )
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
     status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
     echo "process = $process, status=$status"
