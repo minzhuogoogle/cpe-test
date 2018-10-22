@@ -178,6 +178,8 @@ echo "project = $project"
 echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
+cleanup $project $zone $disktype
+
 provision_elastifile $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
