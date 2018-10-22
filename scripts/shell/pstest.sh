@@ -62,7 +62,7 @@ provision_elastifile() {
         echo "count =$count"
     done
 
-    if [ $COUNT -eq $MAX ] && [ $RET -eq 1 ]; then
+    if [ $count -eq $maxcount ] && [ $ret -eq 1 ]; then
         echo -ne " failed to stop!! "
         retval=-1
     else
