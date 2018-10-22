@@ -186,13 +186,13 @@ if [ $retval -ne 0 ]; then
 fi
 
 sleep 300
-test_done=is_test_done 1
+test_done=[ is_test_done 1 ]
 echo "test_done is $test_done"
 count=0
 while [ $test_done -eq -1 ] && [ $count -lt 10 ] 
 do
-   sleep 6
-   test_done=is_test_done 1
+   sleep 1
+   test_done=[ is_test_done 1 ]
    echo "test_done is $test_done"
    count=$((count+1))
 done
