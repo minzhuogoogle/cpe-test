@@ -42,7 +42,7 @@ provision_elastifile() {
        exit -1
     fi
     terraform apply --auto-approve &  
-    MAX=15
+    MAX=30
     COUNT=0
     while [ $COUNT -lt $MAX ] && [ $RET -eq 1 ]; do
         PROCESS_NUM=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
@@ -50,20 +50,24 @@ provision_elastifile() {
         if [ $PROCESS_NUM -gt 0 ]; then
             echo "still running"
             RET=1
-            sleep 60
+            sleep 30
         else
             echo "stopped"
             RET=0
         fi
         let COUNT=COUNT+1
+        echo "count =$COUNT"
     done
 
     if [ $COUNT -eq $MAX ] && [ $RET -eq 1 ]; then
         echo -ne " failed to stop!! "
         retval=-1
     else
+        echo "finished"
         retval=0
     fi
+    
+    echo "retval=$retval"
   
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
     status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
