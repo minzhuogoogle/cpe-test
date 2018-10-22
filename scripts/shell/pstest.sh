@@ -207,9 +207,9 @@ do
 done
 
 elfsname=$disktype-elfs
-cleanup $project $zone $elfsname
+#cleanup $project $zone $elfsname
 vmname=$disktype-$(hostname)
-cleanup $project $zone $vmname
+#cleanup $project $zone $vmname
 
 if [ $test_done -eq -1 ]; then
     echo "io testing might have problem"
