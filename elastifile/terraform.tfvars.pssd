@@ -10,7 +10,7 @@ DISK_CONFIG = "4_1000"
 # <num_of_disks>_<disk_size>
 MIN_CLUSTER = "3"
 CLUSTER_NAME = "pssd-elfs"
-ZONE = "us-central1-f"
+ZONE = "us-east1-b"
 PROJECT = "cpe-performance-storage"
 SUBNETWORK = "default"
 IMAGE = "elastifile-storage-2-7-5-12-ems"
