@@ -168,10 +168,6 @@ fi
 
 initialization
 echo "disktype = $disktype,  storage_in_terraform = $edisk"
-if [  ! [ "$disktype" = "$edisk" ] ];  then
-   print "disk type is not in sync"
-   return -1
-fi	
 
 echo "project = $project"
 echo "zone = $zone"
