@@ -21,8 +21,7 @@ initialization()
    cp terraform.tfvars.$disktype terraform.tfvars
    if [ "$postsubmit" -eq "1" ]; then
        sed 's/elfs/elfs-post/' terraform.tfvars
-       cat terraform.tfvars
-    fi
+   fi
    cat terraform.tfvars
    # temporarily disable load-balancing
    sed 's/true/false/' terraform.tfvars
@@ -39,17 +38,14 @@ initialization()
 }
 
 provision_elastifile() {
-    postsubmit=$1
+   
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
        exit -1
     fi
     echo "run terraform apply to start elfs instance"
-    if [ "$postsubmit" -eq "1" ]; then
-       sed 's/elfs/elfs-post/' terraform.tfvars
-       cat terraform.tfvars
-    fi
+    
     terraform apply --auto-approve &  
     
     maxcount=15
@@ -191,7 +187,7 @@ echo "disktype = $disktype"
 echo "terraform type = $edisk"
 cleanup $project $zone $disktype
 
-provision_elastifile $postsubmit
+provision_elastifile 
 retval=$?
 if [ $retval -ne 0 ]; then
     exit -1
