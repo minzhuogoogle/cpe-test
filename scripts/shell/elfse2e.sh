@@ -35,13 +35,16 @@ initialization()
 }
 
 provision_elastifile() {
-  
+    postsubmit = $1
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
        exit -1
     fi
     echo "run terraform apply to start elfs instance"
+    if [ "$postsubmit" = "1" ]; then
+       sed 's/elfs/elfs-post/' terraform.tfvars
+    fi
     terraform apply --auto-approve &  
     
     maxcount=30
@@ -157,7 +160,12 @@ zone=''
 region=''
 edisk=''
 disktype=$1
-vmname=$disktype-$(hostname)
+postsubmit=$2
+if [ "$postsubmit" = "1" ]; then
+   vmname=post-$disktype-$(hostname)
+else
+   vmname=$disktype-$(hostname)
+fi   
 
 disktype_check $disktype
 retval=$?
@@ -175,7 +183,7 @@ echo "disktype = $disktype"
 echo "terraform type = $edisk"
 cleanup $project $zone $disktype
 
-provision_elastifile 
+provision_elastifile $postsubmit
 retval=$?
 if [ $retval -ne 0 ]; then
     exit -1
