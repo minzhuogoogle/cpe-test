@@ -20,7 +20,7 @@ initialization()
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
    if [ "$postsubmit" -eq "1" ]; then
-       sed -i 's/elfs/elfs-post/' terraform.tfvars
+       sed -i 's/elfs/sfle/' terraform.tfvars
    fi
    cat terraform.tfvars
    # temporarily disable load-balancing
@@ -132,8 +132,8 @@ is_test_done() {
 }
 
 delete_vm() {
-  
-    for i in `gcloud compute instances list --project $project --filter=$vmname | grep -v NAME | cut -d ' ' -f1`; 
+    name=$1
+    for i in `gcloud compute instances list --project $project --filter=$name | grep -v NAME | cut -d ' ' -f1`; 
     do 
        echo "vm to be deleted: $i, $project, $zone"
        gcloud compute instances delete $i --project $project --zone $zone -q; 
@@ -151,7 +151,13 @@ delete_routers() {
 }
 
 cleanup() {
-    delete_vm $project $zone $disktype
+    if [ "$postsubmit" -eq '0' ]; then
+       delete_vm "elfs"
+    else
+       delete_vm "sfle"
+    fi
+    
+    
     #delete_traffic_node()
     #delete_routers()
     #delete_firewalls()
@@ -168,6 +174,7 @@ region=''
 edisk=''
 disktype=$1
 postsubmit=$2
+debug=$3
 if [ "$postsubmit" -eq "1" ]; then
    vmname=post-$disktype-$(hostname)
 else
@@ -190,7 +197,7 @@ echo "project = $project"
 echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
-cleanup $project $zone $disktype
+
 
 provision_elastifile 
 retval=$?
@@ -203,24 +210,25 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-sleep 100
-is_test_done 1
+sleep 1500
+is_test_done 6
 test_done=$?
 echo "test_done is $test_done"
 count=0
 while [[ "$test_done" -eq "-1"  &&  $count -lt 10 ]] 
 do
-   sleep 1
-   is_test_done 1
+   sleep 30
+   is_test_done 6
    test_done=$?
    echo "test_done is $test_done"
    count=$((count+1))
 done
 
 elfsname=$disktype-elfs
-#cleanup $project $zone $elfsname
-vmname=$disktype-$(hostname)
-#cleanup $project $zone $vmname
+if [ "$debug" -eq '0']; then
+    cleanup 
+fi    
+
 
 if [ "$test_done" -eq "-1" ]; then
     echo "io testing might have problem"
