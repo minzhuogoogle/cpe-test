@@ -118,9 +118,9 @@ is_test_done() {
    echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
-       return -1
+       echo "-1"
    fi
-   return 1
+   echo "1"
 }
 
 delete_vm() {
@@ -195,13 +195,13 @@ if [ $retval -ne 0 ]; then
 fi
 
 sleep 300
-test_done=[ is_test_done 1 ]
+test_done=$(is_test_done 1)
 echo "test_done is $test_done"
 count=0
-while [ $test_done -eq -1 ] && [ $count -lt 10 ] 
+while [[ $test_done -eq -1  &&  $count -lt 10 ]] 
 do
    sleep 1
-   test_done=[ is_test_done 1 ]
+   test_done=$(is_test_done 1)
    echo "test_done is $test_done"
    count=$((count+1))
 done
@@ -211,7 +211,7 @@ elfsname=$disktype-elfs
 vmname=$disktype-$(hostname)
 #cleanup $project $zone $vmname
 
-if [ $test_done -eq -1 ]; then
+if [ "$test_done" -eq "-1" ]; then
     echo "io testing might have problem"
     exit -1
 fi   
