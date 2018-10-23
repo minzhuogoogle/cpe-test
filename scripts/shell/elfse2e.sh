@@ -20,7 +20,7 @@ initialization()
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
    if [ "$postsubmit" -eq "1" ]; then
-       sed -i 's/elfs/sfle/' terraform.tfvars
+       sed -i 's/elfs/elfs/' terraform.tfvars
    fi
    cat terraform.tfvars
    # temporarily disable load-balancing
@@ -88,7 +88,7 @@ provision_elastifile() {
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
        name=$disktype-elfs
-       cleanup $project $zone $name
+       cleanup 
        exit -1
     fi
     
@@ -100,6 +100,7 @@ provision_elastifile() {
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
     else
+       cleanup
        exit -1
     fi
     
@@ -113,7 +114,7 @@ start_vm() {
      gcloud compute --project=$project instances create $vmname  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
      retval=$?
      if [ $retval -ne 0 ]; then
-        cleanup $project $zone $disktype
+        cleanup 
         exit -1
      fi
 }
@@ -154,7 +155,7 @@ cleanup() {
     if [ "$postsubmit" -eq '0' ]; then
        delete_vm "elfs"
     else
-       delete_vm "sfle"
+       delete_vm "elfs"
     fi
     
     
