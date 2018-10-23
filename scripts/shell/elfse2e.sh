@@ -80,8 +80,8 @@ provision_elastifile() {
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
     status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
     echo "process = $process, status=$status"
-    
-    if [ $retval -eq -1 ] || [ "$status" = "Failed." ]; then
+
+    if [ $retval -eq -1 ] || [ "$status" = "Failed." ] || [! [ -f "create_vheads.log" ] ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
        cat terraform.tfvars >> create_vheads.log
        logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
