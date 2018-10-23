@@ -35,7 +35,7 @@ initialization()
 }
 
 provision_elastifile() {
-    disktype=$1
+  
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -78,9 +78,11 @@ provision_elastifile() {
     
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
-       testname=$(hostname)
+       #testname=$(hostname)
        cat terraform.tfvars >> create_vheads.log
-       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/elfs.terraform.provision.$testname.$NOW.$disktype.txt
+       logfile=elfs.terraform.provision.$testname.$NOW.$disktype.txt
+       gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
+       echo $logfile
        name=$disktype-elfs
        cleanup $project $zone $name
        exit -1
@@ -88,15 +90,17 @@ provision_elastifile() {
     NOW=`date +%m.%d.%Y.%H.%M.%S`
     testname=$(hostname)
     cat terraform.tfvars >> create_vheads.log
-    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/elfs.terraform.provision.$testname.$NOW.$disktype.txt
+    logfile=elfs.terraform.provision.$testname.$NOW.$disktype.txt
+    gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
+    echo $logfile
     
 }
 
 start_vm() {
-     project=$1
-     zone=$2
-     disktype=$3
-     vmname=$(hostname)
+     #project=$1
+     #zone=$2
+     #disktype=$3
+     #vmname=$(hostname)
      echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
@@ -114,7 +118,9 @@ start_vm() {
 
 is_test_done() {
    expected_files=$1
-   export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
+   export number_logfiles_1=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
+   export number_logfiles_2=`gsutil ls gs://cpe-performance-storage/test_result/backup | grep $(hostname) | grep elfs | grep fio | wc -l`
+   let number_logfiles=number_logfiles_1+number_logfiles_2
    echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
@@ -124,9 +130,7 @@ is_test_done() {
 }
 
 delete_vm() {
-    project=$1
-    zone=$2
-    vmname=$3
+  
     for i in `gcloud compute instances list --project $project --filter=$vmname | grep -v NAME | cut -d ' ' -f1`; 
     do 
        echo "vm to be deleted: $i, $project, $zone"
@@ -137,9 +141,6 @@ delete_vm() {
 
 
 delete_routers() {
-    project=$1
-    zone=$2
-    vm_name=$3
 
     for i in `gcloud compute network list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
     do 
@@ -163,10 +164,11 @@ cleanup() {
 
 project=''
 zone=''
+region=''
 edisk=''
 elfsname=''
-vmname=''
-testnam=''
+vmname=$disktype-$(hostname)
+testname=$(hostname)
 disktype=$1
 disktype_check $disktype
 retval=$?
@@ -183,7 +185,7 @@ echo "disktype = $disktype"
 echo "terraform type = $edisk"
 cleanup $project $zone $disktype
 
-provision_elastifile $disktype
+provision_elastifile 
 retval=$?
 if [ $retval -ne 0 ]; then
     exit -1
