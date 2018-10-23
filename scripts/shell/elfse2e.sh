@@ -42,8 +42,9 @@ provision_elastifile() {
        exit -1
     fi
     echo "run terraform apply to start elfs instance"
-    if [ "$postsubmit" = "1" ]; then
+    if [ "$postsubmit" -eq "1" ]; then
        sed 's/elfs/elfs-post/' terraform.tfvars
+       cat terraform.tfvars
     fi
     terraform apply --auto-approve &  
     
@@ -162,11 +163,13 @@ region=''
 edisk=''
 disktype=$1
 postsubmit=$2
-if [ "$postsubmit" = "1" ]; then
+if [ "$postsubmit" -eq "1" ]; then
    vmname=post-$disktype-$(hostname)
 else
    vmname=$disktype-$(hostname)
 fi   
+
+echo $vmname
 
 disktype_check $disktype
 retval=$?
