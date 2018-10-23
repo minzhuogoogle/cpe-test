@@ -85,7 +85,7 @@ provision_elastifile() {
     echo "process = $process, status=$status"
 
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
-       NOW=`date +%m.%d.%Y.%H.%M.%S`
+       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        cat terraform.tfvars >> create_vheads.log
        logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
@@ -96,7 +96,7 @@ provision_elastifile() {
     fi
     
     if  [ -f "create_vheads.log" ]; then
-       NOW=`date +%m.%d.%Y.%H.%M.%S`
+       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
        cat terraform.tfvars >> create_vheads.log
        logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
