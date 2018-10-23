@@ -35,7 +35,7 @@ initialization()
 }
 
 provision_elastifile() {
-    postsubmit = $1
+    postsubmit=$1
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
