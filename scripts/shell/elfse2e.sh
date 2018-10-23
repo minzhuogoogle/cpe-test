@@ -20,11 +20,11 @@ initialization()
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
    if [ "$postsubmit" -eq "1" ]; then
-       sed 's/elfs/elfs-post/' terraform.tfvars
+       sed -i 's/elfs/elfs-post/' terraform.tfvars
    fi
    cat terraform.tfvars
    # temporarily disable load-balancing
-   #sed 's/true/false/' terraform.tfvars
+   sed -i 's/true/false/' terraform.tfvars
    
    export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
    zone=${zone:1:-1}
