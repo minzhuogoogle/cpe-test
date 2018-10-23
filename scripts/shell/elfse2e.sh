@@ -47,9 +47,10 @@ provision_elastifile() {
     fi
     terraform apply --auto-approve &  
     
-    maxcount=30
+    maxcount=15
     count=0
     ret=1
+    sleep 300
     while [ $count -lt $maxcount ] && [ $ret -eq 1 ]; do
         num_terraform_proc=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
         echo "processs is $num_terrform_proc"
@@ -194,15 +195,15 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-sleep 300
-is_test_done 1
+sleep 1800
+is_test_done 6
 test_done=$?
 echo "test_done is $test_done"
 count=0
 while [[ "$test_done" -eq "-1"  &&  $count -lt 10 ]] 
 do
    sleep 1
-   is_test_done 1
+   is_test_done 6
    test_done=$?
    echo "test_done is $test_done"
    count=$((count+1))
