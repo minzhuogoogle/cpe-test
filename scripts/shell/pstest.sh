@@ -59,7 +59,7 @@ provision_elastifile() {
             ret=0
         fi
         let count=count+1
-        echo "count =$count"
+        echo "count = $count"
     done
 
     if [ $count -eq $maxcount ] && [ $ret -eq 1 ]; then
@@ -78,9 +78,8 @@ provision_elastifile() {
     
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ]; then
        NOW=`date +%m.%d.%Y.%H.%M.%S`
-       #testname=$(hostname)
        cat terraform.tfvars >> create_vheads.log
-       logfile=elfs.terraform.provision.$testname.$NOW.$disktype.txt
+       logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
        name=$disktype-elfs
@@ -90,17 +89,13 @@ provision_elastifile() {
     NOW=`date +%m.%d.%Y.%H.%M.%S`
     testname=$(hostname)
     cat terraform.tfvars >> create_vheads.log
-    logfile=elfs.terraform.provision.$testname.$NOW.$disktype.txt
+    logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
     gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
     echo $logfile
     
 }
 
 start_vm() {
-     #project=$1
-     #zone=$2
-     #disktype=$3
-     #vmname=$(hostname)
      echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
@@ -108,10 +103,7 @@ start_vm() {
      gcloud compute --project=$project instances create $vmname  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
      retval=$?
      if [ $retval -ne 0 ]; then
-        elfsname=$disktype-elfs
-        cleanup $project $zone $elfsname
-        vmname=$disktype-$(hostname)
-        cleanup $project $zone $vmname
+        cleanup $project $zone $disktype
         exit -1
      fi
 }
@@ -121,7 +113,7 @@ is_test_done() {
    export number_logfiles_1=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
    export number_logfiles_2=`gsutil ls gs://cpe-performance-storage/test_result/backup | grep $(hostname) | grep elfs | grep fio | wc -l`
    let number_logfiles=number_logfiles_1+number_logfiles_2
-   echo "Found $number_logfiles io logfile uploaded."
+   #echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
        echo "-1"
@@ -149,27 +141,24 @@ delete_routers() {
 }
 
 cleanup() {
-    echo "start cleanup....."
-    project=$1
-    zone=$2
-    vmname=$3
-    delete_vm $project $zone $vmname
+    delete_vm $project $zone $disktype
     #delete_traffic_node()
     #delete_routers()
     #delete_firewalls()
     #delete_subnetworks()
 }
 
-# Start here
 
+# --------------
+# Start here
+# --------------
 project=''
 zone=''
 region=''
 edisk=''
-elfsname=''
-vmname=$disktype-$(hostname)
-testname=$(hostname)
 disktype=$1
+vmname=$disktype-$(hostname)
+
 disktype_check $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
@@ -178,7 +167,12 @@ if [ $retval -ne 0 ]; then
 fi
 
 initialization
-    
+echo "disktype = $disktype,  storage_in_terraform = $edisk"
+if [  ! [ "$disktype" = "$edisk" ] ];  then
+   print "disk type is not in sync"
+   return -1
+fi	
+
 echo "project = $project"
 echo "zone = $zone"
 echo "disktype = $disktype"
@@ -197,13 +191,15 @@ if [ $retval -ne 0 ]; then
 fi
 
 sleep 300
-test_done=$(is_test_done 1)
+is_test_done 1
+test_done=$?
 echo "test_done is $test_done"
 count=0
-while [[ $test_done -eq -1  &&  $count -lt 10 ]] 
+while [[ "$test_done" -eq "-1"  &&  $count -lt 10 ]] 
 do
    sleep 1
-   test_done=$(is_test_done 1)
+   is_test_done 1
+   test_done=$?
    echo "test_done is $test_done"
    count=$((count+1))
 done
