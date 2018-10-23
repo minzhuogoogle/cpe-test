@@ -26,6 +26,9 @@ initialization()
    # temporarily disable load-balancing
    sed -i 's/true/false/' terraform.tfvars
    
+   # due to no quota for ssd in us-central1 
+   sed -i 's/us-central1-f/us-east1-b' terraform.tfvars
+   
    export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
    zone=${zone:1:-1}
    export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
