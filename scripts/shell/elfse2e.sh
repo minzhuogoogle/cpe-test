@@ -186,7 +186,7 @@ else
 fi   
 
 echo $vmname
-
+cleanup 
 disktype_check $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
