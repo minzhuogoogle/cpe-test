@@ -206,11 +206,13 @@ echo "terraform type = $edisk"
 provision_elastifile 
 retval=$?
 if [ $retval -ne 0 ]; then
+    cleanup 
     exit -1
 fi
 
 start_vm $project $zone $disktype
 if [ $retval -ne 0 ]; then
+    cleanup 
     exit -1
 fi
 
