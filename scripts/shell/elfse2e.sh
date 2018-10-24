@@ -230,7 +230,7 @@ do
    count=$((count+1))
 done
 
-time.sleep(500)
+sleep 500
 
 #if [ "$debug" -eq '0']; then
 cleanup 
