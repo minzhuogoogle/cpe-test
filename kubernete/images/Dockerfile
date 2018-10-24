@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     curl \
     vim \
+    iputils-ping \
     && apt-get clean \
     && python -m pip install --upgrade pip setuptools wheel
 
@@ -55,14 +56,8 @@ RUN wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.ta
         --usage-reporting=false && \
     gcloud components install alpha beta kubectl && \
     gcloud info | tee /workspace/gcloud-info.txt  && \
-    wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_amd64.zip && \
-    unzip terraform_0.11.8_linux_amd64.zip && \
-    cp terraform /usr/local/bin/. && \
-    git clone https://github.com/minzhuogoogle/Terraform-Elastifile-GCP.git && \
-    echo changeme > Terraform-Elastifile-GCP/password.txt  && \
-    git clone https://github.com/minzhuogoogle/storage-performance.git && \
-    git clone https://github.com/GoogleCloudPlatform/python-docs-samples.git && \
-    pip install -r python-docs-samples/iot/api-client/end_to_end_example/requirements.txt 
+    curl -OL https://raw.githubusercontent.com/GoogleCloudPlatform/python-docs-samples/master/iot/api-client/end_to_end_example/requirements.txt &&  \
+    pip install -r requirements.txt
 
 #ADD runner /
 ENTRYPOINT ["/bin/bash"]
