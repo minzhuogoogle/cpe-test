@@ -1,62 +1,93 @@
 periodics:
-- interval: 24h
+- interval: 90m
   agent: kubernetes
-  name: elastifile-deployer
+  name: elastifile-daily-e2e-local-ssd
+  max_concurrency: 1
   spec:
     containers:
-    - image: gcr.io/cpe-performance-storage/elastifile:v20181012-f8c6bc0
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
       tty: true
       stdin: true
       command:
-      - sh
+      - /bin/bash
       - -c
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elastifile_deploy.sh; chmod 777 elastifile_deploy.sh; ./elastifile_deploy.sh'
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 0'
 
 
-- interval: 6h
+- interval: 4h
   agent: kubernetes
-  name: elastifile-io-test
+  name: elastifile-daily-e2e-pssd
+  max_concurrency: 1
   spec:
     containers:
-    - image: gcr.io/cpe-performance-storage/elastifile:v20181012-f8c6bc0
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
       tty: true
       stdin: true
       command:
-      - sh
+      - /bin/bash
       - -c
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/pod_runfio.sh; chmod 777 pod_runfio.sh; ./pod_runfio.sh'
-      volumeMounts:
-        # name must match the volume name below
-        - name: mynfs
-          mountPath: "/mnt/elastifile"
-      volumes:
-      - name: mynfs
-        persistentVolumeClaim:
-          claimName: elastifile-data-1
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 0 0'
+
+- interval: 4h
+  agent: kubernetes
+  name: elastifile-daily-e2e-phdd
+  max_concurrency: 1
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 0 0'
 
 
 postsubmits:
   minzhuogoogle/storage-performance:
-  - name: elastifile-perf-regression 
-    agent: kubernetes
-    branches:
-    - master
+  - name: elfs-postsubmit-local-ssd
     max_concurrency: 1
+    agent: kubernetes
     spec:
       containers:
-      - image: gcr.io/cpe-performance-storage/storage-test:v20181008-f2a92fbd8
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
         tty: true
         stdin: true
         command:
-        - sh
+        - /bin/bash
         - -c
-        - 'mkdir -p /mnt/qtest; cd /mnt/qtest; /workspace/storage-performance/quickfio.test.sh'
-        volumeMounts:
-        # name must match the volume name below
-        - name: mynfs
-          mountPath: "/mnt"
-      volumes:
-      - name: mynfs
-        persistentVolumeClaim:
-          claimName: elastifile-vol-1
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 1 1'
+
+  - name: elfs-postsubmit-pssd
+    max_concurrency: 0
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  1 1'
+
+
+  - name: elfs-postsubmit-phdd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 1 1'
 
