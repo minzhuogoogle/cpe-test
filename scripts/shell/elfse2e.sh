@@ -216,14 +216,14 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-sleep 1500
+sleep 1000
 is_test_done 6
 test_done=$?
 echo "test_done is $test_done"
 count=0
-while [[ "$test_done" -eq "-1"  &&  $count -lt 10 ]] 
+while [[ "$test_done" -eq "-1"  &&  $count -lt 60 ]] 
 do
-   sleep 30
+   sleep 60
    is_test_done 6
    test_done=$?
    echo "test_done is $test_done"
