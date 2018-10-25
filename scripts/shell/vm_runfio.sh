@@ -60,9 +60,9 @@ then
       cd /mnt/elastifile
       declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
       number=0
-      export now=`date`
+      export now=` date +"%s"`
       while [ "$fio_start" != "$now" ]; do  
-          export now=`date +"%s"`; 
+          export now=` date +"%s"`
 	  echo $now "=?" $fio_start
 	  sleep 1; 
       done
