@@ -110,16 +110,21 @@ provision_elastifile() {
 }
 
 start_vm() {
+     nfs_server=$1
+     fio_start=$2
      echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
      machine_type='n1-standard-4'
-     gcloud compute --project=$project instances create $vmname  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype  
+     vminstance='$disktype-$hostname-$vmseq"
+     echo $vminstance
+     gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $nfs_server\ $fio_start
      retval=$?
      if [ $retval -ne 0 ]; then
         cleanup 
         exit -1
      fi
+     vmseq=$((vmseq+1))
 }
 
 is_test_done() {
@@ -180,7 +185,8 @@ edisk=''
 fio_done=0
 disktype=$1
 postsubmit=$2
-debug=$3
+mfio=$3
+vmseq=1
 if [ "$postsubmit" -eq "1" ]; then
    vmname=post-$disktype-$(hostname)
 else
@@ -212,11 +218,20 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-start_vm $project $zone $disktype
-if [ $retval -ne 0 ]; then
-    cleanup 
-    exit -1
-fi
+export now=`date`
+export timer=`date -d "+ 10 minutes"`
+
+
+export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
+echo $nfs_server_ips
+for nfs_server in nfs_server_ips
+do
+    start_vm $nfs_server $timer
+    if [ $retval -ne 0 ]; then
+        cleanup 
+     exit -1
+     fi
+done
 
 sleep 3600
 is_test_done 6
