@@ -19,9 +19,9 @@ initialization()
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
-   if [ "$postsubmit" -eq "1" ]; then
-       sed -i 's/elfs/elfs/' terraform.tfvars
-   fi
+   #if [ "$postsubmit" -eq "1" ]; then
+   #    sed -i 's/elfs/elfs/' terraform.tfvars
+   #fi
    cat terraform.tfvars
    # temporarily disable load-balancing
    sed -i 's/true/false/' terraform.tfvars
