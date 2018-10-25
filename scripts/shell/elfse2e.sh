@@ -222,6 +222,7 @@ fi
 
 export now=`date`
 export timer=`date -d "+ 10 minutes"`
+imer="\"$timer\""
 
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
 echo $nfs_server_ips
