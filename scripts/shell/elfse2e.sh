@@ -235,7 +235,7 @@ done
 
 
 #if [ "$debug" -eq '0']; then
-cleanup 
+#cleanup 
 #fi    
 
 
