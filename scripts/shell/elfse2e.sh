@@ -185,7 +185,7 @@ edisk=''
 fio_done=0
 vmseq=1
 disktype=$1
-#postsubmit=0
+postsubmit=0
 mfio=$2
 
 #if [ "$postsubmit" -eq "1" ]; then
