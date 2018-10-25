@@ -18,58 +18,66 @@ start_fio()
 {
       iotype=$1
       disktype=$2
-      echo $iotype
+      nfs_server=$3
+      echo $iotype $disktype $nfs_server
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       sed -i 's/300/600/' fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
+      logfile=elfs.$nfs_server.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
-      sudo fio fio.$iotype  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
+      sudo fio fio.$iotype.$nfs_server  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
       sudo rm *.*.*
 }
 
 disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
-
-    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$testtype-elfs-elfs --format="value(networkInterfaces[0].networkIP)" | head -n 1`
-    echo $nfs_server_ip
+nfs_server_ip=$1
+#    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$testtype-elfs-elfs --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+#    echo $nfs_server_ip
       
-    export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
-    check_result=${#nfs_server_reachable}
-    echo $check_result
+export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
+check_result=${#nfs_server_reachable}
+echo $check_result
       
-    count=0
-    while [ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ] 
-    do
+count=0
+while [ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ] 
+do
         sleep 1
         export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
         check_result=${#nfs_server_reachable}
         count=$((count+1))
-    done    
+done    
 
-    echo "ping succeeds"
-    echo $count      
-    if [ $count -lt $ping_retry ]
-    then
+echo "ping succeeds"
+echo $count      
+
+if [ $count -lt $ping_retry ]
+then
       echo "Start fio on Elastifile datacontainer."
       sudo mount -o nolock $nfs_server_ip:/$nfs_data_container/root /mnt/elastifile
       cd /mnt/elastifile
       declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
       number=0
+      export now=`date`
+      while [ "$fio_start" != "$now" ]; do  
+          export now=`date`; 
+	  echo $now;  
+	  sleep 1; 
+      done
+
       while [ $number -lt $repeat ] 
       do 
          for j in "${iotype[@]}"
          do 
 	     echo $j     
-             start_fio $j $testtype
+             start_fio $j $testtype $nfs_server
          done
          echo $number
          number=$((number+1))
          sleep $interval
          echo $number
       done
-    else
-         echo "Can not reach NFS server."
-    fi
-
+else
+      echo "Can not reach NFS server."
+fi
