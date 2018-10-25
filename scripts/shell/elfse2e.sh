@@ -124,18 +124,16 @@ start_vm() {
 
 is_test_done() {
    expected_files=$1
-   export number_logfiles_1=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
-   export number_logfiles_2=`gsutil ls gs://cpe-performance-storage/test_result/backup | grep $(hostname) | grep elfs | grep fio | wc -l`
-   let number_logfiles=number_logfiles_1+number_logfiles_2
-   gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio 
-   gsutil ls gs://cpe-performance-storage/test_result/backup | grep $(hostname) | grep elfs | grep fio
+   export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep elfs | grep fio | wc -l`
+   export filelists=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep elfs | grep fio`
    
    #echo "Found $number_logfiles io logfile uploaded."
-   if [ $number_logfiles -lt $expected_files ]; 
-   then
-       echo "-1"
-   fi
-   echo "1"
+   #if [ $number_logfiles -lt $expected_files ]; 
+   #then
+   #    echo "-1"
+   #fi
+   #echo "1"
+   echo "$filelists"
 }
 
 delete_vm() {
@@ -179,6 +177,7 @@ project=''
 zone=''
 region=''
 edisk=''
+fio_done=0
 disktype=$1
 postsubmit=$2
 debug=$3
@@ -219,23 +218,32 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-sleep 1000
+sleep 3600
 is_test_done 6
 test_done=$?
+filenums=${#testdone}
 echo "test_done is $test_done"
+if [ $filenums -gt 6]; then
+        fio_done=1
+fi    
 count=0
-while [[ "$test_done" -eq "-1"  &&  $count -lt 60 ]] 
+while [[ "$fio_done" -eq "0"  &&  $count -lt 60 ]] 
 do
    sleep 60
    is_test_done 6
    test_done=$?
    echo "test_done is $test_done"
+   filenums=${#testdone}
+   if [ $filenums -gt 6]; then
+        fio_done=1
+   fi     
    count=$((count+1))
 done
 
+sleep 600
 
 #if [ "$debug" -eq '0']; then
-#cleanup 
+cleanup 
 #fi    
 
 
