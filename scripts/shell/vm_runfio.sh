@@ -28,17 +28,14 @@ start_fio()
       HOSTNAME=$(hostname)
       logfile=elfs.$nfs_server.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
-      sudo fio fio.$iotype.$nfs_server  --refill_buffers --norandommap --time_based --output-format=json --output $logfile
+      sudo fio fio.$iotype --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
       sudo rm *.*.*
 }
 
 disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
-nfs_server_ip=$1
-#    export nfs_server_ip=`sudo gcloud compute instances list --project=cpe-performance-storage --filter=$testtype-elfs-elfs --format="value(networkInterfaces[0].networkIP)" | head -n 1`
-#    echo $nfs_server_ip
       
-export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
+export nfs_server_reachable=`ping $nfs_server -c 5 | grep "0% packet loss"`
 check_result=${#nfs_server_reachable}
 echo $check_result
       
@@ -46,7 +43,7 @@ count=0
 while [ "$check_result" -lt 5 ] && [ $count -lt $ping_retry ] 
 do
         sleep 1
-        export nfs_server_reachable=`ping $nfs_server_ip -c 5 | grep "0% packet loss"`
+        export nfs_server_reachable=`ping $nfs_server -c 5 | grep "0% packet loss"`
         check_result=${#nfs_server_reachable}
         count=$((count+1))
 done    
@@ -57,7 +54,7 @@ echo $count
 if [ $count -lt $ping_retry ]
 then
       echo "Start fio on Elastifile datacontainer."
-      sudo mount -o nolock $nfs_server_ip:/$nfs_data_container/root /mnt/elastifile
+      sudo mount -o nolock $nfs_server:/$nfs_data_container/root /mnt/elastifile
       cd /mnt/elastifile
       declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
       number=0
