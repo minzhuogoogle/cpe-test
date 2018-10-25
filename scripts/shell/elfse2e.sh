@@ -5,13 +5,15 @@ disktype_check()
     disktype=$1
     valid=(lssd pssd phdd)
     ok=-1
-    for x in "${valid[@]}" ; do 
+    for x in "${valid[@]}"
+    do 
          if [ "$disktype" = "$x" ]; then
-             ok=0 ; 
-         fi ; 
+             ok=0 
+         fi 
     done 
     return $ok
 }
+
 
 initialization() 
 {
@@ -26,9 +28,6 @@ initialization()
    # temporarily disable load-balancing
    sed -i 's/true/false/' terraform.tfvars
    
-   # due to no quota for ssd in us-central1 
-   # sed -i 's/us-central1-f/us-east1-b' terraform.tfvars
-   
    export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
    zone=${zone:1:-1}
    export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
@@ -40,8 +39,8 @@ initialization()
    echo $project,$zone,$cluster_name,$edisk
 }
 
+
 provision_elastifile() {
-   
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -109,6 +108,7 @@ provision_elastifile() {
     
 }
 
+
 start_vm() {
      nfs_server=$1
      fio_start=$2
@@ -126,6 +126,7 @@ start_vm() {
      fi
      vmseq=$((vmseq+1))
 }
+
 
 is_test_done() {
    expected_files=$1
@@ -151,7 +152,6 @@ delete_vm() {
 }
 
 
-
 delete_routers() {
 
     for i in `gcloud compute network list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`; 
@@ -159,6 +159,7 @@ delete_routers() {
        gcloud compute instances delete $i --project $project --zone $zone -q; 
     done
 }
+
 
 cleanup() {
     if [ "$postsubmit" -eq '0' ]; then
@@ -185,18 +186,19 @@ edisk=''
 fio_done=0
 vmseq=1
 disktype=$1
-postsubmit=0
 mfio=$2
+postsubmit=$3
 
-#if [ "$postsubmit" -eq "1" ]; then
-#   vmname=post-$disktype-$(hostname)
-#else
-   vmname=$disktype-$(hostname)
-#
-#fi   
 
+if [ "$postsubmit" -eq "1" ]; then
+    vmname=post-$disktype-$(hostname)
+else
+    vmname=$disktype-$(hostname)
+fi   
 echo $vmname
+
 cleanup 
+
 disktype_check $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
@@ -205,7 +207,7 @@ if [ $retval -ne 0 ]; then
 fi
 
 initialization
-echo "disktype = $disktype,  storage_in_terraform = $edisk"
+echo "disktype = $disktype, storage_in_terraform = $edisk"
 
 echo "project = $project"
 echo "zone = $zone"
@@ -220,15 +222,15 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-export now=` date +"%s"`
-export timer=`date -d "+ 10 minutes" +"%s"`
-#timer="\"$timer\""
 
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
 echo $nfs_server_ips
+export now=` date +"%s"`
+export timer=`date -d "+ 5 minutes" +"%s"`
 for nfs_server in nfs_server_ips
 do
     start_vm $nfs_server $timer
+    retval=$?
     if [ $retval -ne 0 ]; then
         cleanup 
      exit -1
