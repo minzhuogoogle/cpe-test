@@ -1,6 +1,7 @@
 #!/bin/bash
 testtype=$1
-fio_start=$2
+nfs_server=$2
+fio_start=$3
 nfs_data_container='DC01'
 ping_retry=30
 repeat=1
