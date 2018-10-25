@@ -183,15 +183,17 @@ zone=''
 region=''
 edisk=''
 fio_done=0
-disktype=$1
-postsubmit=$2
-mfio=$3
 vmseq=1
-if [ "$postsubmit" -eq "1" ]; then
-   vmname=post-$disktype-$(hostname)
-else
+disktype=$1
+#postsubmit=0
+mfio=$2
+
+#if [ "$postsubmit" -eq "1" ]; then
+#   vmname=post-$disktype-$(hostname)
+#else
    vmname=$disktype-$(hostname)
-fi   
+#
+#fi   
 
 echo $vmname
 cleanup 
@@ -221,7 +223,6 @@ fi
 export now=`date`
 export timer=`date -d "+ 10 minutes"`
 
-
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
 echo $nfs_server_ips
 for nfs_server in nfs_server_ips
@@ -234,11 +235,11 @@ do
 done
 
 sleep 3600
-is_test_done 6
+is_test_done 18
 test_done=$?
 filenums=${#testdone}
 echo "test_done is $test_done"
-if [ $filenums -gt 6]; then
+if [ $filenums -gt 18]; then
         fio_done=1
 fi    
 count=0
