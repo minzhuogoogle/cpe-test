@@ -116,9 +116,9 @@ start_vm() {
      echo "project = $project"
      echo "zone = $zone"
      machine_type='n1-standard-4'
-     vminstance='$disktype-$hostname-$vmseq"
+     vminstance='$disktype-$(hostname)-$vmseq"
      echo $vminstance
-     gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $nfs_server\ $fio_start
+     gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $nfs_server $fio_start
      retval=$?
      if [ $retval -ne 0 ]; then
         cleanup 
