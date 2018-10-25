@@ -62,7 +62,7 @@ then
       number=0
       export now=`date`
       while [ "$fio_start" != "$now" ]; do  
-          export now=`date`; 
+          export now=`date +"%s"`; 
 	  echo $now "=?" $fio_start
 	  sleep 1; 
       done
