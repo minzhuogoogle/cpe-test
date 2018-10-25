@@ -220,9 +220,9 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-export now=`date`
-export timer=`date -d "+ 10 minutes"`
-imer="\"$timer\""
+export now=` date +"%s"`
+export timer=`date -d "+ 10 minutes" +"%s"`
+#timer="\"$timer\""
 
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
 echo $nfs_server_ips
