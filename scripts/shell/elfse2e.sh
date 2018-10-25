@@ -127,6 +127,9 @@ is_test_done() {
    export number_logfiles_1=`gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio | wc -l`
    export number_logfiles_2=`gsutil ls gs://cpe-performance-storage/test_result/backup | grep $(hostname) | grep elfs | grep fio | wc -l`
    let number_logfiles=number_logfiles_1+number_logfiles_2
+   gsutil ls gs://cpe-performance-storage/test_result/ | grep $(hostname) | grep elfs | grep fio 
+   gsutil ls gs://cpe-performance-storage/test_result/backup | grep $(hostname) | grep elfs | grep fio
+   
    #echo "Found $number_logfiles io logfile uploaded."
    if [ $number_logfiles -lt $expected_files ]; 
    then
