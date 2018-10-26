@@ -26,7 +26,7 @@ start_fio()
       sed -i 's/300/600/' fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=elfs.$nfs_server.$iotype.$HOSTNAME.$NOW.$disktype.txt
+      logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
       sudo fio fio.$iotype --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
