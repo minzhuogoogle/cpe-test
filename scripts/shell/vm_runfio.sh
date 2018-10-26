@@ -20,11 +20,12 @@ start_fio()
       iotype=$1
       disktype=$2
       nfsserver=$3
+      fiofile=fio.$nfsserver
       #cd /mnt/elastifile
       echo $iotype $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       sudo sed -i "s/300/600/" fio.$iotype
-      sudo sed -i "s/${iotype}/${nfsserver}/" fio.$iotype
+      sudo sed -i "s/${iotype}/${fiofile}/" fio.$iotype
       cat fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
