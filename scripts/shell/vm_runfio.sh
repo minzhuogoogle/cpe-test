@@ -23,7 +23,7 @@ start_fio()
       #cd /mnt/elastifile
       echo $iotype $disktype $nfs_server
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
-      sudo sed -i 's/300/100/' fio.$iotype
+      sudo sed -i 's/300/600/' fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
       logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
