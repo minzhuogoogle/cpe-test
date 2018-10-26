@@ -23,7 +23,7 @@ start_fio()
       cd /mnt/elastifile
       echo $iotype $disktype $nfs_server
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
-      sed -i 's/300/1200/' fio.$iotype
+      sed -i 's/300/600/' fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
       logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
@@ -73,7 +73,7 @@ then
              start_fio $j $testtype $nfs_server
 	     export current=`date +"%s"`
 	     delta=$((current-fio_start))
-	     expected_gap=$((1300*testno))
+	     expected_gap=$((660*testno))
 	     while [ $delta -lt $expected_gap ]
 	     do 
 	        sleep 1
