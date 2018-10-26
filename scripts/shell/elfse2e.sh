@@ -197,7 +197,7 @@ else
 fi   
 echo $vmname
 
-#cleanup 
+cleanup 
 
 disktype_check $disktype
 retval=$?
@@ -215,12 +215,12 @@ echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
 
-#provision_elastifile 
-#retval=$?
-#if [ $retval -ne 0 ]; then
-#    cleanup 
-#    exit -1
-#fi
+provision_elastifile 
+retval=$?
+if [ $retval -ne 0 ]; then
+    cleanup 
+    exit -1
+fi
 
 
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
@@ -240,7 +240,7 @@ do
 done
 export now=` date `
 echo $now
-sleep 600
+sleep 1200
 #is_test_done 18
 #test_done=$?
 #filenums=${#testdone}
