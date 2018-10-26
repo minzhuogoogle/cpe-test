@@ -2,6 +2,7 @@
 testtype=$1
 nfs_server=$2
 fio_start=$3
+testduration=$4
 nfs_data_container='DC01'
 ping_retry=30
 repeat=1
@@ -20,11 +21,12 @@ start_fio()
       iotype=$1
       disktype=$2
       nfsserver=$3
+      testduration=$4
       fiofile=fio.$nfsserver
       #cd /mnt/elastifile
       echo $iotype $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
-      sudo sed -i "s/300/600/" fio.$iotype
+      sudo sed -i "s/300/${testduration}/" fio.$iotype
       sudo sed -i "s/${iotype}/${fiofile}/" fio.$iotype
       cat fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
@@ -73,11 +75,12 @@ then
          for j in "${iotype[@]}"
          do 
 	     echo $j     
-             start_fio $j $testtype $nfs_server
+             start_fio $j $testtype $nfs_server $testduration
 	     export current=`date +"%s"`
 	     echo $current, $fio_start
 	     delta=$((current-fio_start))
-	     expected_gap=$((660*testno))
+	     testgap=$(($testduration+10))
+	     expected_gap=$(($testgap*testno))
 	     while [ $delta -lt $expected_gap ]
 	     do 
 	        sleep 1
