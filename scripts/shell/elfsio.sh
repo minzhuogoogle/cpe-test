@@ -43,13 +43,14 @@ initialization()
 start_vm() {
      nfs_server=$1
      fio_start=$2
+     test_duration=$3
      echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
      machine_type='n1-standard-4'
      vminstance="$disktype-$(hostname)-$vmseq"
      echo $vminstance
-     gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start
+     gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration
      retval=$?
      if [ $retval -ne 0 ]; then
         cleanup 
@@ -90,6 +91,7 @@ vmseq=1
 disktype=$1
 mfio=$2
 postsubmit=1
+testduration=$4
 
 
 if [ "$postsubmit" -eq "1" ]; then
@@ -127,7 +129,7 @@ for nfs_server in $nfs_server_ips
 do
     export now=` date`
     echo $now
-    start_vm $nfs_server $timer
+    start_vm $nfs_server $timer $testduration
     retval=$?
     if [ $retval -ne 0 ]; then
         cleanup 
