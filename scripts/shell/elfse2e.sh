@@ -259,10 +259,11 @@ fi
 
 
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
-echo $nfs_server_ips
-delaytime=$((${#nfs_server_ips}*$clients))
-echo $delaytimer
+export snodes=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  | wc -l`
+echo $nfs_server_ips $snodes
+delaytime=$(($snodes*$clients))
 export now=` date +"%s"`
+echo $now $delaytimer
 export timer=`date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
 while [ $running_clients -lt $clients ]
