@@ -226,9 +226,11 @@ fi
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
 echo $nfs_server_ips
 export now=` date +"%s"`
-export timer=`date -d "+ 5 minutes" +"%s"`
+export timer=`date -d "+ 10 minutes" +"%s"`
 for nfs_server in $nfs_server_ips
 do
+    export now=` date`
+    echo $now
     start_vm $nfs_server $timer
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -236,37 +238,39 @@ do
      exit -1
      fi
 done
-
+export now=` date `
+echo $now
 sleep 3600
-is_test_done 18
-test_done=$?
-filenums=${#testdone}
-echo "test_done is $test_done"
-if [ $filenums -gt 18]; then
-        fio_done=1
-fi    
-count=0
-while [[ "$fio_done" -eq "0"  &&  $count -lt 60 ]] 
-do
-   sleep 60
-   is_test_done 6
-   test_done=$?
-   echo "test_done is $test_done"
-   filenums=${#testdone}
-   if [ $filenums -gt 6]; then
-        fio_done=1
-   fi     
-   count=$((count+1))
-done
+#is_test_done 18
+#test_done=$?
+#filenums=${#testdone}
+#echo "test_done is $test_done"
+#if [ $filenums -gt 18]; then
+#        fio_done=1
+#fi    
+#count=0
+#while [[ "$fio_done" -eq "0"  &&  $count -lt 60 ]] 
+#do
+#   sleep 60
+#   is_test_done 6
+#   test_done=$?
+#   echo "test_done is $test_done"
+#   filenums=${#testdone}
+#   if [ $filenums -gt 6]; then
+#        fio_done=1
+#   fi     
+#   count=$((count+1))
+#done
 
 sleep 600
-
+export now=` date `
+echo $now
 #if [ "$debug" -eq '0']; then
-cleanup 
+#cleanup 
 #fi    
 
 
-if [ "$test_done" -eq "-1" ]; then
-    echo "io testing might have problem."
-    exit -1
-fi   
+#if [ "$test_done" -eq "-1" ]; then
+#    echo "io testing might have problem."
+#    exit -1
+#fi   
