@@ -227,7 +227,7 @@ export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-s
 echo $nfs_server_ips
 export now=` date +"%s"`
 export timer=`date -d "+ 5 minutes" +"%s"`
-for nfs_server in nfs_server_ips
+for nfs_server in $nfs_server_ips
 do
     start_vm $nfs_server $timer
     retval=$?
