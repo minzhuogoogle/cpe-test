@@ -79,7 +79,7 @@ then
 	     export current=`date +"%s"`
 	     echo $current, $fio_start
 	     delta=$((current-fio_start))
-	     testgap=$(($testduration+10))
+	     testgap=$(($testduration+30))
 	     expected_gap=$(($testgap*testno))
 	     while [ $delta -lt $expected_gap ]
 	     do 
