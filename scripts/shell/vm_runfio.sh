@@ -21,6 +21,7 @@ start_fio()
       iotype=$1
       disktype=$2
       nfs_server=$3
+      cd /mnt/elastifile
       echo $iotype $disktype $nfs_server
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       sed -i 's/300/600/' fio.$iotype
