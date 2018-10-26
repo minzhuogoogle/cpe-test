@@ -75,12 +75,15 @@ then
 	     echo $j     
              start_fio $j $testtype $nfs_server
 	     export current=`date +"%s"`
+	     echo $current, $fio_start
 	     delta=$((current-fio_start))
 	     expected_gap=$((660*testno))
 	     while [ $delta -lt $expected_gap ]
 	     do 
 	        sleep 1
 		export current=`date +"%s"`
+		delta=$((current-fio_start))
+		echo $current, $fio_start
              done
 	     testno=$((testno+1))
          done
