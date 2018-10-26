@@ -19,16 +19,18 @@ start_fio()
 {
       iotype=$1
       disktype=$2
-      nfs_server=$3
+      nfsserver=$3
       #cd /mnt/elastifile
-      echo $iotype $disktype $nfs_server
+      echo $iotype $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
       sudo sed -i 's/300/600/' fio.$iotype
+      sudo sed -i 's/$iotype/$iotype-$nfsserver' fio.$iotype
+      cat fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
       logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
-      sudo fio /mnt/elastifile/fio.$iotype --refill_buffers --norandommap --time_based --output-format=json --output $logfile
+      sudo fio fio.$iotype --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
       sudo rm -rf /mnt/elastifile/fio.*
 }
