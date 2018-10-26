@@ -187,7 +187,7 @@ fio_done=0
 vmseq=1
 disktype=$1
 mfio=$2
-postsubmit=$3
+postsubmit=1
 
 
 if [ "$postsubmit" -eq "1" ]; then
@@ -226,7 +226,7 @@ fi
 export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
 echo $nfs_server_ips
 export now=` date +"%s"`
-export timer=`date -d "+ 10 minutes" +"%s"`
+export timer=`date -d "+ 5 minutes" +"%s"`
 for nfs_server in $nfs_server_ips
 do
     export now=` date`
@@ -240,7 +240,7 @@ do
 done
 export now=` date `
 echo $now
-sleep 3600
+sleep 600
 #is_test_done 18
 #test_done=$?
 #filenums=${#testdone}
@@ -262,7 +262,7 @@ sleep 3600
 #   count=$((count+1))
 #done
 
-sleep 600
+#sleep 600
 export now=` date `
 echo $now
 #if [ "$debug" -eq '0']; then
