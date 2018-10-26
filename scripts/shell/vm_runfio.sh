@@ -64,20 +64,22 @@ then
 	  echo $now "=?" $fio_start
 	  sleep 1; 
       done
-     
+      testno=1
       while [ $number -lt $repeat ] 
       do 
          for j in "${iotype[@]}"
          do 
 	     echo $j     
              start_fio $j $testtype $nfs_server
-	     export current=` date +"%s"`
+	     export current=`date +"%s"`
 	     delta=$((current-fio_start))
-	     while [ $delta -lt < 1300 ]
+	     expected_gap=$((1300*testno))
+	     while [ $delta -lt $expected_gap ]
 	     do 
 	        sleep 1
-		export current=` date +"%s"`
-             done		
+		export current=`date +"%s"`
+             done
+	     testno=$((testno+1))
          done
          echo $number
          number=$((number+1))
