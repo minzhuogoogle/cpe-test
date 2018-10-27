@@ -47,9 +47,9 @@ provision_elastifile() {
        exit -1
     fi
     echo "run terraform apply to start elfs instance"
-    if  [ "$pstest" == "1" ]; then
-        sed -i 's/elfs/pselfs/' terraform.tfvars
-    fi
+    #if  [ "$pstest" == "1" ]; then
+        #sed -i 's/elfs/pselfs/' terraform.tfvars
+    #fi
    
     cat terraform.tfvars
     
@@ -218,12 +218,13 @@ case "$testname" in
     *-daily-* ) echo "prepare daily e2e test";;
     *-perf-* ) echo "preppare perf test";skipprovision=1;;
     *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;;
-    *-ha-* ) echo "prepare ha test";ha=1;;
+    *-ha-* ) echo "prepare ha test";ha=1;skipprovision=1;;
     *-io-* ) echo "prepare io only test";skipprovision=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; newelfs="pselfs-$disktype"; pstest=1;;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;;
     * ) echo "Error...";;
 esac
 
+echo $skipprovision $pstest
 
 if [ "$deletion" -eq "1" ] ; then
   if [[ $testname = *-io-* ]]; then
