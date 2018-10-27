@@ -212,7 +212,7 @@ case "$testname" in
     *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;;
     *-ha-* ) echo "prepare ha test";ha=1;;
     *-io-* ) echo "prepare io only test";skipprovision=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; newelfs="pselfs-$disktype"; pstest=1;;
+    *postsubmit* ) echo "prepare postsubmit sanity test"; newelfs="pselfs-$disktype"; pstest=1;;
     * ) echo "Error...";;
 esac
 
