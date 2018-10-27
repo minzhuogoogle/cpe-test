@@ -104,7 +104,7 @@ provision_elastifile() {
     
     if  [ -f "create_vheads.log" ]; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-       testname=$(hostname)
+       
        cat terraform.tfvars >> output.txt
        cat create_vheads.log >> output.txt 
        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
