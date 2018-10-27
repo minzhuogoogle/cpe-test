@@ -47,9 +47,12 @@ provision_elastifile() {
        exit -1
     fi
     echo "run terraform apply to start elfs instance"
-    if  [ "$newelfs" -eq "pselfs-$disktype" ]; then
+    if  [ "$pstest" == "1" ]; then
         sed -i 's/elfs/pselfs/' terraform.tfvars
     fi
+   
+    cat terraform.tfvars
+    
     terraform apply --auto-approve &
 
     maxcount=15
