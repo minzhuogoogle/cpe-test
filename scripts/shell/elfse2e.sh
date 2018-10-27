@@ -264,12 +264,24 @@ if [ $retval -ne 0 ]; then
 fi
 
 if [ "$pstest" -eq "1" ]; then
-   export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-pselfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
+   snodename="$disktype-pselfs-elfs-" 
 else
-   export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  --format="value(networkInterfaces[0].networkIP)"`
-fi
-export snodes=`gcloud compute instances list --project=cpe-performance-storage --filter="$disktype-elfs-elfs-"  | wc -l`
-snodes=3
+   snodename="$disktype-elfs-elfs-" 
+fi   
+if [ $mfio -eq 0 ] ; then
+     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+else
+     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" `
+fi     
+
+echo "nfs servers:" $nfs_server_ip
+
+if [ $mfio -eq 0 ] ; then
+     snodes=1
+else
+     snodes=3
+fi 
+
 echo $nfs_server_ips $snodes
 
 delaytime=$(($snodes*$clients))
@@ -288,7 +300,7 @@ do
         if [ $retval -ne 0 ]; then
          #   cleanup
             exit -1
-        fi
+        fi  
         running_clients=$((running_clients+1))
     done
 done
