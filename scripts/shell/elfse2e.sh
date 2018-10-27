@@ -41,6 +41,10 @@ initialization()
 
 
 provision_elastifile() {
+    echo "iotest ?"  $iotest
+    if [ $iotest -eq 1 ]; then
+        return
+    fi    
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -211,6 +215,7 @@ testname=$5
 clients=1
 skipprovision=0
 pstest=0
+iotest=0
 
 echo  $disktype $mfio $deletion $testduration $testname
 
@@ -219,7 +224,7 @@ case "$testname" in
     *-perf-* ) echo "preppare perf test";skipprovision=1;;
     *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;;
     *-ha-* ) echo "prepare ha test";ha=1;skipprovision=1;;
-    *-io-* ) echo "prepare io only test";skipprovision=1;;
+    *-io-* ) echo "prepare io only test";skipprovision=1;iotest=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;;
     * ) echo "Error...";;
 esac
