@@ -333,7 +333,7 @@ echo $now
 
 
 
-if [ "$test_done" -eq "-1" ]; then
+if [ "$fio_done" -eq "0" ]; then
     echo "io testing might have problem."
     exit -1
 fi  
