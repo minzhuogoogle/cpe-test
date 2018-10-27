@@ -102,7 +102,7 @@ provision_elastifile() {
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
        cat terraform.tfvars >> create_vheads.log
-       logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
+       logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
     else
