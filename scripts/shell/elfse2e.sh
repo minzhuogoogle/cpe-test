@@ -130,11 +130,11 @@ start_vm() {
      echo $vminstance
 
      gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
-     retval=$?
-     if [ $retval -ne 0 ]; then
-        cleanup 
-        return -1
-     fi
+    # retval=$?
+    # if [ $retval -ne 0 ]; then
+    #    cleanup 
+    #    return -1
+    # fi
      vmseq=$((vmseq+1))
 }
 
@@ -254,7 +254,7 @@ if [ "$skipprovision"  -eq "0" ]; then
 fi
 retval=$?
 if [ $retval -ne 0 ]; then
-    cleanup
+    #cleanup
     exit -1
 fi
 
@@ -279,7 +279,7 @@ do
         start_vm $nfs_server $timer $testduration $testname
         retval=$?
         if [ $retval -ne 0 ]; then
-            cleanup
+         #   cleanup
             exit -1
         fi
         running_clients=$((running_clients+1))
