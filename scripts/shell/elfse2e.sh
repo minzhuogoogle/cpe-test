@@ -316,7 +316,7 @@ sleep 600
 export now=` date `
 echo $now
 
-if [ "$deletion" -eq '1']; then
+if [ "$deletion" -eq '1' ]; then
    if [ "$pstest" -eq "1" ]; then
         cleanup "$disktype-pselfs"
    fi
