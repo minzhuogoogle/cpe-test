@@ -226,16 +226,6 @@ esac
 
 echo $skipprovision $pstest
 
-if [ "$deletion" -eq "1" ] ; then
-  if [[ $testname = *-io-* ]]; then
-      echo "Skip cleanup elastfile nodes"
-      cleanup $(hostname)
-  else
-      cleanup $disktype
-  fi
-fi
-
-
 disktype_check $disktype
 retval=$?
 if [ $retval -ne 0 ]; then
@@ -249,6 +239,15 @@ echo "project = $project"
 echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
+
+if [ "$deletion" -eq "1" ] ; then
+  if [[ $testname = *-io-* ]]; then
+      echo "Skip cleanup elastfile nodes"
+      cleanup $(hostname)
+  else
+      cleanup $disktype
+  fi
+fi
 
 if [ "$skipprovision"  -eq "0" ]; then
     provision_elastifile
