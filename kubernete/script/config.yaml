@@ -1,7 +1,7 @@
 periodics:
-- interval: 90m
+- cron: '0 7  * * *' # Run at midnight PST on everydat (07:00 UTC)
   agent: kubernetes
-  name: elastifile-daily-e2e-local-ssd
+  name: elfs-daily-e2e-lssd
   max_concurrency: 1
   spec:
     containers:
@@ -12,12 +12,12 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 0'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 0 1 300 elfs-daily-e2e-lssd'
 
 
-- interval: 4h
+- cron: '0 7 * * *'
   agent: kubernetes
-  name: elastifile-daily-e2e-pssd
+  name: elfs-daily-e2e-pssd
   max_concurrency: 1
   spec:
     containers:
@@ -28,11 +28,12 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 0 0'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 0 1 300 elfs-daily-e2e-pssd'
 
-- interval: 4h
+
+- cron: '0 7 * * *'
   agent: kubernetes
-  name: elastifile-daily-e2e-phdd
+  name: elfs-daily-e2e-phdd
   max_concurrency: 1
   spec:
     containers:
@@ -43,12 +44,60 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 0 0'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
 
 
-postsubmits:
-  minzhuogoogle/storage-performance:
-  - name: elfs-postsubmit-local-ssd
+- cron: '0 13-23  * * *'
+  agent: kubernetes
+  name: elfs-daily-io-lssd
+  max_concurrency: 1
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 0 0 300 elfs-daily-io-lssd'
+
+
+- cron: '0 13-23 * * *'
+  agent: kubernetes
+  name: elfs-daily-io-pssd
+  max_concurrency: 1
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 0 0 300 elfs-daily-io-pssd'
+
+
+- cron: '0 13-23 * * *'
+  agent: kubernetes
+  name: elfs-daily-io-phdd
+  max_concurrency: 1
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 0 0 300 elfs-daily-io-phdd'
+
+
+
+- cron: '0 10 * * 1,3,5'
+  - name: elfs-perf-lssd
     max_concurrency: 1
     agent: kubernetes
     spec:
@@ -60,9 +109,11 @@ postsubmits:
         - /bin/bash
         - -c
         args:
-        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 1 1'
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 1 0 600 elfs-perf-lssd'
 
-  - name: elfs-postsubmit-pssd
+
+- cron: '0 10 * * 1,3,5'
+  - name: elfs-perf-pssd
     max_concurrency: 0
     agent: kubernetes
     spec:
@@ -74,10 +125,11 @@ postsubmits:
         - /bin/bash
         - -c
         args:
-        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  1 1'
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  1 0 600 elfs-perf-pssd'
 
 
-  - name: elfs-postsubmit-phdd
+- cron: '0 10 * * 1,3,5'
+  - name: elfs-perf-phdd
     max_concurrency: 1
     agent: kubernetes
     spec:
@@ -89,5 +141,152 @@ postsubmits:
         - /bin/bash
         - -c
         args:
-        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 1 1'
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 1 0 600 elfs-perf-phdd'
+
+
+- cron: '0 10 * * 2,4,6'
+  - name: elfs-scalability-lssd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 1 1 600 elfs-scalability-lssd'
+
+
+- cron: '0 10 * * 2,4,6'
+  - name: elfs-scalability-pssd
+    max_concurrency: 0
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  1 1 600 elfs-scalability-pssd'
+
+
+- cron: '0 10 * * 2,4,6'
+  - name: elfs-scalbility-phdd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 1 1 600 elfs-scalability-phdd'
+
+
+
+- cron: '0 12 * * 0'
+  - name: elfs-ha-lssd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 1 1 600 elfs-ha-lssd'
+
+
+- cron: '0 12 * * 0'
+  - name: elfs-scalability-pssd
+    max_concurrency: 0
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  1 1 600 elfs-ha-pssd'
+
+
+- cron: '0 12 * * 0'
+  - name: elfs-scalbility-phdd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 1 1 600 elfs-ha-phdd'
+
+
+
+
+postsubmits:
+  minzhuogoogle/storage-performance:
+  - name: elfs-ps-lssd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 1 1 60 elfs-ps-lssd'
+
+
+  - name: elfs-ps-pssd
+    max_concurrency: 0
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  1 1 60 elfs-ps-pssd'
+
+
+  - name: elfs-ps-phdd
+    max_concurrency: 1
+    agent: kubernetes
+    spec:
+      containers:
+      - image: gcr.io/cpe-performance-storage/elastifile:latest
+        tty: true
+        stdin: true
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 1 1 60 elfs-ps-phdd'
+
 
