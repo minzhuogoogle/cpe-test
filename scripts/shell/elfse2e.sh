@@ -276,7 +276,15 @@ fi
 
 retval=$?
 if [ $retval -ne 0 ]; then
-    #cleanup
+    if [ "$deletion" -eq "1" ] && [ $iotest -eq 0 ]; then
+         if [ $pstest -eq 1 ]; then
+             cleanup "$disktype-pselfs"
+             cleanup "ps-$disktype-"
+         else
+             cleanup "$disktype-elsf"
+             cleanup "$disktype-"
+        fi   
+    fi
     exit -1
 fi
 
@@ -293,6 +301,7 @@ fi
 
 echo "nfs servers:" $nfs_server_ip
 
+# TODO: get number of enodes from nfs_server_ips
 if [ $mfio -eq 0 ] ; then
      snodes=1
 else
@@ -303,7 +312,7 @@ echo $nfs_server_ips $snodes
 
 delaytime=$(($snodes*$clients))
 export now=` date +"%s"`
-echo $now $delaytimer
+echo $now $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
 while [ $running_clients -lt $clients ]
@@ -322,12 +331,12 @@ do
     done
 done
 export now=` date `
-if [ "$ha" -eq '1' ]; then
+if [ "$ha" -eq "1" ]; then
     inject_failure_into_cluster 
 fi 
 echo $now
 
-sleep $(($testduration*6+300)) 
+sleep $(($testduration*6+30)) 
 
 logfiles_uploaded
 no_of_logfiles=$?
@@ -335,12 +344,14 @@ echo $no_of_logfiles
 if [ "$mfio" -eq "0" ]; then
     expected_logfile=$((clients*6))
 else
-    expected_logfile=$((nodes*clients*6))
+    expected_logfile=$((snodes*clients*6))
 fi    
 
 if [ $no_of_logfiles -ge $expected_logfile ]; then
-        fio_done=1
+    fio_done=1
 fi    
+
+
 count=0
 while [[ "$fio_done" -eq "0"  &&  $count -lt 60 ]] 
 do
