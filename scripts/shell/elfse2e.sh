@@ -220,7 +220,7 @@ iotest=0
 echo  $disktype $mfio $deletion $testduration $testname
 
 case "$testname" in
-    *-daily-* ) echo "prepare daily e2e test";;
+    *-daily-e2e* ) echo "prepare daily e2e test";;
     *-perf-* ) echo "preppare perf test";skipprovision=1;;
     *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;;
     *-ha-* ) echo "prepare ha test";ha=1;skipprovision=1;;
@@ -229,7 +229,7 @@ case "$testname" in
     * ) echo "Error...";;
 esac
 
-echo $skipprovision $pstest
+echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest
 
 disktype_check $disktype
 retval=$?
