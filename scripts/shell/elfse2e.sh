@@ -53,7 +53,7 @@ provision_elastifile() {
    
     cat terraform.tfvars
     
-    terraform apply --auto-approve &
+    terraform apply --auto-approve | tee -a output.txt &
 
     maxcount=30
     count=0
@@ -91,6 +91,7 @@ provision_elastifile() {
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        cat terraform.tfvars >> create_vheads.log
+       cat output >> create_vheads.log
        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
@@ -102,6 +103,7 @@ provision_elastifile() {
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        testname=$(hostname)
        cat terraform.tfvars >> create_vheads.log
+       cat output >> create_vheads.log
        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
