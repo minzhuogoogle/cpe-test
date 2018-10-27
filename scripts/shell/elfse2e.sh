@@ -4,14 +4,14 @@ disktype_check()
 {
     disktype=$1
     valid=(lssd pssd phdd)
-    ok=-1
+    retVal=-1
     for x in "${valid[@]}"
     do
-         if [ "$disktype" = "$x" ]; then
-             ok=0
+         if [ "$disktype" == "$x" ]; then
+             retVal=0
          fi
     done
-    return $ok
+    return $retVal
 }
 
 
@@ -21,9 +21,6 @@ initialization()
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
-   #if [ "$postsubmit" -eq "1" ]; then
-   #    sed -i 's/elfs/elfs/' terraform.tfvars
-   #fi
    cat terraform.tfvars
    # temporarily disable load-balancing
    sed -i 's/true/false/' terraform.tfvars
@@ -43,18 +40,18 @@ initialization()
 provision_elastifile() {
     echo "iotest ?"  $iotest
     if [ $iotest -eq 1 ]; then
-        return
+        return 0
     fi    
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
-       exit -1
+       return -1
     fi
     echo "run terraform apply to start elfs instance"
     if  [ "$pstest" == "1" ]; then
         sed -i 's/elfs/pselfs/' terraform.tfvars
     fi
-   
+    echo "==== new terraform.tfvars====="
     cat terraform.tfvars
     
     terraform apply --auto-approve | tee -a output.txt &
@@ -108,12 +105,12 @@ provision_elastifile() {
     
     if  [ -f "create_vheads.log" ]; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-       
        cat terraform.tfvars >> output.txt
        cat create_vheads.log >> output.txt 
        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
+       return 0
     else
        return -1
     fi
@@ -126,20 +123,23 @@ start_vm() {
      fio_start=$2
      test_duration=$3
      test_name=$4
-     echo "vmname = $vmname"
      echo "project = $project"
      echo "zone = $zone"
      machine_type='n1-standard-4'
-     vminstance="$disktype-$(hostname)-$vmseq"
+     if [ $pstest -eq 1 ]; then
+          vminstance="ps-$disktype-$(hostname)-$vmseq"
+     else
+          vminstance="$disktype-$(hostname)-$vmseq"
+     fi
      echo $vminstance
 
      gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
-    # retval=$?
-    # if [ $retval -ne 0 ]; then
-    #    cleanup 
-    #    return -1
-    # fi
+     retval=$?
+     if [ $retval -ne 0 ]; then
+           return -1
+     fi
      vmseq=$((vmseq+1))
+     return 0
 }
 
 
@@ -148,6 +148,11 @@ inject_failure_into_cluster() {
     failure_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     echo "vm to be deleted: $failure_node, $project, $zone"
     gcloud compute instances delete $failure_node --project $project --zone $zone -q
+    retval=$?
+    if [ $retval -ne 0 ]; then
+           return -1
+    fi
+    return 0
 }
 
 
@@ -164,6 +169,11 @@ delete_vm() {
        echo "vm to be deleted: $i, $project, $zone"
        gcloud compute instances delete $i --project $project --zone $zone -q; 
     done
+    retval=$?
+    if [ $retval -ne 0 ]; then
+           return -1
+    fi
+    return 0
 }
 
 
@@ -187,6 +197,11 @@ cleanup() {
        return
     fi  
     delete_vm $vmaffix
+    retval=$?
+    if [ $retval -ne 0 ]; then
+           return -1
+    fi
+    return 0
     #delete_traffic_node()
     #delete_routers()
     #delete_firewalls()
@@ -198,26 +213,26 @@ cleanup() {
 # Start here
 # ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
 # --------------
-clients=1
-project=''
-newelfs=''
-zone=''
-region=''
-edisk=''
-fio_done=0
-vmseq=1
-ha=0
 disktype=$1
 mfio=$2
 deletion=$3
 testduration=$4
 testname=$5
+echo  $disktype $mfio $deletion $testduration $testname
+
+project=''
+newelfs=''
+zone=''
+region=''
+edisk=''
+
 clients=1
+fio_done=0
+vmseq=1
+ha=0
 skipprovision=0
 pstest=0
 iotest=0
-
-echo  $disktype $mfio $deletion $testduration $testname
 
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";;
@@ -245,18 +260,20 @@ echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
-if [ "$deletion" -eq "1" ] ; then
-  if [[ $testname = *-io-* ]]; then
-      echo "Skip cleanup elastfile nodes"
-      cleanup $(hostname)
-  else
-      cleanup $disktype
-  fi
+if [ "$deletion" -eq "1" ] && [ $iotest -eq 0 ]; then
+    if [ $pstest -eq 1 ]; then
+         cleanup "$disktype-pselfs"
+         cleanup "ps-$disktype-"
+    else
+         cleanup "$disktype-elsf"
+         cleanup "$disktype-"
+    fi   
 fi
 
 if [ "$skipprovision" == "0" ]; then
     provision_elastifile
 fi
+
 retval=$?
 if [ $retval -ne 0 ]; then
     #cleanup
@@ -341,8 +358,10 @@ sleep 600
 export now=` date `
 echo $now
 
-if [ "$pstest" -eq "1" ]; then
-   cleanup "pselfs"  
+
+if [ $pstest -eq 1 ]; then
+    cleanup "$disktype-pselfs"
+    cleanup "ps-$disktype-"
 fi
 
 if [ "$fio_done" -eq "0" ]; then
