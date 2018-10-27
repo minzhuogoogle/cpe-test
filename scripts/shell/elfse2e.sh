@@ -41,7 +41,6 @@ initialization()
 
 
 provision_elastifile() {
-    elfs_name=$1
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -89,12 +88,11 @@ provision_elastifile() {
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        cat terraform.tfvars >> create_vheads.log
-       logfile=elfs.terraform.provision.$(hostname).$NOW.$disktype.txt
+       logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
        name=$disktype-elfs
-#       cleanup 
-       exit -1
+       return -1
     fi
     
     if  [ -f "create_vheads.log" ]; then
@@ -105,8 +103,7 @@ provision_elastifile() {
        gsutil cp create_vheads.log gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
     else
-       #cleanup
-       exit -1
+       return -1
     fi
     
 }
@@ -128,7 +125,7 @@ start_vm() {
      retval=$?
      if [ $retval -ne 0 ]; then
         cleanup 
-        exit -1
+        return -1
      fi
      vmseq=$((vmseq+1))
 }
@@ -142,17 +139,10 @@ inject_failure_into_cluster() {
 }
 
 
-is_test_done() {
-   expected_files=$1
-   export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep elfs | grep fio | wc -l`
-   export filelists=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep elfs | grep fio`
-   #echo "Found $number_logfiles io logfile uploaded."
-   #if [ $number_logfiles -lt $expected_files ]; 
-   #then
-   #    echo "-1"
-   #fi
-   #echo "1"
-   echo "$filelists"
+logfiles_uploaded() {
+   export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio | wc -l`
+   export filelists=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio`
+   return $number_logfiles
 }
 
 delete_vm() {
@@ -212,16 +202,17 @@ testduration=$4
 testname=$5
 clients=1
 skipprovision=0
+pstest=0
 
 echo  $disktype $mfio $deletion $testduration $testname
 
 case "$testname" in
     *-daily-* ) echo "prepare daily e2e test";;
-    *-perf-* ) echo "preppare perf test";;
-    *-scalability-* ) echo "prepare scability test";clients=256;;
+    *-perf-* ) echo "preppare perf test";skipprovision=1;;
+    *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;;
     *-ha-* ) echo "prepare ha test";ha=1;;
     *-io-* ) echo "prepare io only test";skipprovision=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; newelfs="pselfs-$disktype";;
+    *-ps-* ) echo "prepare postsubmit sanity test"; newelfs="pselfs-$disktype"; pstest=1;;
     * ) echo "Error...";;
 esac
 
@@ -290,33 +281,43 @@ fi
 echo $now
 
 sleep $(($testduration*6+300)) 
-is_test_done 18
-test_done=$?
-filenums=${#testdone}
-echo "test_done is $test_done"
-if [ $filenums -gt 18]; then
+
+logfiles_uploaded
+no_of_logfiles=$?
+echo $no_of_logfiles
+if [ "$mfio" -eq "0" ]; then
+    expected_logfile=$((clients*6))
+else
+    expected_logfile=$((nodes*clients*6))
+fi    
+
+if [ $no_of_logfiles -ge $expected_logfile ]; then
         fio_done=1
 fi    
 count=0
 while [[ "$fio_done" -eq "0"  &&  $count -lt 60 ]] 
 do
    sleep 60
-   is_test_done 6
-   test_done=$?
-   echo "test_done is $test_done"
-   filenums=${#testdone}
-   if [ $filenums -gt 6]; then
+   logfiles_uploaded
+   no_of_logfiles=$?
+   echo $no_of_logfiles
+   if [ $no_of_logfiles -ge $expected_logfile ]; then
         fio_done=1
-   fi     
+   fi      
    count=$((count+1))
 done
 
 sleep 600
 export now=` date `
 echo $now
-if [ "$deletion" -eq '0']; then
-   cleanup "$disktype-elfs" 
+
+if [ "$deletion" -eq '1']; then
+   if [ "$pstest" -eq "1" ]; then
+        cleanup "$disktype-pselfs"
+   fi
+   cleanup "$disktype-elfs"  
 fi
+
 
 
 if [ "$test_done" -eq "-1" ]; then
