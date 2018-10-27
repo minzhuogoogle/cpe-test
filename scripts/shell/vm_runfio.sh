@@ -1,8 +1,15 @@
 #!/bin/bash
+#gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type
+#--scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=
+#sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ 
+#sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\
+#$disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
+   
 testtype=$1
 nfs_server=$2
 fio_start=$3
 testduration=$4
+testname=$5
 nfs_data_container='DC01'
 ping_retry=30
 repeat=1
@@ -22,6 +29,7 @@ start_fio()
       disktype=$2
       nfsserver=$3
       testduration=$4
+      testname=$5
       fiofile=fio.$nfsserver
       #cd /mnt/elastifile
       echo $iotype $disktype $nfsserver
@@ -31,7 +39,7 @@ start_fio()
       cat fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=elfs.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
+      logfile=$testname.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
       sudo fio fio.$iotype --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
@@ -75,7 +83,7 @@ then
          for j in "${iotype[@]}"
          do 
 	     echo $j     
-             start_fio $j $testtype $nfs_server $testduration
+             start_fio $j $testtype $nfs_server $testduration $testname
 	     export current=`date +"%s"`
 	     echo $current, $fio_start
 	     delta=$((current-fio_start))
