@@ -55,10 +55,10 @@ provision_elastifile() {
     
     terraform apply --auto-approve &
 
-    maxcount=15
+    maxcount=30
     count=0
     ret=1
-    sleep 300
+    
     while [ $count -lt $maxcount ] && [ $ret -eq 1 ]; do
         num_terraform_proc=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
         echo "processs is $num_terrform_proc"
