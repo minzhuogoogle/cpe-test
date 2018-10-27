@@ -139,7 +139,7 @@ inject_failure_into_cluster() {
     failure_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     echo "vm to be deleted: $failure_node, $project, $zone"
     gcloud compute instances delete $failure_node --project $project --zone $zone -q
-} 
+}
 
 
 is_test_done() {
@@ -211,6 +211,7 @@ deletion=$3
 testduration=$4
 testname=$5
 clients=1
+skipprovision=0
 
 echo  $disktype $mfio $deletion $testduration $testname
 
@@ -219,7 +220,7 @@ case "$testname" in
     *-perf-* ) echo "preppare perf test";;
     *-scalability-* ) echo "prepare scability test";clients=256;;
     *-ha-* ) echo "prepare ha test";ha=1;;
-    *-io-* ) echo "prepare io only test";;
+    *-io-* ) echo "prepare io only test";skipprovision=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; newelfs="pselfs-$disktype";;
     * ) echo "Error...";;
 esac
@@ -249,8 +250,9 @@ echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
-
-provision_elastifile
+if [ "$skipprovision"  -eq "0" ]; then
+    provision_elastifile
+fi
 retval=$?
 if [ $retval -ne 0 ]; then
     cleanup
@@ -284,7 +286,7 @@ done
 export now=` date `
 if [ "$ha" -eq '1' ]; then
     inject_failure_into_cluster 
-fi  
+fi 
 echo $now
 
 sleep $(($testduration*6+300)) 
