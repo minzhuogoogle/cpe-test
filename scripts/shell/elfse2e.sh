@@ -51,9 +51,9 @@ provision_elastifile() {
        exit -1
     fi
     echo "run terraform apply to start elfs instance"
-    #if  [ "$pstest" == "1" ]; then
-        #sed -i 's/elfs/pselfs/' terraform.tfvars
-    #fi
+    if  [ "$pstest" == "1" ]; then
+        sed -i 's/elfs/pselfs/' terraform.tfvars
+    fi
    
     cat terraform.tfvars
     
@@ -329,14 +329,9 @@ sleep 600
 export now=` date `
 echo $now
 
-#if [ "$deletion" -eq '1' ]; then
-#   if [ "$pstest" -eq "1" ]; then
-#        cleanup "$disktype-pselfs"
-#   fi
-#   cleanup "$disktype-elfs"  
-#fi
-
-
+if [ "$pstest" -eq "1" ]; then
+   cleanup "pselfs"  
+fi
 
 if [ "$fio_done" -eq "0" ]; then
     echo "io testing might have problem."
