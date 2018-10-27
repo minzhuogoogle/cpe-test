@@ -249,7 +249,7 @@ if [ "$deletion" -eq "1" ] ; then
   fi
 fi
 
-if [ "$skipprovision"  -eq "0" ]; then
+if [ "$skipprovision" == "0" ]; then
     provision_elastifile
 fi
 retval=$?
