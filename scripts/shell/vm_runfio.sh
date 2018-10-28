@@ -31,7 +31,7 @@ start_fio()
       nfsserver=$3
       testduration=$4
       testname=$5
-      fiofile=$iotype_$nfsserver
+      fiofile=$iotype.$nfsserver
       #cd /mnt/elastifile
       echo $iotype $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
