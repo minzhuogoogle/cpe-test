@@ -261,7 +261,7 @@ echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
 echo "delete VMs"
-export vmlists=`gcloud compute instances list --project $project --zone $zone --filter="-name ~ elfs AND name ~ $disktype" grep -v NAME | cut -d ' ' -f1`
+export vmlists=`gcloud compute instances list --project $project --filter="-name ~ elfs AND name ~ $disktype" | grep -v NAME | cut -d ' ' -f1`
 for i in $vmlists
 do 
        echo "vm to be deleted: $i, $project, $zone"
