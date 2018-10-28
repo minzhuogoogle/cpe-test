@@ -20,7 +20,8 @@ sudo apt-get iputils-ping
 sudo apt install fio -y
 sudo apt install nfs-common -y
 sudo mkdir -p /mnt/elastifile
-gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
+#gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
+gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
 
 start_fio() 
