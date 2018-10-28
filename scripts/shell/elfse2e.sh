@@ -215,11 +215,9 @@ cleanup() {
 # ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
 # --------------
 disktype=$1
-mfio=$2
-deletion=$3
-testduration=$4
-testname=$5
-echo  $disktype $mfio $deletion $testduration $testname
+testduration=$2
+testname=$3
+echo  $disktype $testduration $testname
 
 project=''
 newelfs=''
