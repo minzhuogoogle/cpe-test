@@ -337,9 +337,14 @@ do
     for nfs_server in $nfs_server_ips
     do
         export now=`date +"%s"`
-        echo "this is now", $now
-        echo "wait until" $timer
-        start_vm $nfs_server $timer $testduration $testname
+        newtimer=`date -d "+ 2 minutes" +"%s"`
+        echo "this is now: ", $now, $newtimer
+        echo "wait until:" $timer
+        if [ $timer > $newtimer ]; then
+           start_vm $nfs_server $timer $testduration $testname
+        else
+           start_vm $nfs_server $newtimer $testduration $testname
+        fi
         export now=`date +"%s"`
         echo "this is now again", $now
         retval=$?
