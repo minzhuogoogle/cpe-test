@@ -231,21 +231,21 @@ clients=1
 fio_done=0
 vmseq=20
 ha=0
-skipprovision=0
+skipprovision=1
 pstest=0
 iotest=0
 
 case "$testname" in
-    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;;
+    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=6;skipprovision=1;iotest=1;mfio=3;;
-    *-ha-* ) echo "prepare ha test";ha=1;skipprovision=1;iotest=1;mfio=1;;
-    *-io-* ) echo "prepare io only test";skipprovision=1;iotest=1;mfio=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;;
+    *-scalability-* ) echo "prepare scability test";clients=6;iotest=1;mfio=3;;
+    *elfs-ha-* ) echo "prepare ha test";ha=1;iotest=1;mfio=1;;
+    *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;;
     * ) echo "Error...";;
 esac
 
-echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest
+echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $ha
 
 disktype_check $disktype
 retval=$?
