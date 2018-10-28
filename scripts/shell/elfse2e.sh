@@ -301,7 +301,7 @@ fi
 echo "nfs servers:" $nfs_server_ip
 
 # TODO: get number of enodes from nfs_server_ips
-if [ $mfio -eq 0 ] ; then
+if [ "$mfio" -eq "0" ] ; then
      snodes=1
 else
      snodes=3
@@ -333,7 +333,7 @@ do
         running_clients=$((running_clients+1))
     done
 done
-export now=` date `
+export now=`date`
 if [ "$ha" -eq "1" ]; then
     inject_failure_into_cluster 
 fi 
@@ -373,7 +373,7 @@ export now=` date `
 echo $now
 
 
-if [ $pstest -eq 1 ]; then
+if [ "$pstest" -eq "1" ]; then
     cleanup "$disktype-pselfs"
     cleanup "ps-$disktype-"
 fi
