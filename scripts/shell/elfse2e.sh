@@ -311,7 +311,7 @@ fi
 
 echo $nfs_server_ips $snodes
 
-delaytime=$(($snodes*$clients+10))
+delaytime=$(($snodes*$clients))
 export now=`date +"%s"`
 echo $now  "wait for this minutes:" $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
