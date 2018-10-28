@@ -275,8 +275,8 @@ fi
 
 retval=$?
 if [ $retval -ne 0 ]; then
-    if [ "$deletion" -eq "1" ] && [ $iotest -eq 0 ]; then
-         if [ $pstest -eq 1 ]; then
+    if [ "$deletion" -eq "1" ] && [ "$iotest" -eq "0" ]; then
+         if [ "$pstest" -eq "1" ]; then
              cleanup "$disktype-pselfs"
              cleanup "ps-$disktype-"
          else
@@ -292,7 +292,7 @@ if [ "$pstest" -eq "1" ]; then
 else
    snodename="$disktype-elfs-elfs-" 
 fi   
-if [ $mfio -eq 0 ] ; then
+if [ "$mfio" -eq "0" ] ; then
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
 else
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" `
