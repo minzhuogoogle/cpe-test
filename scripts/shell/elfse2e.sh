@@ -320,9 +320,12 @@ while [ $running_clients -lt $clients ]
 do
     for nfs_server in $nfs_server_ips
     do
-        export now=` date`
-        echo $now
+        export now=`date +"%s"`
+        echo "this is now", $now
+        echo "wait until" $timer
         start_vm $nfs_server $timer $testduration $testname
+        export now=`date +"%s"`
+        echo "this is now again", $now
         retval=$?
         if [ $retval -ne 0 ]; then
          #   cleanup
