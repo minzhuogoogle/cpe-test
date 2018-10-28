@@ -322,8 +322,11 @@ else
 fi 
 
 echo $nfs_server_ips $snodes
-
-delaytime=$(($clients+2))
+if [ $clients -lt 12 ]; then
+    delaytime=$(($clients+2))
+else
+    delaytime=12
+fi    
 export now=`date +"%s"`
 echo $now  "wait for this minutes:" $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
