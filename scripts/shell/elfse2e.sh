@@ -227,7 +227,7 @@ edisk=''
 
 clients=1
 fio_done=0
-vmseq=20
+vmseq=1
 ha=0
 skipprovision=1
 deletion=0
@@ -237,7 +237,7 @@ iotest=0
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=6;iotest=1;mfio=3;;
+    *-scalability-* ) echo "prepare scability test";clients=36;iotest=1;mfio=3;;
     *elfs-ha-* ) echo "prepare ha test";ha=1;iotest=1;mfio=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
@@ -293,6 +293,7 @@ if [ "$pstest" == "1" ]; then
 else
    snodename="$disktype-elfs-elfs-" 
 fi   
+echo $snodename $mfio $disktype
 if [ "$mfio" == "0" ] ; then
      echo $snodename $mfio $disktype
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
