@@ -235,12 +235,12 @@ pstest=0
 iotest=0
 
 case "$testname" in
-    *-daily-e2e* ) echo "prepare daily e2e test";;
-    *-perf-* ) echo "preppare perf test";skipprovision=1;;
-    *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;;
-    *-ha-* ) echo "prepare ha test";ha=1;skipprovision=1;;
-    *-io-* ) echo "prepare io only test";skipprovision=1;iotest=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;;
+    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;;
+    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;
+    *-scalability-* ) echo "prepare scability test";clients=256;skipprovision=1;iotest=1;mfio=3;;
+    *-ha-* ) echo "prepare ha test";ha=1;skipprovision=1;iotest=1;mfio=1;;
+    *-io-* ) echo "prepare io only test";skipprovision=1;iotest=1;mfio=1;;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;
     * ) echo "Error...";;
 esac
 
@@ -310,10 +310,11 @@ fi
 
 echo $nfs_server_ips $snodes
 
-delaytime=$(($snodes*$clients))
-export now=` date +"%s"`
-echo $now $delaytime
+delaytime=$(($snodes*$clients+10))
+export now=`date +"%s"`
+echo $now  "wait for this minutes:" $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
+echo `date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
 while [ $running_clients -lt $clients ]
 do
