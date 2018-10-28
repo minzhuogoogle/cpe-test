@@ -259,8 +259,8 @@ echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
-if [ "$deletion" -eq "1" ] && [ $iotest -eq 0 ]; then
-    if [ $pstest -eq 1 ]; then
+if [ "$deletion" == "1" ] && [ "$iotest" == "0" ]; then
+    if [ "$pstest" == "1" ]; then
          cleanup "$disktype-pselfs"
          cleanup "ps-$disktype-"
     else
@@ -275,7 +275,7 @@ fi
 
 retval=$?
 if [ $retval -ne 0 ]; then
-    if [ "$deletion" -eq "1" ] && [ "$iotest" -eq "0" ]; then
+    if [ "$deletion" == "1" ] && [ "$iotest" == "0" ]; then
          if [ "$pstest" -eq "1" ]; then
              cleanup "$disktype-pselfs"
              cleanup "ps-$disktype-"
@@ -287,12 +287,12 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-if [ "$pstest" -eq "1" ]; then
+if [ "$pstest" == "1" ]; then
    snodename="$disktype-pselfs-elfs-" 
 else
    snodename="$disktype-elfs-elfs-" 
 fi   
-if [ "$mfio" -eq "0" ] ; then
+if [ "$mfio" == "0" ] ; then
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
 else
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" `
@@ -301,7 +301,7 @@ fi
 echo "nfs servers:" $nfs_server_ip
 
 # TODO: get number of enodes from nfs_server_ips
-if [ "$mfio" -eq "0" ] ; then
+if [ "$mfio" == "0" ] ; then
      snodes=1
 else
      snodes=3
@@ -334,7 +334,7 @@ do
     done
 done
 export now=`date`
-if [ "$ha" -eq "1" ]; then
+if [ "$ha" == "1" ]; then
     inject_failure_into_cluster 
 fi 
 echo $now
@@ -344,7 +344,7 @@ sleep $(($testduration*6+30))
 logfiles_uploaded
 no_of_logfiles=$?
 echo $no_of_logfiles
-if [ "$mfio" -eq "0" ]; then
+if [ "$mfio" == "0" ]; then
     expected_logfile=$((clients*6))
 else
     expected_logfile=$((snodes*clients*6))
@@ -356,7 +356,7 @@ fi
 
 
 count=0
-while [[ "$fio_done" -eq "0"  &&  $count -lt 60 ]] 
+while [[ "$fio_done" == "0"  &&  $count -lt 60 ]] 
 do
    sleep 60
    logfiles_uploaded
@@ -373,12 +373,12 @@ export now=` date `
 echo $now
 
 
-if [ "$pstest" -eq "1" ]; then
+if [ "$pstest" == "1" ]; then
     cleanup "$disktype-pselfs"
     cleanup "ps-$disktype-"
 fi
 
-if [ "$fio_done" -eq "0" ]; then
+if [ "$fio_done" == "0" ]; then
     echo "io testing might have problem."
     exit -1
 fi  
