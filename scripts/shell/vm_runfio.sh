@@ -94,7 +94,7 @@ then
 	        sleep 1
 		export current=`date +"%s"`
 		delta=$((current-fio_start))
-		echo $current, $fio_start
+		echo $current, $fio_start,  "<===>" $delta, $expected_gap
              done
 	     testno=$((testno+1))
          done
