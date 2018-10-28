@@ -293,8 +293,10 @@ else
    snodename="$disktype-elfs-elfs-" 
 fi   
 if [ "$mfio" == "0" ] ; then
+     echo $snodename $mfio $disktype
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
 else
+     echo $snodename $mfio $disktype
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" `
 fi     
 
