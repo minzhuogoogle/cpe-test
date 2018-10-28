@@ -18,7 +18,8 @@ disktype_check()
 initialization()
 {
    cd gcp-automation/
-   gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
+   #gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
+   gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
    cat terraform.tfvars
