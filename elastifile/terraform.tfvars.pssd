@@ -14,7 +14,7 @@ DISK_CONFIG = "4_375"
 USE_LB = "false"
 MIN_CLUSTER = "3"
 # instance prefix
-CLUSTER_NAME = "pssd-elfs
+CLUSTER_NAME = "pssd-elfs"
 # GCP zone
 ZONE = "us-east1-b"
 # GCP project
