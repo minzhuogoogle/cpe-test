@@ -17,7 +17,7 @@ disktype_check()
 
 initialization()
 {
-   cd gcp-automation/
+   cd /workplace/gcp-automation/
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
    #gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
@@ -39,6 +39,7 @@ initialization()
 
 
 provision_elastifile() {
+    cd /workplace/gcp-automation/
     echo "iotest ?"  $iotest
     if [ $iotest -eq 1 ]; then
         return 0
