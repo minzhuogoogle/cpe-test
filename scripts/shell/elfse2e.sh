@@ -17,7 +17,7 @@ disktype_check()
 
 initialization()
 {
-   cd /workplace/gcp-automation/
+   cd gcp-automation/
    echo `pwd`
    echo $disktype
    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
@@ -43,7 +43,7 @@ initialization()
 
 
 provision_elastifile() {
-    cd /workplace/gcp-automation/
+    #cd gcp-automation/
     echo "iotest ?"  $iotest
     if [ $iotest -eq 1 ]; then
         return 0
