@@ -18,6 +18,10 @@ disktype_check()
 initialization()
 {
    cd /workplace/gcp-automation/
+   echo `pwd`
+   echo $disktype
+   curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
+   
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
    #gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
