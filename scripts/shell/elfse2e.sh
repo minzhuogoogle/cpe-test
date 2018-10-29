@@ -49,6 +49,7 @@ provision_elastifile() {
        return -1
     fi
     echo "run terraform apply to start elfs instance"
+    sed -i 's/ssd/persistent/' terraform.tfvar
     if  [ "$pstest" == "1" ]; then
         sed -i 's/elfs/pselfs/' terraform.tfvars
     fi
