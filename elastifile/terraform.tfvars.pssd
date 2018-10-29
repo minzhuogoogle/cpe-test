@@ -2,7 +2,7 @@ EMPLATE_TYPE = "small"
 #small,medium,standard,custom
 NUM_OF_VMS = "3"
 USE_LB = "false"
-DISK_TYPE = "ssd"
+DISK_TYPE = "persistent"
 #local,ssd,hdd
 VM_CONFIG = "4_42"
 # <cpucores>_<ram> default: 4_42
