@@ -15,7 +15,7 @@ USE_LB = "true"
 #
 MIN_CLUSTER = "3"
 # instance prefix
-CLUSTER_NAME = "lssd-elfs"
+CLUSTER_NAME = "phdd-elfs"
 # GCP zone
 ZONE = "us-east1-b"
 # GCP project
