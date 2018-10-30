@@ -139,6 +139,10 @@ start_vm() {
      else
           vminstance="vm-$disktype-$(hostname)-$vmseq"
      fi
+     if [ $demo_test -eq 1 ]; then
+          vminstance="demovm-$disktype-$(hostname)-$vmseq"
+     fi     
+     
      echo $vminstance
 
      gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
@@ -294,12 +298,15 @@ if [ $demo_test == 0 ]; then
    else
        export vmlists=`gcloud compute instances list --project $project --filter="psvm-$disktype" | grep -v NAME | cut -d ' ' -f1`
    fi    
-   for i in $vmlists
-   do 
+else
+   export vmlists=`gcloud compute instances list --project $project --filter="demovm-$disktype" | grep -v NAME | cut -d ' ' -f1`
+fi   
+for i in $vmlists
+do 
        echo "vm to be deleted: $i, $project, $zone"
        gcloud compute instances delete $i --project $project --zone $zone -q; 
-   done
-fi   
+done
+   
    
 
 echo "delete elfs nodes........"
