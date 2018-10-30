@@ -276,9 +276,9 @@ echo "terraform type = $edisk"
 
 echo "delete traffic VMs........"
 if [ $pstest -eq 0 ]; then
-    export vmlists=`gcloud compute instances list --project $project --filter="-name ~ vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
+    export vmlists=`gcloud compute instances list --project $project --filter="vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
 else
-    export vmlists=`gcloud compute instances list --project $project --filter="name ~ psvm-$disktype" | grep -v NAME | cut -d ' ' -f1`
+    export vmlists=`gcloud compute instances list --project $project --filter="psvm-$disktype" | grep -v NAME | cut -d ' ' -f1`
 fi    
 for i in $vmlists
 do 
