@@ -170,7 +170,7 @@ logfiles_uploaded() {
 }
 
 delete_vm() {
-    protected_nodes = ( gke-prow-default-pool-acf595a2-bldl gke-prow-default-pool-acf595a2-hv8b)
+    protected_nodes=(gke-prow-default-pool-acf595a2-bldl gke-prow-default-pool-acf595a2-hv8b)
     name=$1
     
     for i in `gcloud compute instances list --project $project --filter=$name | grep -v NAME | cut -d ' ' -f1`; 
