@@ -307,7 +307,7 @@ if [ $retval -ne 0 ]; then
          if [ "$pstest" -eq "1" ]; then
              cleanup "$disktype-pselfs"
          else
-             cleanup "$disktype-elsf"
+             cleanup "$disktype-elfs"
          fi   
     fi
     exit -1
