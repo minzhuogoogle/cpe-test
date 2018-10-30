@@ -170,10 +170,18 @@ logfiles_uploaded() {
 }
 
 delete_vm() {
+    protected_nodes = ( gke-prow-default-pool-acf595a2-bldl gke-prow-default-pool-acf595a2-hv8b)
     name=$1
+    
     for i in `gcloud compute instances list --project $project --filter=$name | grep -v NAME | cut -d ' ' -f1`; 
     do 
        echo "vm to be deleted: $i, $project, $zone"
+       for x in "${protected_nodes[@]}"
+       do
+           if [ "$i" == "$x" ]; then
+               return 0
+           fi
+       done
        gcloud compute instances delete $i --project $project --zone $zone -q; 
     done
     retval=$?
