@@ -5,11 +5,11 @@ TEMPLATE_TYPE = "small"
 # number of vheads exlusive of EMS
 NUM_OF_VMS = "4"
 # <cpucores>_<ram> default: 4_42
-VM_CONFIG = "4_42"
+VM_CONFIG = "4_32"
 #local,persistent,hdd
 DISK_TYPE = "persistent"
 # <num_of_disks>_<disk_size>
-DISK_CONFIG = "8_1000"
+DISK_CONFIG = "4_175"
 # "true" "false"
 USE_LB = "false"
 MIN_CLUSTER = "3"
