@@ -345,7 +345,7 @@ else
        snodename="$disktype-elfs-elfs-" 
     fi 
 fi    
-snodename="demo-lsdd-vm" 
+snodename="demo-lsdd-vm-elfs" 
 echo $snodename $mfio $disktype
 if [ "$mfio" == "0" ] ; then
      echo $snodename $mfio $disktype
