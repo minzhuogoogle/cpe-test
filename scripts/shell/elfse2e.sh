@@ -287,17 +287,20 @@ echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
-echo "delete traffic VMs........"
-if [ $pstest -eq 0 ]; then
-    export vmlists=`gcloud compute instances list --project $project --filter="vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
-else
-    export vmlists=`gcloud compute instances list --project $project --filter="psvm-$disktype" | grep -v NAME | cut -d ' ' -f1`
-fi    
-for i in $vmlists
-do 
-    echo "vm to be deleted: $i, $project, $zone"
-    gcloud compute instances delete $i --project $project --zone $zone -q; 
-done
+if [ $demo_test == 0 ]; then
+   echo "delete traffic VMs........"
+   if [ $pstest -eq 0 ]; then
+       export vmlists=`gcloud compute instances list --project $project --filter="vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
+   else
+       export vmlists=`gcloud compute instances list --project $project --filter="psvm-$disktype" | grep -v NAME | cut -d ' ' -f1`
+   fi    
+   for i in $vmlists
+   do 
+       echo "vm to be deleted: $i, $project, $zone"
+       gcloud compute instances delete $i --project $project --zone $zone -q; 
+   done
+fi   
+   
 
 echo "delete elfs nodes........"
 if [ "$deletion" == "1" ]; then
