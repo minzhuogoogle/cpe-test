@@ -264,9 +264,9 @@ case "$testname" in
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
-    *-demo-lssd-* ) echo "prepare to run io on demo lssd instance";iotest=1;snodename="demo-lsdd-vm";iotest=1;clients=12;demo_test=1;mfio=1;;
-    *-demo-pssd-* ) echo "prepare to run io on demo pssd instance";iotest=1;snodename="demo-pssd-vm";iotest=1;clients=12;demo_test=1;mfio=1;;
-    *-demo-phdd-* ) echo "prepare to run io on demo phhd instance";iotest=1;snodename="demo-phhd-vm";iotest=1;clients=12;demo_test=1;mfio=1;;
+    *-demo-lssd-* ) echo "prepare to run io on demo lssd instance";iotest=1;snodename="demo-lsdd-vm";iotest=1;clients=36;demo_test=1;mfio=1;;
+    *-demo-pssd-* ) echo "prepare to run io on demo pssd instance";iotest=1;snodename="demo-pssd-vm";iotest=1;clients=36;demo_test=1;mfio=1;;
+    *-demo-phdd-* ) echo "prepare to run io on demo phhd instance";iotest=1;snodename="demo-phhd-vm";iotest=1;clients=36;demo_test=1;mfio=1;;
     * ) echo "Error...";;
 esac
 
@@ -345,7 +345,9 @@ else
        snodename="$disktype-elfs-elfs-" 
     fi 
 fi    
-snodename="demo-lsdd-vm-elfs" 
+if [ $disktype == "lssd" ]; then
+    snodename="demo-lsdd-vm-elfs" 
+fi
 echo $snodename $mfio $disktype
 if [ "$mfio" == "0" ] ; then
      echo $snodename $mfio $disktype
