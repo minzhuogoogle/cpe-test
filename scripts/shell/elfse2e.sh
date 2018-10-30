@@ -195,6 +195,7 @@ delete_routers() {
 
 cleanup() {
     vmaffix=$1
+    echo "all vm with $vmaffix will be deleted"
     if [ "$vmaffix" == '' ]; then
         vmaffix='elfs'
     fi
@@ -203,7 +204,7 @@ cleanup() {
     if [ $checklen -eq 0 ]; then
        return
     fi  
-    delete_vm $vmaffix
+    #delete_vm $vmaffix
     retval=$?
     if [ $retval -ne 0 ]; then
            return -1
@@ -242,12 +243,12 @@ iotest=0
 cleanup=0
 
 case "$testname" in
-    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
+    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=0;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
     *-scalability-* ) echo "prepare scability test";clients=9;iotest=1;mfio=1;;
     *elfs-ha-* ) echo "prepare ha test";ha=1;iotest=1;mfio=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=0;;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
     * ) echo "Error...";;
 esac
@@ -273,7 +274,7 @@ echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
-echo "delete VMs"
+echo "delete traffic VMs........"
 if [ $pstest -eq 0 ]; then
     export vmlists=`gcloud compute instances list --project $project --filter="-name ~ vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
 else
@@ -282,14 +283,16 @@ fi
 for i in $vmlists
 do 
     echo "vm to be deleted: $i, $project, $zone"
-    gcloud compute instances delete $i --project $project --zone $zone -q; 
+    #gcloud compute instances delete $i --project $project --zone $zone -q; 
 done
 
-
+echo "delete elfs nodes........"
 if [ "$deletion" == "1" ]; then
     if [ "$pstest" == "1" ]; then
+         echo "delete elfs nodes created during postsubmit test........" 
          cleanup "$disktype-pselfs"
     else
+         echo "delete elfs nodes created during test........" 
          cleanup "$disktype-elsf"
     fi   
 fi
