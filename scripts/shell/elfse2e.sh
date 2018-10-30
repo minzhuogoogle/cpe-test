@@ -260,7 +260,7 @@ case "$testname" in
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
-    *-demo-lssd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-lssd-vm";demo_test=1;
+    *-demo-lssd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-lssd-vm";clients=9;demo_test=1;
     *-demo-pssd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-pssd-vm";demo_test=1;
     *-demo-phdd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-phhd-vm";demo_test=1;
     * ) echo "Error...";;
