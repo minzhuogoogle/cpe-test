@@ -16,7 +16,7 @@ metadata:
 data:
   config.yaml: |
     periodics:
-    - interval: 60m
+    - interval: 3600m
       agent: kubernetes
       name: echo-test
       spec:

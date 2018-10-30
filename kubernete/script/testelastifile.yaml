@@ -1,15 +1,26 @@
 # This is to provision an Elastifile instance 
+#spec:
+#    containers:
+#    - image: gcr.io/cpe-performance-storage/elastifile:v20181013-f8c6bc0
+#      tty: true
+#      stdin: true
+#      command:
+#      - /bin/bash
+#      - -c
+#      args:
+#      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elastifile_deploy.sh; chmod 777 elastifile_deploy.sh; ./elastifile_deploy.sh; sleep 1200'
+
 apiVersion: v1
 kind: Pod
 metadata:
-  name: elastifile-cluster
+  name: elastifile-cluster-2
 spec:
   containers:
-  - image: gcr.io/cpe-performance-storage/elastifile:v20181012-f8c6bc0
-    name: elastifile-cluster
+  - image: gcr.io/cpe-performance-storage/elastifile:latest
+    name: elastifile-cluster-2
     tty: true
     stdin: true
     command:
-      - sh
+      - /bin/bash
       - -c
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elastifile_deploy.sh; chmod 777 elastifile_deploy.sh; ./elastifile_deploy.sh'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/pstest.sh; chmod 777 pstest.sh; sleep 99999'
