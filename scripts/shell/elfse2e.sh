@@ -132,6 +132,7 @@ start_vm() {
      test_name=$4
      echo "project = $project"
      echo "zone = $zone"
+     zone="us-east1-b"
      machine_type='n1-standard-1'
      if [ $pstest -eq 1 ]; then
           vminstance="psvm-$disktype-$(hostname)-$vmseq"
