@@ -250,6 +250,7 @@ deletion=0
 pstest=0
 iotest=0
 cleanup=0
+demo_test=0
 
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
@@ -259,6 +260,9 @@ case "$testname" in
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
+    *-demo-lssd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-lssd-vm";demo_test=1;
+    *-demo-pssd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-pssd-vm";demo_test=1;
+    *-demo-phdd-* ) echo "prepare to run io on demo instance";iotest=1;snodename="demo-phhd-vm";demo_test=1;
     * ) echo "Error...";;
 esac
 
@@ -322,11 +326,17 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-if [ "$pstest" == "1" ]; then
-   snodename="$disktype-pselfs-elfs-" 
+if [ $demo_test == 1 ]; then
+    snodename="demo-$disktype-vm" 
 else
-   snodename="$disktype-elfs-elfs-" 
-fi   
+    if [ "$pstest" == "1" ]; then
+       snodename="$disktype-pselfs-elfs-" 
+    else
+       snodename="$disktype-elfs-elfs-" 
+    fi 
+fi    
+
+
 echo $snodename $mfio $disktype
 if [ "$mfio" == "0" ] ; then
      echo $snodename $mfio $disktype
@@ -336,17 +346,22 @@ else
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" `
 fi     
 
+vhead_count=0
+for i in nfs_server_ips
+do 
+    vhead_count=$((vhead_count+1))
+done    
 echo "nfs servers:" $nfs_server_ip
 
 # TODO: get number of enodes from nfs_server_ips
-if [ "$mfio" == "0" ] ; then
-     snodes=1
-else
-     snodes=4
-fi 
+#if [ "$mfio" == "0" ] ; then
+#     snodes=1
+#else
+#     snodes=4
+#fi 
 
-echo $nfs_server_ips $snodes
-delaytime=$(($clients+2))
+echo $nfs_server_ips $vhead_count
+delaytime=$(($clients*vhead_count+2))
 export now=`date +"%s"`
 echo $now  "wait for this minutes:" $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
@@ -389,7 +404,7 @@ echo $no_of_logfiles
 if [ "$mfio" == "0" ]; then
     expected_logfile=$((clients*6))
 else
-    expected_logfile=$((snodes*clients*6))
+    expected_logfile=$((vhead_count*clients*6))
 fi    
 
 if [ $no_of_logfiles -ge $expected_logfile ]; then
