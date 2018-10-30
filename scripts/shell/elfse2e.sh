@@ -204,7 +204,7 @@ cleanup() {
     if [ $checklen -eq 0 ]; then
        return
     fi  
-    #delete_vm $vmaffix
+    delete_vm $vmaffix
     retval=$?
     if [ $retval -ne 0 ]; then
            return -1
@@ -283,7 +283,7 @@ fi
 for i in $vmlists
 do 
     echo "vm to be deleted: $i, $project, $zone"
-    #gcloud compute instances delete $i --project $project --zone $zone -q; 
+    gcloud compute instances delete $i --project $project --zone $zone -q; 
 done
 
 echo "delete elfs nodes........"
