@@ -3,13 +3,13 @@ IMAGE = "elastifile-storage-2-7-5-12-ems"
 # "small" "medium" "large" "standard" "small standard" "local" "small local" "custom"
 TEMPLATE_TYPE = "small local"
 # number of vheads exlusive of EMS
-NUM_OF_VMS = "4"
+NUM_OF_VMS = "3"
 # <cpucores>_<ram> default: 4_42
 VM_CONFIG = "4_42"
 #local,persistent,hdd
 DISK_TYPE = "local"
 # <num_of_disks>_<disk_size>
-DISK_CONFIG = "8_375"
+DISK_CONFIG = "3_375"
 # "true" "false"
 USE_LB = "false"
 MIN_CLUSTER = "3"
