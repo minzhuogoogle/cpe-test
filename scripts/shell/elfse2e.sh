@@ -243,12 +243,12 @@ iotest=0
 cleanup=0
 
 case "$testname" in
-    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=0;;
+    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
     *-scalability-* ) echo "prepare scability test";clients=9;iotest=1;mfio=1;;
     *elfs-ha-* ) echo "prepare ha test";ha=1;iotest=1;mfio=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=0;;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
     * ) echo "Error...";;
 esac
