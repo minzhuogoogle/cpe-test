@@ -134,9 +134,9 @@ start_vm() {
      echo "zone = $zone"
      machine_type='n1-standard-1'
      if [ $pstest -eq 1 ]; then
-          vminstance="ps-$disktype-$(hostname)-$vmseq"
+          vminstance="psvm-$disktype-$(hostname)-$vmseq"
      else
-          vminstance="$disktype-$(hostname)-$vmseq"
+          vminstance="vm-$disktype-$(hostname)-$vmseq"
      fi
      echo $vminstance
 
@@ -239,18 +239,25 @@ skipprovision=1
 deletion=0
 pstest=0
 iotest=0
+cleanup=0
 
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=9;iotest=1;mfio=3;;
+    *-scalability-* ) echo "prepare scability test";clients=9;iotest=1;mfio=1;;
     *elfs-ha-* ) echo "prepare ha test";ha=1;iotest=1;mfio=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
+    *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
     * ) echo "Error...";;
 esac
 
-echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $ha
+echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $ha "cleanup?" $cleanup
+if [ $cleanup -eq 1 ]; then
+   echo "start cleanup resource"
+   cleanup "elfs"
+   return 0
+fi
 
 disktype_check $disktype
 retval=$?
@@ -267,22 +274,23 @@ echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
 echo "delete VMs"
-export vmlists=`gcloud compute instances list --project $project --filter="-name ~ ps AND -name ~ elfs AND name ~ $disktype" | grep -v NAME | cut -d ' ' -f1`
+if [ $pstest -eq 0 ]; then
+    export vmlists=`gcloud compute instances list --project $project --filter="-name ~ vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
+else
+    export vmlists=`gcloud compute instances list --project $project --filter="name ~ psvm$disktype" | grep -v NAME | cut -d ' ' -f1`
+fi    
 for i in $vmlists
 do 
-       echo "vm to be deleted: $i, $project, $zone"
-       gcloud compute instances delete $i --project $project --zone $zone -q; 
+    echo "vm to be deleted: $i, $project, $zone"
+    gcloud compute instances delete $i --project $project --zone $zone -q; 
 done
-cleanup "ps-$disktype-"
 
 
 if [ "$deletion" == "1" ]; then
     if [ "$pstest" == "1" ]; then
          cleanup "$disktype-pselfs"
-         cleanup "ps-$disktype-"
     else
          cleanup "$disktype-elsf"
-         cleanup "$disktype-"
     fi   
 fi
 
@@ -295,11 +303,9 @@ if [ $retval -ne 0 ]; then
     if [ "$deletion" == "1" ] && [ "$iotest" == "0" ]; then
          if [ "$pstest" -eq "1" ]; then
              cleanup "$disktype-pselfs"
-             cleanup "ps-$disktype-"
          else
              cleanup "$disktype-elsf"
-             cleanup "$disktype-"
-        fi   
+         fi   
     fi
     exit -1
 fi
@@ -324,15 +330,11 @@ echo "nfs servers:" $nfs_server_ip
 if [ "$mfio" == "0" ] ; then
      snodes=1
 else
-     snodes=3
+     snodes=4
 fi 
 
 echo $nfs_server_ips $snodes
-if [ $clients -lt 12 ]; then
-    delaytime=$(($clients+2))
-else
-    delaytime=12
-fi    
+delaytime=$(($clients+2))
 export now=`date +"%s"`
 echo $now  "wait for this minutes:" $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
@@ -408,5 +410,5 @@ fi
 
 if [ "$fio_done" == "0" ]; then
     echo "io testing might have problem."
-    exit -1
+    exit 0
 fi  
