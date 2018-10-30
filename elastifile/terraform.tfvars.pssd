@@ -11,7 +11,7 @@ DISK_TYPE = "persistent"
 # <num_of_disks>_<disk_size>
 DISK_CONFIG = "4_175"
 # "true" "false"
-USE_LB = "false"
+USE_LB = "true"
 MIN_CLUSTER = "3"
 # instance prefix
 CLUSTER_NAME = "pssd-elfs"
