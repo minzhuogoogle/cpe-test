@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && python -m pip install --upgrade pip setuptools wheel
 
 
+
 # Install gcloud
 ENV PATH=/google-cloud-sdk/bin:/workspace:${PATH} \
     CLOUDSDK_CORE_DISABLE_PROMPTS=0
@@ -56,16 +57,7 @@ RUN wget -q https://dl.google.com/dl/cloudsdk/channels/rapid/google-cloud-sdk.ta
     gcloud components install alpha beta kubectl && \
     gcloud info | tee /workspace/gcloud-info.txt  && \
     curl -OL https://raw.githubusercontent.com/GoogleCloudPlatform/python-docs-samples/master/iot/api-client/end_to_end_example/requirements.txt &&  \
-    pip install -r requirements.txt && \
-    wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_amd64.zip && \
-    unzip terraform_0.11.8_linux_amd64.zip && \
-    cp terraform /usr/local/bin/. && \
-    git clone https://github.com/Elastifile/gcp-automation.git && \
-    echo sunnydog > gcp-automation/password.txt && \
-    cd gcp-automation && \
-    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.lssd && \
-    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.pssd && \
-    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.phdd
+    pip install -r requirements.txt
 
 #ADD runner /
 ENTRYPOINT ["/bin/bash"]

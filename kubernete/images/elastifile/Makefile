@@ -14,8 +14,8 @@
 
 VERSION := $(shell date +v%Y%m%d)-$(shell git describe --tags --always --dirty)
 
-IMG="gcr.io/cpe-performance-storage/elastifile-test"
-
+IMG="gcr.io/cpe-performance-storage/elastifile"
+#IMG="gcr.io/gtp-cpe-integration-testing/elastifile"
 image:
 	docker build --build-arg "IMAGE_ARG=$(IMG):$(VERSION)" -t "$(IMG):$(VERSION)" .
 

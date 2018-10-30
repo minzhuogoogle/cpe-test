@@ -32,7 +32,7 @@ Run wget https://releases.hashicorp.com/terraform/0.11.8/terraform_0.11.8_linux_
     cd gcp-automation && \
     curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.lssd && \
     curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.pssd && \
-    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.phdd
+    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.phdd  
 
 #ADD runner /
 ENTRYPOINT ["/bin/bash"]
