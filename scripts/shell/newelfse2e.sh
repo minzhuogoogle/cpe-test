@@ -2,7 +2,8 @@
 
 delete_vm() {
     name=$1
-    for i in `gcloud compute instances list --project $project --filter=$name  | cut -d ' ' -f1`;
+    echo $name
+    for i in `gcloud compute instances list --project $project --filter=$name  | grep -v NAME |  cut -d ' ' -f1`;
     do
        echo "vm to be deleted: $i, $project, $zone"
        gcloud compute instances delete $i --project $project --zone $zone -q;
@@ -360,6 +361,7 @@ emsname="$disktype-elfs"
 enodename="$disktype-elfs-elfs"
 testvmname="vm-$disktype"
 
+echo $emsname, $enodename, $testvmname
 project=''
 newelfs=''
 zone=''
@@ -418,12 +420,12 @@ fi
 
 
 echo "delete traffic VMs........"
-cleanup $testvmname
+delete_vm $testvmname
 
 echo "delete elfs nodes........"
 if [ "$deletion" == "1" ]; then
     echo "delete elfs nodes........"
-    cleanup $emsname
+    delete_vm $emsname
 fi
 
 if [ "$skipprovision" == "0" ]; then
@@ -518,7 +520,6 @@ echo $now
 
 if [ "$pstest" == "1" ]; then
     cleanup $emsname
-    cleanup $enodename
     cleanup $testvmname 
 fi
 
