@@ -424,7 +424,7 @@ if [ "$skipprovision" == "0" ]; then
     provision_elastifile
     retval=$?
     if [ $retval -ne 0 ]; then
-        return -1
+        exit -1
     fi
 fi
 
@@ -467,15 +467,11 @@ do
         retval=$?
         if [ $retval -ne 0 ]; then
             echo "Fail to create test vm."
-            return -1 
+            delete_vm $testvmname
+            exit -1 
         fi 
         export now=`date +"%s"`
         echo "this is now again", $now
-        retval=$?
-        if [ $retval -ne 0 ]; then
-         #   cleanup
-            return -1
-        fi
         running_clients=$((running_clients+1))
     done
 done
@@ -526,5 +522,5 @@ fi
 
 if [ "$io_test_done" == "0" ]; then
     echo "io testing might have problem."
-    return 0
+    exit -1
 fi 
