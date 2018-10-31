@@ -1,5 +1,115 @@
 #!/bin/bash
 
+delete_vm() {
+    name=$1
+    echo $name
+    for i in `gcloud compute instances list --project $project --filter=$name  | grep -v NAME |  cut -d ' ' -f1`;
+    do
+       echo "vm to be deleted: $i, $project, $zone"
+       gcloud compute instances delete $i --project $project --zone $zone -q;
+       retval=$?
+       if [ $retval -ne 0 ]; then
+          return -1
+       fi
+    done
+    return 0
+}
+
+delete_address() {
+    name=$1
+    region=$2
+    for i in `gcloud compute addresses list --project $project --filter=$region | grep $name |  cut -d ' ' -f1`
+    do
+       echo "addess to be deleted: $i, $project, $region"
+       gcloud compute addresses delete $i --project $project --region $region -q;
+          retval=$?
+       if [ $retval -ne 0 ]; then
+          return -1
+       fi
+
+    done
+
+}
+
+delete_subnet() {
+    name=$1
+    region=$2
+    for i in `gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1`;
+    do
+       echo "subnet to be deleted: $i, $project, $region"
+       gcloud compute  networks subnets delete $i --project $project --region $region -q;
+          retval=$?
+       if [ $retval -ne 0 ]; then
+          return -1
+       fi
+
+    done
+}
+
+delete_route() {
+    name=$1
+    region=$2
+
+    for i in `gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1`;
+    do
+       echo "route to be deleted: $i, $project, $region"
+       gcloud compute  routes delete $i --project $project -q;
+       retval=$?
+       if [ $retval -ne 0 ]; then
+          return -1
+       fi
+
+     done
+}
+
+delete_network() {
+    name=$1
+    region=$2
+    for i in `gcloud compute networks list --project $project  --filter=$region | grep $name | cut -d ' ' -f1`;
+    do
+       echo "network to be deleted: $i, $project, $region"
+
+       gcloud compute networks  delete $i --project $project -q;
+       retval=$?
+       if [ $retval -ne 0 ]; then
+          return -1
+       fi
+     done
+}
+
+delete_firewall() {
+    name=$1
+    region=$2
+    for i in `gcloud compute networks list --project $project  --filter=$region | grep $name | cut -d ' ' -f1`;
+    do
+       echo "network to be deleted: $i, $project, $region"
+
+       gcloud compute networks  delete $i --project $project -q;
+       retval=$?
+       if [ $retval -ne 0 ]; then
+          return -1
+       fi
+     done
+}
+
+cleanup() {
+    name=$1
+    delete_vm $name
+    for i in `gcloud compute regions list  | cut -d ' ' -f1`
+    do
+          echo $i
+          if [[ $i =~ "NAME" ]]; then
+             echo "skip"
+             continue
+          fi
+          delete_address $name  $i
+          delete_subnet $name $i
+          delete_route $name $i
+          delete_network $name $i
+          delete_firewall $name $i
+    done
+}
+
 disktype_check()
 {
     disktype=$1
@@ -21,15 +131,13 @@ initialization()
    echo `pwd`
    echo $disktype
    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
-   
    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
-   #gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
    gcloud auth activate-service-account --key-file elastifile.json
    cp terraform.tfvars.$disktype terraform.tfvars
    cat terraform.tfvars
    # temporarily disable load-balancing
    sed -i 's/true/false/' terraform.tfvars
- 
+
    export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
    zone=${zone:1:-1}
    export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
@@ -47,7 +155,7 @@ provision_elastifile() {
     echo "iotest ?"  $iotest
     if [ $iotest -eq 1 ]; then
         return 0
-    fi    
+    fi
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -60,13 +168,13 @@ provision_elastifile() {
     fi
     echo "==== new terraform.tfvars====="
     cat terraform.tfvars
-    
+
     terraform apply --auto-approve | tee -a output.txt &
 
     maxcount=30
     count=0
     ret=1
-    
+
     while [ $count -lt $maxcount ] && [ $ret -eq 1 ]; do
         num_terraform_proc=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
         echo "processs is $num_terrform_proc"
@@ -89,7 +197,7 @@ provision_elastifile() {
         echo "finished"
         retval=0
     fi
-    
+
     echo "retval=$retval"
     echo $(tail -5 create_vheads.log )
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
@@ -98,22 +206,22 @@ provision_elastifile() {
 
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-       
+
        cat terraform.tfvars >> output.txt
        if  [ -f "create_vheads.log" ]; then
-          cat create_vheads.log >> output.txt 
-       fi   
+          cat create_vheads.log >> output.txt
+       fi
        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
        name=$disktype-elfs
        return -1
     fi
-    
+
     if  [ -f "create_vheads.log" ]; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
        cat terraform.tfvars >> output.txt
-       cat create_vheads.log >> output.txt 
+       cat create_vheads.log >> output.txt
        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
        gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
        echo $logfile
@@ -121,7 +229,7 @@ provision_elastifile() {
     else
        return -1
     fi
-    
+
 }
 
 
@@ -134,18 +242,10 @@ start_vm() {
      echo "zone = $zone"
      zone="us-east1-b"
      machine_type='n1-standard-1'
-     if [ $pstest -eq 1 ]; then
-          vminstance="psvm-$disktype-$(hostname)-$vmseq"
-     else
-          vminstance="vm-$disktype-$(hostname)-$vmseq"
-     fi
-     if [ $demo_test -eq 1 ]; then
-          vminstance="demovm-$disktype-$(hostname)-$vmseq"
-     fi     
-     
-     echo $vminstance
 
-     gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
+     echo $testvmname
+
+     gcloud compute --project=$project instances create $testvmname  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
      retval=$?
      if [ $retval -ne 0 ]; then
            return -1
@@ -158,12 +258,30 @@ start_vm() {
 inject_failure_into_cluster() {
     failure_node_name="$disktype-elfs-elfs"
     failure_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
-    echo "vm to be deleted: $failure_node, $project, $zone"
-    gcloud compute instances delete $failure_node --project $project --zone $zone -q
-    retval=$?
-    if [ $retval -ne 0 ]; then
-           return -1
-    fi
+    traffic_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
+    case "$testname" in
+        *node* ) echo "prepare to inject failure in enode";
+                 echo "vm to be deleted: $failure_node, $project, $zone"
+                 start_vm $traffic_node 0 1200 $testname
+                 gcloud compute instances delete $failure_node --project $project --zone $zone -q
+                 retval=$?
+                 if [ $retval -ne 0 ]; then
+                    return -1
+                 fi
+
+          ;;
+        *storage* ) echo "preppare to inject failure in storage on enode";
+                 echo "vm to be deleted: $failure_node, $project, $zone"
+                 start_vm $traffic_node 0 1200 $testname
+                 gcloud compute instances delete $failure_node --project $project --zone $zone -q
+                 retval=$?
+                 if [ $retval -ne 0 ]; then
+                    return -1
+                 fi
+
+          ;;
+        * ) echo "Error...";;
+    esac
     return 0
 }
 
@@ -174,12 +292,12 @@ logfiles_uploaded() {
    return $number_logfiles
 }
 
-delete_vm() {
+old_delete_vm() {
     #protected_nodes=(gke-prow-default-pool-acf595a2-bldl gke-prow-default-pool-acf595a2-hv8b)
     name=$1
-    
-    for i in `gcloud compute instances list --project $project --filter=$name | grep -v NAME | cut -d ' ' -f1`; 
-    do 
+
+    for i in `gcloud compute instances list --project $project --filter=$name | grep -v NAME | cut -d ' ' -f1`;
+    do
        echo "vm to be deleted: $i, $project, $zone"
        ##for x in "${protected_nodes[@]}"
        #do
@@ -187,7 +305,7 @@ delete_vm() {
        #        return 0
        #    fi
        #done
-       gcloud compute instances delete $i --project $project --zone $zone -q; 
+       gcloud compute instances delete $i --project $project --zone $zone -q;
     done
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -197,16 +315,8 @@ delete_vm() {
 }
 
 
-delete_routers() {
 
-    for i in `gcloud compute network list --project $project --filter=$vm_name | grep -v NAME | cut -d ' ' -f1`;
-    do
-       gcloud compute instances delete $i --project $project --zone $zone -q;
-    done
-}
-
-
-cleanup() {
+old_cleanup() {
     vmaffix=$1
     echo "all vm with $vmaffix will be deleted"
     if [ "$vmaffix" == '' ]; then
@@ -216,7 +326,7 @@ cleanup() {
     echo $checklen
     if [ $checklen -eq 0 ]; then
        return
-    fi  
+    fi
     delete_vm $vmaffix
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -235,55 +345,20 @@ cleanup() {
 # ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
 # --------------
 disktype=$1
-testduration=$2
+ioruntime=$2
 testname=$3
-echo  $disktype $testduration $testname
+echo  $disktype $ioruntime $testname
 
+emsname="$disktype-elfs"
+enodename="$disktype-elfs-elfs"
+testvmname="vm-$disktype"
+
+echo $emsname, $enodename, $testvmname
 project=''
 newelfs=''
 zone=''
 region=''
 edisk=''
-
-clients=1
-fio_done=0
-vmseq=1
-ha=0
-skipprovision=1
-deletion=0
-pstest=0
-iotest=0
-cleanup=0
-demo_test=0
-
-case "$testname" in
-    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
-    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=9;iotest=1;mfio=1;;
-    *elfs-ha-* ) echo "prepare ha test";ha=1;iotest=1;mfio=1;;
-    *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;;
-    *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
-    *-demo-lssd-* ) echo "prepare to run io on demo lssd instance";iotest=1;snodename="demo-lsdd-vm";iotest=1;clients=36;demo_test=1;mfio=1;;
-    *-demo-pssd-* ) echo "prepare to run io on demo pssd instance";iotest=1;snodename="demo-pssd-vm";iotest=1;clients=36;demo_test=1;mfio=1;;
-    *-demo-phdd-* ) echo "prepare to run io on demo phhd instance";iotest=1;snodename="demo-phhd-vm";iotest=1;clients=36;demo_test=1;mfio=1;;
-    * ) echo "Error...";;
-esac
-
-echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $ha "cleanup?" $cleanup
-if [ $cleanup -eq 1 ]; then
-   echo "start cleanup resource"
-   cleanup "elfs"
-   return 0
-fi
-
-disktype_check $disktype
-retval=$?
-if [ $retval -ne 0 ]; then
-    echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
-    exit -1
-fi
-
 initialization
 echo "disktype = $disktype, storage_in_terraform = $edisk"
 echo "project = $project"
@@ -291,86 +366,83 @@ echo "zone = $zone"
 echo "disktype = $disktype"
 echo "terraform type = $edisk"
 
-if [ $demo_test == 0 ]; then
-   echo "delete traffic VMs........"
-   if [ $pstest -eq 0 ]; then
-       export vmlists=`gcloud compute instances list --project $project --filter="vm-$disktype" | grep -v NAME | cut -d ' ' -f1`
-   else
-       export vmlists=`gcloud compute instances list --project $project --filter="psvm-$disktype" | grep -v NAME | cut -d ' ' -f1`
-   fi    
-else
-   export vmlists=`gcloud compute instances list --project $project --filter="demovm-$disktype" | grep -v NAME | cut -d ' ' -f1`
-fi   
-for i in $vmlists
-do 
-       echo "vm to be deleted: $i, $project, $zone"
-       gcloud compute instances delete $i --project $project --zone $zone -q; 
-done
-   
-   
+clients=1
+vmseq=1
+skipprovision=1
+mfio=0
+deletion=0
+cleanup=0
+pstest=0
+iotest=0
+hatest=0
+demotest=0
+nodefailure=0
+storagefailure=0
+
+io_data_done=0
+io_integrity_done=0
+
+case "$testname" in
+    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
+    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
+    *-scalability-* ) echo "prepare scability test";clients=9;iotest=1;mfio=1;;
+    *elfs-ha-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;;
+    *elfs-ha-storage* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;storagefailure=1;;
+    *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-vm";enodename="ps-$disktype-vm-elfs"; testvmname="psvm-$disktype";;
+    *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
+    *-demo-* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demovm-$disktype";iotest=1;clients=36;demotest=1;mfio=1;;
+    * ) echo "Error...";;
+esac
+
+echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $hatest "cleanup?" $cleanup
+if [ $cleanup -eq 1 ]; then
+   echo "start cleanup resource"
+   cleanup $emsname 
+   cleanup $testvmname
+   return 0
+fi
+
+disktype_check $disktype
+retval=$?
+if [ $retval -ne 0 ]; then
+    echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
+    return -1
+fi
+
+
+echo "delete traffic VMs........"
+delete_vm $testvmname
 
 echo "delete elfs nodes........"
 if [ "$deletion" == "1" ]; then
-    if [ "$pstest" == "1" ]; then
-         echo "delete elfs nodes created during postsubmit test........" 
-         cleanup "$disktype-pselfs"
-    else
-         echo "delete elfs nodes created during test........" 
-         cleanup "$disktype-elsf"
-    fi   
+    echo "delete elfs nodes........"
+    delete_vm $emsname
 fi
 
 if [ "$skipprovision" == "0" ]; then
     provision_elastifile
-fi
-
-retval=$?
-if [ $retval -ne 0 ]; then
-    if [ "$deletion" == "1" ] && [ "$iotest" == "0" ]; then
-         if [ "$pstest" -eq "1" ]; then
-             cleanup "$disktype-pselfs"
-         else
-             cleanup "$disktype-elfs"
-         fi   
+    retval=$?
+    if [ $retval -ne 0 ]; then
+        return -1
     fi
-    exit -1
 fi
 
-if [ $demo_test == 1 ]; then
-    snodename="demo-$disktype-vm" 
-else
-    if [ "$pstest" == "1" ]; then
-       snodename="$disktype-pselfs-elfs-" 
-    else
-       snodename="$disktype-elfs-elfs-" 
-    fi 
-fi    
-if [ $disktype == "lssd" ]; then
-    snodename="demo-lsdd-vm-elfs" 
-fi
-echo $snodename $mfio $disktype
+echo $enodename $mfio $disktype
 if [ "$mfio" == "0" ] ; then
-     echo $snodename $mfio $disktype
-     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
 else
-     echo $snodename $mfio $disktype
-     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$snodename  --format="value(networkInterfaces[0].networkIP)" `
-fi     
+     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
+fi
 
 vhead_count=0
 for i in nfs_server_ips
-do 
+do
     vhead_count=$((vhead_count+1))
-done    
+done
 clients=$((clients*vhead_count))
 echo "nfs servers:" $nfs_server_ip
 
-# TODO: get number of enodes from nfs_server_ips
-#if [ "$mfio" == "0" ] ; then
-#     snodes=1
-#else
-#     snodes=4
-#fi 
 
 echo $nfs_server_ips $vhead_count
 delaytime=$(($clients+2))
@@ -388,27 +460,27 @@ do
         echo "this is now: ", $now, $newtimer
         echo "wait until:" $timer
         if [ $timer > $newtimer ]; then
-           start_vm $nfs_server $timer $testduration $testname
+           start_vm $nfs_server $timer $ioruntime $testname
         else
-           start_vm $nfs_server $newtimer $testduration $testname
+           start_vm $nfs_server $newtimer $ioruntime $testname
         fi
         export now=`date +"%s"`
         echo "this is now again", $now
         retval=$?
         if [ $retval -ne 0 ]; then
          #   cleanup
-            exit -1
-        fi  
+            return -1
+        fi
         running_clients=$((running_clients+1))
     done
 done
 export now=`date`
-if [ "$ha" == "1" ]; then
-    inject_failure_into_cluster 
-fi 
+if [ "$hatest" == "1" ]; then
+    inject_failure_into_cluster
+fi
 echo $now
 
-sleep $(($testduration*6+30)) 
+sleep $(($ioruntime*6+30))
 
 logfiles_uploaded
 no_of_logfiles=$?
@@ -417,15 +489,15 @@ if [ "$mfio" == "0" ]; then
     expected_logfile=$((clients*6))
 else
     expected_logfile=$((vhead_count*clients*6))
-fi    
+fi
 
 if [ $no_of_logfiles -ge $expected_logfile ]; then
-    fio_done=1
-fi    
+    io_test_done=1
+fi
 
 
 count=0
-while [[ "$fio_done" == "0"  &&  $count -lt 60 ]] 
+while [[ "$io_test_done" == "0"  &&  $count -lt 60 ]]
 do
    sleep 60
    logfiles_uploaded
@@ -433,7 +505,7 @@ do
    echo $no_of_logfiles
    if [ $no_of_logfiles -ge $expected_logfile ]; then
         fio_done=1
-   fi      
+   fi
    count=$((count+1))
 done
 
@@ -443,11 +515,11 @@ echo $now
 
 
 if [ "$pstest" == "1" ]; then
-    cleanup "$disktype-pselfs"
-    cleanup "ps-$disktype-"
+    cleanup $emsname
+    cleanup $testvmname 
 fi
 
-if [ "$fio_done" == "0" ]; then
+if [ "$io_test_done" == "0" ]; then
     echo "io testing might have problem."
-    exit 0
-fi  
+    return 0
+fi 
