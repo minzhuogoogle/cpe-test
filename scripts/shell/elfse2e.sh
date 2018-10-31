@@ -349,9 +349,9 @@ ioruntime=$2
 testname=$3
 echo  $disktype $ioruntime $testname
 
-emsname="$disktype-elfs"
-enodename="$disktype-elfs-elfs"
-testvmname="vm-$disktype"
+emsname="test-$disktype-elfs"
+enodename="test-$disktype-elfs-elfs"
+testvmname="test-vm-$disktype"
 
 echo $emsname, $enodename, $testvmname
 project=''
