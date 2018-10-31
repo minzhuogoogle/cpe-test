@@ -464,6 +464,11 @@ do
         else
            start_vm $nfs_server $newtimer $ioruntime $testname
         fi
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            echo "Fail to create test vm."
+            return -1 
+        fi 
         export now=`date +"%s"`
         echo "this is now again", $now
         retval=$?
