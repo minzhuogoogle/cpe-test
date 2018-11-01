@@ -294,8 +294,8 @@ inject_failure_into_cluster() {
     echo $now  "wait for this minutes:" $delaytime
     export timer=`date -d "+ $delaytime minutes" +"%s"`
     echo `date -d "+ $delaytime minutes" +"%s"`
-    case "$testname" in
-        *node* ) echo "prepare to inject failure in enode";
+    if [ $nodefailure -eq 1]; then
+                 echo "prepare to inject failure in enode";
                  echo "vm to be deleted: $failure_node, $project, $zone"
                  start_vm $traffic_node $delaytime $testname
                  inject_node_failure_to_clustervm $failure_node
@@ -303,9 +303,8 @@ inject_failure_into_cluster() {
                  if [ $retval -ne 0 ]; then
                     return -1
                  fi
-
-          ;;
-        *storage* ) echo "preppare to inject failure in storage on enode";
+    else             
+                 echo "preppare to inject failure in storage on enode";
                  echo "vm to be deleted: $failure_node, $project, $zone"
                  start_vm $traffic_node $delaytime $testname
                  inject_storage_failure_to_vm $failure_node
@@ -314,9 +313,7 @@ inject_failure_into_cluster() {
                  if [ $retval -ne 0 ]; then
                     return -1
                  fi
-          ;;
-        * ) echo "Error...";;
-    esac
+    fi    
     io_test_done=0
     logfiles_uploaded
     no_of_logfiles=$?
@@ -390,7 +387,7 @@ iotest=0
 hatest=0
 demotest=0
 nodefailure=0
-storagefailure=0
+diskfailure=0
 
 io_data_done=0
 io_integrity_done=0
@@ -400,7 +397,7 @@ case "$testname" in
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=4;mfio=1;;
     *-scalability-* ) echo "prepare scability test";clients=1;iotest=16;mfio=1;;
     *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;;
-    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;storagefailure=1;;
+    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;diskfailure=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-elfs";enodename="ps-$disktype-elfs-elfs"; testvmname="ps-elfs-$disktype";;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
