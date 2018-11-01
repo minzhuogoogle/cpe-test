@@ -472,10 +472,11 @@ sleep 600
 export now=` date `
 echo $now
 
-
-if [ "$pstest" == "1" ]; then
-    cleanup $emsname
+if [ "$io_est_done" == "1" ]; then
     cleanup $testvmname 
+    if [ "$pstest" == "1" ]; then
+        cleanup $emsname
+    fi
 fi
 
 if [ "$io_test_done" == "0" ]; then
