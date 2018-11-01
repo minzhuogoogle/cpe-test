@@ -3,7 +3,7 @@ IMAGE = "elastifile-storage-2-7-5-12-ems"
 # "small" "medium" "large" "standard" "small standard" "local" "small local" "custom"
 #TEMPLATE_TYPE = "small standard"
 #TEMPLATE_TYPE = "custom"
-TEMPLATE_TYPE = "small standard"
+TEMPLATE_TYPE = "small"
 # number of vheads exlusive of EMS
 NUM_OF_VMS = "3"
 # <cpucores>_<ram> default: 4_42
