@@ -256,14 +256,20 @@ start_vm() {
 
 
 inject_failure_into_cluster() {
+#https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.data.verify
     failure_node_name="$disktype-elfs-elfs"
     failure_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     traffic_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
+    delaytime=2
+    export now=`date +"%s"`
+    echo $now  "wait for this minutes:" $delaytime
+    export timer=`date -d "+ $delaytime minutes" +"%s"`
+    echo `date -d "+ $delaytime minutes" +"%s"`
     case "$testname" in
         *node* ) echo "prepare to inject failure in enode";
                  echo "vm to be deleted: $failure_node, $project, $zone"
-                 start_vm $traffic_node 0 1200 $testname
-                 gcloud compute instances delete $failure_node --project $project --zone $zone -q
+                 start_vm $traffic_node $delaytime $testname
+                 stop_vm $failure_node
                  retval=$?
                  if [ $retval -ne 0 ]; then
                     return -1
@@ -272,16 +278,42 @@ inject_failure_into_cluster() {
           ;;
         *storage* ) echo "preppare to inject failure in storage on enode";
                  echo "vm to be deleted: $failure_node, $project, $zone"
-                 start_vm $traffic_node 0 1200 $testname
+                 start_vm $traffic_node $delaytime $testname
+                 inject_storage_failure_to_vm $failure_node
                  gcloud compute instances delete $failure_node --project $project --zone $zone -q
                  retval=$?
                  if [ $retval -ne 0 ]; then
                     return -1
                  fi
-
           ;;
         * ) echo "Error...";;
     esac
+    io_test_done=0
+    logfiles_uploaded
+    no_of_logfiles=$?
+    echo $no_of_logfiles
+    expected_logfile=1
+    if [ $no_of_logfiles -ge $expected_logfile ]; then
+       io_data_done=1
+    fi
+    count=0
+    while [[ "$io_test_done" == "0"  &&  $count -lt 60 ]]
+    do
+      sleep 60
+      logfiles_uploaded
+      no_of_logfiles=$?
+      echo $no_of_logfiles
+      if [ $no_of_logfiles -ge $expected_logfile ]; then
+          io_date_done=1
+      fi 
+      count=$((count+1))
+    done
+
+    if [ "$io_data_done" == "0" ]; then
+        echo "io testing might have problem."
+        exit -1
+    fi 
+
     return 0
 }
 
@@ -437,6 +469,12 @@ done
 export now=`date`
 if [ "$hatest" == "1" ]; then
     inject_failure_into_cluster
+     retval=$?
+        if [ $retval -ne 0 ]; then
+            echo "HA test fails."
+            delete_vm $testvmname
+            exit -1 
+        fi 
 fi
 echo $now
 io_test_done=0
