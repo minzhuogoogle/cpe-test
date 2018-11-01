@@ -475,9 +475,9 @@ export now=` date `
 echo $now
 
 if [ "$io_date_done" == "1" ]; then
-    cleanup $testvmname 
+    delete_vm $testvmname 
     if [ "$pstest" == "1" ]; then
-        cleanup $emsname
+       delete_vm $emsname
     fi
 fi
 
