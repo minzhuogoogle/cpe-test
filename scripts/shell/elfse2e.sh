@@ -244,8 +244,12 @@ start_vm() {
      machine_type='n1-standard-1'
 
      echo $testvmname
+     if [ $hatest -eq 1 ]; then
+         gcloud compute --project=$project instances create $testvmname-$(hostname)-$vmseq  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_hatest.sh\;\ sudo\ chmod\ 777\ vm_hatet.sh\;\ sudo\ ./vm_hatest.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
+     else
+         gcloud compute --project=$project instances create $testvmname-$(hostname)-$vmseq  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
 
-     gcloud compute --project=$project instances create $testvmname-$(hostname)-$vmseq  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
+     fi
      retval=$?
      if [ $retval -ne 0 ]; then
            return -1
@@ -254,6 +258,31 @@ start_vm() {
      return 0
 }
 
+
+inject_node_failure_to_clustervm() {
+# gcloud compute instances describe test-lssd-elfs-elfs-1d391f3b  --format="text(disks[0].deviceName)"
+# gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef    --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
+    enode=$1
+    gcloud compute instances stop $enode
+    retval=$?
+    if [ $retval -ne 0 ]; then
+         return -1
+    fi
+}
+
+
+inject_storage_failure_to_vm() {
+# gcloud compute instances describe test-lssd-elfs-elfs-1d391f3b  --format="text(disks[0].deviceName)"
+# gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef	 --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
+    enode=$1
+    export diskname=`gcloud compute instances describe enode --format="text(disks[0].deviceName)" | cut -d ' ' -f2 `
+    echo $diskname
+    gcloud compute instances detach-disk  $enode  --disk=$diskname
+    retval=$?
+    if [ $retval -ne 0 ]; then
+         return -1
+    fi
+}
 
 inject_failure_into_cluster() {
 #https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.data.verify
@@ -269,7 +298,7 @@ inject_failure_into_cluster() {
         *node* ) echo "prepare to inject failure in enode";
                  echo "vm to be deleted: $failure_node, $project, $zone"
                  start_vm $traffic_node $delaytime $testname
-                 stop_vm $failure_node
+                 inject_node_failure_to_clustervm $failure_node
                  retval=$?
                  if [ $retval -ne 0 ]; then
                     return -1
