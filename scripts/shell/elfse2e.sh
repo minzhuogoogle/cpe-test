@@ -470,6 +470,8 @@ echo $now  "wait for this minutes:" $delaytime
 export timer=`date -d "+ $delaytime minutes" +"%s"`
 echo `date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
+
+if [ $hatest -eq 0 ]; then
 while [ $running_clients -lt $clients ]
 do
     for nfs_server in $nfs_server_ips
@@ -495,7 +497,7 @@ do
     done
 done
 export now=`date`
-if [ "$hatest" == "1" ]; then
+else:
     inject_failure_into_cluster
      retval=$?
         if [ $retval -ne 0 ]; then
