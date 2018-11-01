@@ -336,14 +336,15 @@ io_integrity_done=0
 
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
-    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=1;iotest=1;mfio=1;;
+    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=4;mfio=1;;
+    *-scalability-* ) echo "prepare scability test";clients=1;iotest=16;mfio=1;;
     *elfs-ha-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;;
     *elfs-ha-storage* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;storagefailure=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-elfs";enodename="ps-$disktype-elfs-elfs"; testvmname="ps-elfs-$disktype";;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
-    *-demo-* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demo-vm-$disktype";iotest=1;clients=4;demotest=1;mfio=1;;
+    *-demo-*-single* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demo-vm-$disktype";iotest=1;clients=4;demotest=1;mfio=1;;
+    *-demo-*-scale* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demo-vm-$disktype";iotest=1;clients=16;demotest=1;mfio=1;;
     * ) echo "Error...";;
 esac
 
