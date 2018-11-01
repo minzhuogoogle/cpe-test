@@ -393,7 +393,7 @@ do
     vhead_count=$((vhead_count+1))
 done
 
-if [ $vhead_count -eq 0 ]; 
+if [ $vhead_count -eq 0 ]; then
    echo "no enode available"
    exit -1
 fi
