@@ -337,7 +337,7 @@ io_integrity_done=0
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=4;iotest=1;mfio=1;;
+    *-scalability-* ) echo "prepare scability test";clients=1;iotest=1;mfio=1;;
     *elfs-ha-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;;
     *elfs-ha-storage* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;storagefailure=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
