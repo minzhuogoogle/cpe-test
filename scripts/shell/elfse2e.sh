@@ -164,7 +164,7 @@ provision_elastifile() {
     echo "run terraform apply to start elfs instance"
     if  [ $pstest -eq 1 ]; then
         echo "set number of node"
-        sed -i "s/${disktype}/ps-${disktype}/g" terraform.tfvars
+        sed -i "s/$test-{disktype}/ps-${disktype}/g" terraform.tfvars
     fi
     echo "==== new terraform.tfvars====="
     cat terraform.tfvars
