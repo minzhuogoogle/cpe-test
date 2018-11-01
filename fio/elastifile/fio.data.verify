@@ -1,0 +1,10 @@
+[write-and-verify]
+rw=randwrite
+bs=16k
+direct=1
+ioengine=libaio
+iodepth=16
+randrepeat=0
+verify=crc32c
+size=512G
+filename=/mnt/elastifile/test.verify.data
