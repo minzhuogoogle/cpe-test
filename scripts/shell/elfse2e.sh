@@ -245,7 +245,7 @@ start_vm() {
 
      echo $testvmname
      if [ $hatest -eq 1 ]; then
-         gcloud compute --project=$project instances create $testvmname-$(hostname)-$vmseq  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_hatest.sh\;\ sudo\ chmod\ 777\ vm_hatest.sh\;\ sudo\ ./vm_hatest.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
+         gcloud compute --project=$project instances create $testvmname-ha-$(hostname)-$vmseq  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_hatest.sh\;\ sudo\ chmod\ 777\ vm_hatest.sh\;\ sudo\ ./vm_hatest.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
      else
          gcloud compute --project=$project instances create $testvmname-$(hostname)-$vmseq  --zone=$zone --machine-type=$machine_type --scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\ $disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
 
@@ -423,7 +423,7 @@ fi
 
 
 echo "delete traffic VMs........"
-delete_vm $testvmname
+#delete_vm $testvmname
 
 echo "delete elfs nodes........"
 if [ "$deletion" == "1" ]; then
@@ -539,7 +539,7 @@ export now=` date `
 echo $now
 
 if [ "$io_date_done" == "1" ]; then
-    delete_vm $testvmname 
+    #delete_vm $testvmname 
     if [ "$pstest" == "1" ]; then
        delete_vm $emsname
     fi
