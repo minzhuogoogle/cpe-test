@@ -440,6 +440,12 @@ for i in nfs_server_ips
 do
     vhead_count=$((vhead_count+1))
 done
+
+if [ $vhead_count -eq 0 ]; 
+   echo "no enode available"
+   exit -1
+fi
+
 clients=$((clients*vhead_count))
 echo "nfs servers:" $nfs_server_ip
 
