@@ -292,54 +292,6 @@ logfiles_uploaded() {
    return $number_logfiles
 }
 
-old_delete_vm() {
-    #protected_nodes=(gke-prow-default-pool-acf595a2-bldl gke-prow-default-pool-acf595a2-hv8b)
-    name=$1
-
-    for i in `gcloud compute instances list --project $project --filter=$name | grep -v NAME | cut -d ' ' -f1`;
-    do
-       echo "vm to be deleted: $i, $project, $zone"
-       ##for x in "${protected_nodes[@]}"
-       #do
-       #    if [ "$i" == "$x" ]; then
-       #        return 0
-       #    fi
-       #done
-       gcloud compute instances delete $i --project $project --zone $zone -q;
-    done
-    retval=$?
-    if [ $retval -ne 0 ]; then
-           return -1
-    fi
-    return 0
-}
-
-
-
-old_cleanup() {
-    vmaffix=$1
-    echo "all vm with $vmaffix will be deleted"
-    if [ "$vmaffix" == '' ]; then
-        vmaffix='elfs'
-    fi
-    checklen=${#vmaffix}
-    echo $checklen
-    if [ $checklen -eq 0 ]; then
-       return
-    fi
-    delete_vm $vmaffix
-    retval=$?
-    if [ $retval -ne 0 ]; then
-           return -1
-    fi
-    return 0
-    #delete_traffic_node()
-    #delete_routers()
-    #delete_firewalls()
-    #delete_subnetworks()
-}
-
-
 # --------------
 # Start here
 # ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
