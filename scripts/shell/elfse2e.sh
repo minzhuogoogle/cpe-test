@@ -451,7 +451,7 @@ else
 fi
 
 if [ $no_of_logfiles -ge $expected_logfile ]; then
-    io_test_done=1
+    io_data_done=1
 fi
     
 
@@ -464,7 +464,7 @@ do
    no_of_logfiles=$?
    echo $no_of_logfiles
    if [ $no_of_logfiles -ge $expected_logfile ]; then
-        fio_done=1
+        io_date_done=1
    fi
    count=$((count+1))
 done
@@ -473,14 +473,14 @@ sleep 600
 export now=` date `
 echo $now
 
-if [ "$io_est_done" == "1" ]; then
+if [ "$io_date_done" == "1" ]; then
     cleanup $testvmname 
     if [ "$pstest" == "1" ]; then
         cleanup $emsname
     fi
 fi
 
-if [ "$io_test_done" == "0" ]; then
+if [ "$io_data_done" == "0" ]; then
     echo "io testing might have problem."
     exit -1
 fi 
