@@ -164,7 +164,7 @@ provision_elastifile() {
     echo "run terraform apply to start elfs instance"
     sed -i 's/ssd/persistent/' terraform.tfvar
     if  [ "$pstest" == "1" ]; then
-        sed -i 's/elfs/pselfs/' terraform.tfvars
+        sed -i 's/${disktype}-elfs/ps-${disktype}-elfs/' terraform.tfvars
     fi
     echo "==== new terraform.tfvars====="
     cat terraform.tfvars
@@ -341,7 +341,7 @@ case "$testname" in
     *elfs-ha-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;;
     *elfs-ha-storage* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;storagefailure=1;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-vm";enodename="ps-$disktype-vm-elfs"; testvmname="ps-elfs-$disktype";;
+    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-elfs";enodename="ps-$disktype-elfs-elfs"; testvmname="ps-elfs-$disktype";;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
     *-demo-* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demo-vm-$disktype";iotest=1;clients=4;demotest=1;mfio=1;;
     * ) echo "Error...";;
