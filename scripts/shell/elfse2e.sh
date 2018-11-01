@@ -484,7 +484,7 @@ do
         retval=$?
         if [ $retval -ne 0 ]; then
             echo "Fail to create test vm."
-            delete_vm $testvmname
+            #delete_vm $testvmname
             exit -1 
         fi 
         export now=`date +"%s"`
@@ -498,7 +498,7 @@ if [ "$hatest" == "1" ]; then
      retval=$?
         if [ $retval -ne 0 ]; then
             echo "HA test fails."
-            delete_vm $testvmname
+            #delete_vm $testvmname
             exit -1 
         fi 
 fi
