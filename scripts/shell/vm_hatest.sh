@@ -30,11 +30,11 @@ start_fio()
       cat fio.data.verify
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
       HOSTNAME=$(hostname)
-      logfile=$testname.$testname.ha.$HOSTNAME.$NOW.$disktype.txt
+      logfile=$testname.fio.$testname.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
-      sudo fio fio.data.verify --refill_buffers --norandommap  --output-format=json --output $logfile
+      sudo fio fio.data.verify --refill_buffers --norandommap --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
-      sudo rm -rf /mnt/elastifile/fio.*
+      sudo rm -rf /mnt/elastifile/$testname.fio*.*
 }
 
 disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
