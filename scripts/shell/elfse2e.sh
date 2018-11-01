@@ -171,7 +171,7 @@ provision_elastifile() {
 
     terraform apply --auto-approve | tee -a output.txt &
 
-    maxcount=30
+    maxcount=20
     count=0
     ret=1
 
