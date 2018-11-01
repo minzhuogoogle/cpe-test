@@ -277,6 +277,7 @@ inject_storage_failure_to_vm() {
     enode=$1
     export diskname=`gcloud compute instances describe enode --format="text(disks[0].deviceName)" | cut -d ' ' -f2 `
     echo $diskname
+    echo "this is disk to be detached from $enode"
     gcloud compute instances detach-disk  $enode  --disk=$diskname
     retval=$?
     if [ $retval -ne 0 ]; then
