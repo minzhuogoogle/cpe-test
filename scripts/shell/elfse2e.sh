@@ -438,7 +438,7 @@ if [ "$hatest" == "1" ]; then
     inject_failure_into_cluster
 fi
 echo $now
-
+io_test_done=0
 sleep $(($ioruntime*6+30))
 
 logfiles_uploaded
@@ -453,6 +453,7 @@ fi
 if [ $no_of_logfiles -ge $expected_logfile ]; then
     io_test_done=1
 fi
+    
 
 
 count=0
