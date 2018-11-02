@@ -147,10 +147,13 @@ initialization() {
     case "$disktype" in 
         lsdd )
 	    elfstemplate=custom
+	    ;;
 	psdd )
 	    elfstemplate=medium
+	    ;;
 	phdd )
 	    elfstemplate=small
+	    ;;
 	* ) echo "Error..."
         ;;
     esac
@@ -198,8 +201,8 @@ initialization() {
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
-            skipprovision=1;
-            deletion=0;
+            skipprovision=0;
+            deletion=1;
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
@@ -212,8 +215,8 @@ initialization() {
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
-            skipprovision=1;
-            deletion=0;
+            skipprovision=0;
+            deletion=1;
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
