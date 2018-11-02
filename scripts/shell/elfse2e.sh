@@ -588,6 +588,7 @@ logfiles_uploaded() {
 
 
 test_result() {
+    count=0
     logfiles_uploaded
     no_of_logfiles=$?
     echo $no_of_logfiles
