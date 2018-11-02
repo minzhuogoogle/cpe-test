@@ -594,7 +594,7 @@ test_result() {
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
     else
-        expect_logfile=$$((clients*6))
+        expect_logfile=$((clients*6))
     fi	
     if [ $no_of_logfiles -ge $expected_logfile ]; then
        io_data_done=1
