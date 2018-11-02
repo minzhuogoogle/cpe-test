@@ -17,11 +17,11 @@ USE_LB = "true"
 #
 MIN_CLUSTER = "3"
 # instance prefix
-CLUSTER_NAME = "test-phdd-elfs"
+CLUSTER_NAME = "testcluster"
 # GCP zone
-ZONE = "us-east1-b"
+ZONE = "testzone"
 # GCP project
-PROJECT = "cpe-performance-storage"
+PROJECT = "testproject"
 # GCP project subnetwork
 SUBNETWORK = "default"
 # GCP service account credential filename
