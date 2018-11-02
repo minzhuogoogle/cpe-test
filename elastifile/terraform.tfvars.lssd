@@ -2,7 +2,7 @@
 
 # "small" "medium" "large" "standard" "small standard" "local" "small local" "custom"
 #TEMPLATE_TYPE = "small local"
-
+TEMPLATE_TYPE = "testtemplate"
 # number of vheads exlusive of EMS
 NUM_OF_VMS = "3"
 # <cpucores>_<ram> default: 4_42
@@ -30,7 +30,7 @@ SUBNETWORK = "default"
 CREDENTIALS = "elastifile.json"
 SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
 
-TEMPLATE_TYPE = "testtemplate"
+
 CLUSTER_NAME = "testcluster"
 # GCP zone
 ZONE = "testzone"
