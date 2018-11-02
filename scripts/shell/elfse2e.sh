@@ -481,6 +481,8 @@ export timer=`date -d "+ $delaytime minutes" +"%s"`
 echo `date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
 
+echo "hatest =? $hatest"
+
 if [ $hatest -eq 0 ]; then
     echo "not ha testing"
     while [ $running_clients -lt $clients ]
@@ -551,6 +553,8 @@ else:
             exit -1 
     fi 
 fi
+
+echo "test done"
 
 if [ "$io_date_done" == "1" ]; then
     #delete_vm $testvmname 
