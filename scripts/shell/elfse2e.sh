@@ -299,6 +299,7 @@ pre_cleanup() {
 post_cleanup() {
     if [ "$io_date_done" == "1" ]; then
         delete_vm $testvmname 
+    fi	
     if [ "$pstest" == "1" ]; then
         delete_vm $emsname
     fi
