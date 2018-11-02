@@ -313,7 +313,7 @@ inject_failure_into_cluster() {
     if [ $nodefailure -eq 1 ]; then
                  echo "prepare to inject failure in enode";
                  echo "vm to inject failre: $failure_node, $project, $zone"
-                 #start_vm $traffic_node $delaytime $testname
+                 start_vm $traffic_node $delaytime $testname
                  inject_node_failure_to_clustervm $failure_node
                  retval=$?
                  if [ $retval -ne 0 ]; then
@@ -323,7 +323,7 @@ inject_failure_into_cluster() {
     if [ $diskfailure -eq 1 ]; then
                  echo "preppare to inject failure in storage on enode";
                  echo "vm to inject failure $failure_node, $project, $zone"
-                 #start_vm $traffic_node $delaytime $testname
+                 start_vm $traffic_node $delaytime $testname
                  inject_storage_failure_to_vm $failure_node
                  #gcloud compute instances delete $failure_node --project $project --zone $zone -q
                  retval=$?
