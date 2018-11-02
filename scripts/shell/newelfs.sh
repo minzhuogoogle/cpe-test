@@ -147,6 +147,75 @@ initialization()
    export disk=`grep DISK_TYPE terraform.tfvars | awk -v N=3 '{print $N}'`
    edisk=${disk:1:-1}
    echo $project,$zone,$cluster_name,$edisk
+   
+
+echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $hatest "cleanup?" $cleanup
+if [ $cleanup -eq 1 ]; then
+   echo "start cleanup resource"
+   cleanup $emsname 
+   cleanup $testvmname
+   return 0
+fi
+
+disktype_check $disktype
+retval=$?
+if [ $retval -ne 0 ]; then
+    echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
+    return -1
+fi
+
+
+echo "delete traffic VMs........"
+delete_vm $testvmname
+
+echo "delete elfs nodes........"
+if [ $deletion -eq 1 ]; then
+    echo "delete elfs nodes........"
+    delete_vm $emsname
+fi
+
+if [ $skipprovision -eq 0 ]; then
+    provision_elastifile
+    retval=$?
+    if [ $retval -ne 0 ]; then
+        exit -1
+    fi
+fi
+
+echo "provision done" $enodename $mfio $disktype
+if [ "$mfio" == "0" ] ; then
+     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+else
+     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
+fi
+
+echo "nfs servers:" $nfs_server_ip
+
+vhead_count=0
+for i in nfs_server_ips
+do
+    vhead_count=$((vhead_count+1))
+done
+
+if [ $vhead_count -eq 0 ]; then
+   echo "no enode available"
+   exit -1
+fi
+
+clients=$((clients*vhead_count))
+
+
+echo $nfs_server_ips $vhead_count
+delaytime=$(($clients+2))
+export now=`date +"%s"`
+echo $now  "wait for this minutes:" $delaytime
+export timer=`date -d "+ $delaytime minutes" +"%s"`
+echo `date -d "+ $delaytime minutes" +"%s"`
+
+
+
+
+
 }
 
 
@@ -367,6 +436,95 @@ logfiles_uploaded() {
    return $number_logfiles
 }
 
+ha_test() {
+    echo "hatest =? $hatest"
+    echo "ha test start"
+    inject_failure_into_cluster
+    retval=$?
+    if [ $retval -ne 0 ]; then
+            echo "HA test fails."
+            #delete_vm $testvmname
+            return -1 
+    fi 
+}
+
+non_ha_test() {
+
+echo "not ha testing"
+    while [ $running_clients -lt $clients ]
+    do
+        for nfs_server in $nfs_server_ips
+        do
+            export now=`date +"%s"`
+            newtimer=`date -d "+ 2 minutes" +"%s"`
+            echo "this is now: ", $now, $newtimer
+            echo "wait until:" $timer
+            if [ $timer > $newtimer ]; then
+               start_vm $nfs_server $timer $ioruntime $testname
+            else
+                start_vm $nfs_server $newtimer $ioruntime $testname
+            fi
+            retval=$?
+            if [ $retval -ne 0 ]; then
+                echo "Fail to create test vm."
+                    delete_vm $testvmname
+                exit -1 
+            fi 
+            export now=`date +"%s"`
+            echo "this is now again", $now
+            running_clients=$((running_clients+1))
+        done
+    done
+    export now=`date`
+    echo $now
+    io_test_done=0
+    sleep $(($ioruntime*6+30))
+
+    logfiles_uploaded
+    no_of_logfiles=$?
+    echo $no_of_logfiles
+    if [ "$mfio" == "0" ]; then
+        expected_logfile=$((clients*6))
+    else
+        expected_logfile=$((vhead_count*clients*6))
+    fi
+if [ $no_of_logfiles -ge $expected_logfile ]; then
+       io_data_done=1
+    fi
+
+    count=0
+    while [[ "$io_test_done" == "0"  &&  $count -lt 60 ]]
+    do
+        sleep 60
+        logfiles_uploaded
+        no_of_logfiles=$?
+        echo $no_of_logfiles
+        if [ $no_of_logfiles -ge $expected_logfile ]; then
+           io_date_done=1
+        fi
+        count=$((count+1))
+    done
+
+    sleep 120
+    export now=` date `
+    echo $now
+
+}
+
+test_result() {
+if [ "$io_date_done" == "1" ]; then
+    #delete_vm $testvmname 
+    if [ "$pstest" == "1" ]; then
+       delete_vm $emsname
+    fi
+fi
+
+if [ "$io_data_done" == "0" ]; then
+    echo "io testing might have problem."
+    exit -1
+fi 
+}
+
 # --------------
 # Start here
 # ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
@@ -409,106 +567,8 @@ diskfailure=0
 io_data_done=0
 io_integrity_done=0
 
-case "$testname" in
-    *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
-    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=4;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=1;iotest=16;mfio=1;;
-    *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;mfio=0;nodefailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=1;deletion=0;;
-    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;mfio=0;diskfailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=1;deletion=0;;
-    *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
-    *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-elfs";enodename="ps-$disktype-elfs-elfs"; testvmname="ps-elfs-$disktype";;
-    *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
-    *-demo-*-single* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demo-vm-$disktype";iotest=1;clients=4;demotest=1;mfio=1;;
-    *-demo-*-scale* ) echo "prepare to run io on demo lssd instance";iotest=1;emsname="demo-$disktype-vm";enodename="demo-$disktype-vm-elfs"; testvmname="demo-vm-$disktype";iotest=1;clients=16;demotest=1;mfio=1;;
-    * ) echo "Error...";;
-esac
-
-echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $hatest "cleanup?" $cleanup
-if [ $cleanup -eq 1 ]; then
-   echo "start cleanup resource"
-   cleanup $emsname 
-   cleanup $testvmname
-   return 0
-fi
-
-disktype_check $disktype
-retval=$?
-if [ $retval -ne 0 ]; then
-    echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
-    return -1
-fi
 
 
-echo "delete traffic VMs........"
-delete_vm $testvmname
-
-echo "delete elfs nodes........"
-if [ $deletion -eq 1 ]; then
-    echo "delete elfs nodes........"
-    delete_vm $emsname
-fi
-
-if [ $skipprovision -eq 0 ]; then
-    provision_elastifile
-    retval=$?
-    if [ $retval -ne 0 ]; then
-        exit -1
-    fi
-fi
-
-echo "provision done" $enodename $mfio $disktype
-if [ "$mfio" == "0" ] ; then
-     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
-else
-     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
-fi
-
-echo "nfs servers:" $nfs_server_ip
-
-vhead_count=0
-for i in nfs_server_ips
-do
-    vhead_count=$((vhead_count+1))
-done
-
-if [ $vhead_count -eq 0 ]; then
-   echo "no enode available"
-   exit -1
-fi
-
-clients=$((clients*vhead_count))
 
 
-echo $nfs_server_ips $vhead_count
-delaytime=$(($clients+2))
-export now=`date +"%s"`
-echo $now  "wait for this minutes:" $delaytime
-export timer=`date -d "+ $delaytime minutes" +"%s"`
-echo `date -d "+ $delaytime minutes" +"%s"`
-running_clients=0
 
-echo "hatest =? $hatest"
-
-    echo "ha test start"
-    inject_failure_into_cluster
-    retval=$?
-    if [ $retval -ne 0 ]; then
-            echo "HA test fails."
-            #delete_vm $testvmname
-            exit -1 
-    fi 
-fi
-
-echo "test done"
-
-if [ "$io_date_done" == "1" ]; then
-    #delete_vm $testvmname 
-    if [ "$pstest" == "1" ]; then
-       delete_vm $emsname
-    fi
-fi
-
-if [ "$io_data_done" == "0" ]; then
-    echo "io testing might have problem."
-    exit -1
-fi 
