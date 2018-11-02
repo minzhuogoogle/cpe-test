@@ -6,5 +6,5 @@ ioengine=libaio
 iodepth=16
 randrepeat=0
 verify=crc32c
-size=512G
+size=4G
 filename=/mnt/elastifile/test.verify.data
