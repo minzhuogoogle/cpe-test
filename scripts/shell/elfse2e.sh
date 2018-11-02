@@ -405,8 +405,8 @@ io_integrity_done=0
 
 case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
-    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=4;mfio=1;;
-    *-scalability-* ) echo "prepare scability test";clients=1;iotest=16;mfio=1;;
+    *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=1;mfio=1;clients=4;;
+    *-scalability-* ) echo "prepare scability test";clients=16;iotest=1;mfio=1;;
     *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;mfio=0;nodefailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=1;deletion=0;;
     *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;mfio=0;diskfailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=1;deletion=0;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
@@ -543,21 +543,21 @@ if [ $hatest -eq 0 ]; then
     sleep 120
     export now=` date `
     echo $now
-else:
-    echo "ha test start"
-    inject_failure_into_cluster
-    retval=$?
-    if [ $retval -ne 0 ]; then
-            echo "HA test fails."
-            #delete_vm $testvmname
-            exit -1 
-    fi 
+#else:
+#    echo "ha test start"
+#    inject_failure_into_cluster
+#    retval=$?
+#    if [ $retval -ne 0 ]; then
+#            echo "HA test fails."
+#            #delete_vm $testvmname
+#            exit -1 
+#    fi 
 fi
 
 echo "test done"
 
 if [ "$io_date_done" == "1" ]; then
-    #delete_vm $testvmname 
+    delete_vm $testvmname 
     if [ "$pstest" == "1" ]; then
        delete_vm $emsname
     fi
