@@ -30,6 +30,7 @@ SUBNETWORK = "default"
 CREDENTIALS = "elastifile.json"
 SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
 
+TEMPLATE_TYPE = "testtemplate"
 CLUSTER_NAME = "testcluster"
 # GCP zone
 ZONE = "testzone"
