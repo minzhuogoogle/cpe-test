@@ -143,7 +143,19 @@ initialization() {
     region=us-east1
     cluster=test-$disktype-elfs
     elfsimage=elastifile-storage-2-7-5-12-ems
-    elfstemplate=small
+    
+    case "$disktype" in 
+        lsdd )
+	    elfstemplate=custom
+	psdd )
+	    elfstemplate=medium
+	phdd )
+	    elfstemplate=small
+	* ) echo "Error..."
+        ;;
+    esac
+    
+   
 
     io_data_done=0
     io_integrity_done=0
