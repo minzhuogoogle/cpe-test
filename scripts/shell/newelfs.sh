@@ -282,11 +282,11 @@ inject_storage_failure_to_vm() {
 # gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef	 --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
     echo "detaching disk" 
     enode=$1
-    export diskindex=`gcloud compute instances describe  $enode --project=$project  --zones=$zone --format="text(disks[].index)"   |  tail -n 1 |  cut -d ' ' -f2`
+    export diskindex=`gcloud compute instances describe $enode --project=$project  --zone=$zone --format="text(disks[].index)"   |  tail -n 1 |  cut -d ' ' -f2`
     diskindex=$((diskindex-1))
-    export diskname=`gcloud compute instances describe $enode  --project=$project  --zones=$zone  --format="text(disks[$diskindex].deviceName)" | grep $disktype-elfs-elfs | cut -d ' ' -f2 `
+    export diskname=`gcloud compute instances describe $enode  --project=$project  --zone=$zone  --format="text(disks[$diskindex].deviceName)" | grep $disktype-elfs-elfs | cut -d ' ' -f2 `
     echo $diskname
-    echo "this is disk to be detached from $enode  : $diskname"
+    echo "this is disk to be detached from $enode: $diskname"
     gcloud compute instances detach-disk  $enode  --disk=$diskname
     retval=$?
     if [ $retval -ne 0 ]; then
