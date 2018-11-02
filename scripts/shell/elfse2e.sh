@@ -448,7 +448,7 @@ run_test() {
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
     echo $now "wait for this minutes to start traffic on testing vm" $delaytime $timer
-
+    running_clients=0
     while [ $running_clients -lt $clients ]
     do
         for nfs_server in $nfs_server_ips
