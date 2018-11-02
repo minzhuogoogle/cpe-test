@@ -429,7 +429,7 @@ echo "delete traffic VMs........"
 delete_vm $testvmname
 
 echo "delete elfs nodes........"
-if [ $deletion peq 1 ]; then
+if [ $deletion -eq 1 ]; then
     echo "delete elfs nodes........"
     delete_vm $emsname
 fi
