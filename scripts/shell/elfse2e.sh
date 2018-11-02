@@ -399,8 +399,8 @@ case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=4;mfio=1;;
     *-scalability-* ) echo "prepare scability test";clients=1;iotest=16;mfio=1;;
-    *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;;
-    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;diskfailure=1;;
+    *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;nodefailure=1;testvmname="ha-elfs-$disktype";;
+    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;iotest=1;mfio=1;diskfailure=1;testvmname="ha-elfs-$disktype";;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-elfs";enodename="ps-$disktype-elfs-elfs"; testvmname="ps-elfs-$disktype";;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
@@ -426,7 +426,7 @@ fi
 
 
 echo "delete traffic VMs........"
-#delete_vm $testvmname
+delete_vm $testvmname
 
 echo "delete elfs nodes........"
 if [ "$deletion" == "1" ]; then
@@ -473,75 +473,73 @@ echo `date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
 
 if [ $hatest -eq 0 ]; then
-while [ $running_clients -lt $clients ]
-do
-    for nfs_server in $nfs_server_ips
+    while [ $running_clients -lt $clients ]
     do
-        export now=`date +"%s"`
-        newtimer=`date -d "+ 2 minutes" +"%s"`
-        echo "this is now: ", $now, $newtimer
-        echo "wait until:" $timer
-        if [ $timer > $newtimer ]; then
-           start_vm $nfs_server $timer $ioruntime $testname
-        else
-           start_vm $nfs_server $newtimer $ioruntime $testname
-        fi
-        retval=$?
-        if [ $retval -ne 0 ]; then
-            echo "Fail to create test vm."
-            #delete_vm $testvmname
-            exit -1 
-        fi 
-        export now=`date +"%s"`
-        echo "this is now again", $now
-        running_clients=$((running_clients+1))
+        for nfs_server in $nfs_server_ips
+        do
+            export now=`date +"%s"`
+            newtimer=`date -d "+ 2 minutes" +"%s"`
+            echo "this is now: ", $now, $newtimer
+            echo "wait until:" $timer
+            if [ $timer > $newtimer ]; then
+               start_vm $nfs_server $timer $ioruntime $testname
+            else
+                start_vm $nfs_server $newtimer $ioruntime $testname
+            fi
+            retval=$?
+            if [ $retval -ne 0 ]; then
+                echo "Fail to create test vm."
+                    delete_vm $testvmname
+                exit -1 
+            fi 
+            export now=`date +"%s"`
+            echo "this is now again", $now
+            running_clients=$((running_clients+1))
+        done
     done
-done
-export now=`date`
+    export now=`date`
+    echo $now
+    io_test_done=0
+    sleep $(($ioruntime*6+30))
+
+    logfiles_uploaded
+    no_of_logfiles=$?
+    echo $no_of_logfiles
+    if [ "$mfio" == "0" ]; then
+        expected_logfile=$((clients*6))
+    else
+        expected_logfile=$((vhead_count*clients*6))
+    fi
+
+    if [ $no_of_logfiles -ge $expected_logfile ]; then
+       io_data_done=1
+    fi
+
+    count=0
+    while [[ "$io_test_done" == "0"  &&  $count -lt 60 ]]
+    do
+        sleep 60
+        logfiles_uploaded
+        no_of_logfiles=$?
+        echo $no_of_logfiles
+        if [ $no_of_logfiles -ge $expected_logfile ]; then
+           io_date_done=1
+        fi
+        count=$((count+1))
+    done
+
+    sleep 120
+    export now=` date `
+    echo $now
 else:
     inject_failure_into_cluster
-     retval=$?
-        if [ $retval -ne 0 ]; then
+    retval=$?
+    if [ $retval -ne 0 ]; then
             echo "HA test fails."
             #delete_vm $testvmname
             exit -1 
-        fi 
+    fi 
 fi
-echo $now
-io_test_done=0
-sleep $(($ioruntime*6+30))
-
-logfiles_uploaded
-no_of_logfiles=$?
-echo $no_of_logfiles
-if [ "$mfio" == "0" ]; then
-    expected_logfile=$((clients*6))
-else
-    expected_logfile=$((vhead_count*clients*6))
-fi
-
-if [ $no_of_logfiles -ge $expected_logfile ]; then
-    io_data_done=1
-fi
-    
-
-
-count=0
-while [[ "$io_test_done" == "0"  &&  $count -lt 60 ]]
-do
-   sleep 60
-   logfiles_uploaded
-   no_of_logfiles=$?
-   echo $no_of_logfiles
-   if [ $no_of_logfiles -ge $expected_logfile ]; then
-        io_date_done=1
-   fi
-   count=$((count+1))
-done
-
-sleep 600
-export now=` date `
-echo $now
 
 if [ "$io_date_done" == "1" ]; then
     #delete_vm $testvmname 
