@@ -37,7 +37,7 @@ start_fio()
       sudo rm -rf /mnt/elastifile/$testname.fio*.*
 }
 
-disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
+#disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
       
 export nfs_server_reachable=`ping $nfs_server -c 5 | grep "0% packet loss"`
 check_result=${#nfs_server_reachable}
