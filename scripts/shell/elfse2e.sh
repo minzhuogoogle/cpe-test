@@ -145,10 +145,10 @@ initialization() {
     elfsimage=elastifile-storage-2-7-5-12-ems
     
     case "$disktype" in 
-        lsdd )
+        lssd )
 	    elfstemplate=custom
 	    ;;
-	psdd )
+	pssd )
 	    elfstemplate=medium
 	    ;;
 	phdd )
@@ -201,8 +201,8 @@ initialization() {
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
-            skipprovision=1;
-            deletion=0;
+            skipprovision=0
+            deletion=1
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
@@ -215,8 +215,8 @@ initialization() {
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
-            skipprovision=1;
-            deletion=0;
+            skipprovision=0
+            deletion=1
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
@@ -454,7 +454,7 @@ run_test() {
         for nfs_server in $nfs_server_ips
         do
             export now=`date +"%s"`
-            newtimer=`date -d "+ 2 minutes" +"%s"`
+            newtimer=`date -d "+ 1minutes" +"%s"`
             echo "Now: ", $now, $newtimer
             echo "Wait until:" $timer
             if [ $timer > $newtimer ]; then
@@ -549,7 +549,7 @@ inject_failure_into_cluster() {
     export failure_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
     #export traffic_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
     echo "ha nodes:" $failure_node $traffic_node
-    delaytime=2
+    delaytime=0
     export now=`date +"%s"`
     echo $now  "......wait for this minutes:" $delaytime
     export timer=`date -d "+ $delaytime minutes" +"%s"`
