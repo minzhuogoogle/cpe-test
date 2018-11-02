@@ -16,14 +16,6 @@ USE_LB = "true"
 #
 MIN_CLUSTER = "3"
 
-
-# GCP project subnetwork
-SUBNETWORK = "default"
-# GCP service account credential filename
-CREDENTIALS = "elastifile.json"
-SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
-
-
 # GCP project subnetwork
 SUBNETWORK = "default"
 # GCP service account credential filename
@@ -32,7 +24,5 @@ SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
 
 
 CLUSTER_NAME = "testcluster"
-# GCP zone
 ZONE = "testzone"
-# GCP project
 PROJECT = "testproject"
