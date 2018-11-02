@@ -269,7 +269,7 @@ inject_node_failure_to_clustervm() {
 # gcloud compute instances describe test-lssd-elfs-elfs-1d391f3b  --format="text(disks[0].deviceName)"
 # gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef    --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
     enode=$1
-    gcloud compute instances stop $enode
+    gcloud compute instances stop $enode  --project=$project  --zone=$zone
     retval=$?
     if [ $retval -ne 0 ]; then
          return -1
@@ -280,10 +280,11 @@ inject_node_failure_to_clustervm() {
 inject_storage_failure_to_vm() {
 # gcloud compute instances describe test-lssd-elfs-elfs-1d391f3b  --format="text(disks[0].deviceName)"
 # gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef	 --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
+    echo "detaching disk" 
     enode=$1
-    export diskindex=`gcloud compute instances describe  $enode --project=cpe-performance-storage  --zone=us-east1-b --format="text(disks[].index)"   |  tail -n 1 |  cut -d ' ' -f2`
+    export diskindex=`gcloud compute instances describe  $enode --project=$project  --zone=$zone --format="text(disks[].index)"   |  tail -n 1 |  cut -d ' ' -f2`
     diskindex=$((diskindex-1))
-    export diskname=`gcloud compute instances describe $enode  --project=cpe-performance-storage  --zone=us-east1-b  --format="text(disks[$diskindex].deviceName)" | grep $disktype-elfs-elfs | cut -d ' ' -f2 `
+    export diskname=`gcloud compute instances describe $enode  --project=$project  --zone=$zone  --format="text(disks[$diskindex].deviceName)" | grep $disktype-elfs-elfs | cut -d ' ' -f2 `
     echo $diskname
     echo "this is disk to be detached from $enode  : $diskname"
     gcloud compute instances detach-disk  $enode  --disk=$diskname
@@ -300,7 +301,7 @@ inject_failure_into_cluster() {
     traffic_node=`gcloud compute instances list --project $project --filter=$failure_node_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     delaytime=2
     export now=`date +"%s"`
-    echo $now  "wait for this minutes:" $delaytime
+    echo $now  "......wait for this minutes:" $delaytime
     export timer=`date -d "+ $delaytime minutes" +"%s"`
     echo `date -d "+ $delaytime minutes" +"%s"`
     if [ $nodefailure -eq 1 ]; then
@@ -312,7 +313,8 @@ inject_failure_into_cluster() {
                  if [ $retval -ne 0 ]; then
                     return -1
                  fi
-    else             
+    fi
+    if [ $diskfailure -eq 1 ]; then
                  echo "preppare to inject failure in storage on enode";
                  echo "vm to inject failure $failure_node, $project, $zone"
                  start_vm $traffic_node $delaytime $testname
@@ -405,8 +407,8 @@ case "$testname" in
     *-daily-e2e* ) echo "prepare daily e2e test";mfio=0;skipprovision=0;deletion=1;;
     *-perf-* ) echo "preppare perf test";skipprovision=1;iotest=4;mfio=1;;
     *-scalability-* ) echo "prepare scability test";clients=1;iotest=16;mfio=1;;
-    *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;mfio=0;nodefailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=0;deletion=1;;
-    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;mfio=0;diskfailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=0;deletion=1;;
+    *elfs-ha-*-node* ) echo "prepare ha test";hatest=1;mfio=0;nodefailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=1;deletion=0;;
+    *elfs-ha-*-disk* ) echo "prepare ha test";hatest=1;mfio=0;diskfailure=1;emsname="ha-$disktype-elfs";enodename="ha-$disktype-elfs-elfs"; testvmname="ha-elfs-$disktype";skipprovision=1;deletion=0;;
     *-io-* ) echo "prepare io only test";iotest=1;mfio=1;;
     *-ps-* ) echo "prepare postsubmit sanity test"; pstest=1;mfio=0;skipprovision=0;deletion=1;emsname="ps-$disktype-elfs";enodename="ps-$disktype-elfs-elfs"; testvmname="ps-elfs-$disktype";;
     *-cleanup-* ) echo "prepare to cleanup all resources used by testing"; cleanup=1;;
@@ -455,6 +457,8 @@ else
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
 fi
 
+echo "nfs servers:" $nfs_server_ip
+
 vhead_count=0
 for i in nfs_server_ips
 do
@@ -467,7 +471,6 @@ if [ $vhead_count -eq 0 ]; then
 fi
 
 clients=$((clients*vhead_count))
-echo "nfs servers:" $nfs_server_ip
 
 
 echo $nfs_server_ips $vhead_count
@@ -479,6 +482,7 @@ echo `date -d "+ $delaytime minutes" +"%s"`
 running_clients=0
 
 if [ $hatest -eq 0 ]; then
+    echo "not ha testing"
     while [ $running_clients -lt $clients ]
     do
         for nfs_server in $nfs_server_ips
@@ -538,6 +542,7 @@ if [ $hatest -eq 0 ]; then
     export now=` date `
     echo $now
 else:
+    echo "ha test start"
     inject_failure_into_cluster
     retval=$?
     if [ $retval -ne 0 ]; then
