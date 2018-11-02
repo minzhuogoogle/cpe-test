@@ -166,7 +166,7 @@ provision_elastifile() {
         echo "set number of node"
         sed -i "s/test-${disktype}/ps-${disktype}/g" terraform.tfvars
     fi
-    if  [ $pstest -eq 1 ]; then
+    if  [ $hatest -eq 1 ]; then
         echo "set number of node"
         sed -i "s/test-${disktype}/ha-${disktype}/g" terraform.tfvars
     fi
