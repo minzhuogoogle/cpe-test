@@ -296,11 +296,11 @@ inject_storage_failure_to_vm() {
 
 inject_failure_into_cluster() {
 #https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.data.verify
-     zone='us-central1-f'
-    failure_node_name="$disktype-elfs-elfs"
-    failure_node=`gcloud compute instances list --project $project --filter=enode_name | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
-    traffic_node=`gcloud compute instances list --project $project --filter=enode_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
-    echo $failure_node $traffic_node
+    zone='us-central1-f'
+    #failure_node_name="$disktype-elfs-elfs"
+    export failure_node=`gcloud compute instances list --project $project --filter=enode_name | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
+    export traffic_node=`gcloud compute instances list --project $project --filter=enode_name | grep -v NAME | cut -d ' ' -f1 | head -n 1`
+    echo "ha nodes:" $failure_node $traffic_node
     delaytime=2
     export now=`date +"%s"`
     echo $now  "......wait for this minutes:" $delaytime
