@@ -591,7 +591,7 @@ test_result() {
     logfiles_uploaded
     no_of_logfiles=$?
     echo $no_of_logfiles
-    if [ $hatest -eq 1 ];
+    if [ $hatest -eq 1 ]; then
         expected_logfile=1
     else
         expect_logfile=$$((clients*6))
