@@ -80,22 +80,20 @@ then
       testno=1
       while [ $number -lt $repeat ] 
       do 
-         
-	       
-             start_fio  $testtype $nfs_server $testduration $testname
-	     export current=`date +"%s"`
-	     echo $current, $fio_start
-	     delta=$((current-fio_start))
-	     testgap=$(($testduration+30))
-	     expected_gap=$(($testgap*testno))
-	     while [ $delta -lt $expected_gap ]
-	     do 
+         start_fio  $testtype $nfs_server $testduration $testname
+	 export current=`date +"%s"`
+	 echo $current, $fio_start
+	 delta=$((current-fio_start))
+	 testgap=$(($testduration+30))
+	 expected_gap=$(($testgap*testno))
+	 while [ $delta -lt $expected_gap ]
+	 do 
 	        sleep 1
 		export current=`date +"%s"`
 		delta=$((current-fio_start))
 		echo $current, $fio_start,  "<===>" $delta, $expected_gap
-             done
-	     testno=$((testno+1))
+         done
+	 testno=$((testno+1))
         
          echo $number
          number=$((number+1))
