@@ -110,8 +110,7 @@ cleanup() {
     done
 }
 
-disktype_check()
-{
+disktype_check() {
     disktype=$1
     valid=(lssd pssd phdd)
     retVal=-1
@@ -125,102 +124,193 @@ disktype_check()
 }
 
 
-initialization()
-{
-   cd gcp-automation/
-   echo `pwd`
-   echo $disktype
-   curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
-   gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
-   gcloud auth activate-service-account --key-file elastifile.json
-   cp terraform.tfvars.$disktype terraform.tfvars
-   cat terraform.tfvars
-   # temporarily disable load-balancing
-   sed -i 's/true/false/' terraform.tfvars
+initialization() {
+    clients=1
+    vmseq=1
+    skipprovision=1
+    mfio=0
+    deletion=0
+    cleanup=0
+    pstest=0
+    iotest=0
+    hatest=0
+    demotest=0
+    nodefailure=0
+    diskfailure=0
+    project=cpe-performance-storage
+    zone=us-east1-b
+    cluster=test-$disktype-elfs
 
-   export zone=`grep ZONE terraform.tfvars | awk -v N=3 '{print $N}'`
-   zone=${zone:1:-1}
-   export project=`grep PROJECT terraform.tfvars | awk -v N=3 '{print $N}'`
-   project=${project:1:-1}
-   export cluster_name=`grep CLUSTER_NAME terraform.tfvars | awk -v N=3 '{print $N}'`
-   cluster_name=${cluster_name:1:-1}
-   export disk=`grep DISK_TYPE terraform.tfvars | awk -v N=3 '{print $N}'`
-   edisk=${disk:1:-1}
-   echo $project,$zone,$cluster_name,$edisk
-   
-
-echo "skip?" $skipprovision "pstest?" $pstest "iotest?" $iotest "ha?" $hatest "cleanup?" $cleanup
-if [ $cleanup -eq 1 ]; then
-   echo "start cleanup resource"
-   cleanup $emsname 
-   cleanup $testvmname
-   return 0
-fi
-
-disktype_check $disktype
-retval=$?
-if [ $retval -ne 0 ]; then
-    echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
-    return -1
-fi
-
-
-echo "delete traffic VMs........"
-delete_vm $testvmname
-
-echo "delete elfs nodes........"
-if [ $deletion -eq 1 ]; then
-    echo "delete elfs nodes........"
-    delete_vm $emsname
-fi
-
-if [ $skipprovision -eq 0 ]; then
-    provision_elastifile
+    io_data_done=0
+    io_integrity_done=0
+ 
+    case "$testname" in
+        *-daily-e2e* ) 
+            echo "prepare daily e2e test";
+            mfio=0;
+            skipprovision=0;
+            deletion=1
+        ;;
+        *-perf-* ) 
+            echo "preppare perf test";
+            skipprovision=1;
+            iotest=1;
+            mfio=1
+        ;; 
+        *-scalability-* ) 
+            echo "prepare scability test";
+            clients=1;
+            iotest=1;
+            mfio=1
+        ;;
+        *elfs-ha-*-node* ) 
+            echo "prepare ha test";
+            hatest=1;
+            mfio=0;
+            nodefailure=1;
+            emsname="ha-$disktype-elfs";
+            enodename="ha-$disktype-elfs-elfs"; 
+            testvmname="ha-elfs-$disktype";
+            skipprovision=1;
+            deletion=0;
+            zone=us-central1-f;
+            cluster=ha-$disktype-elfs
+        ;;
+        *elfs-ha-*-disk* ) 
+            echo "prepare ha test";
+            hatest=1;
+            mfio=0;
+            diskfailure=1;
+            emsname="ha-$disktype-elfs";
+            enodename="ha-$disktype-elfs-elfs"; 
+            testvmname="ha-elfs-$disktype";
+            skipprovision=1;
+            deletion=0;
+            zone=us-central1-f;
+            cluster=ha-$disktype-elfs
+        ;;
+        *-io-* ) 
+            echo "prepare io only test";
+            iotest=1;
+            mfio=1
+        ;;
+        *-ps-* ) 
+            echo "prepare postsubmit sanity test"; 
+            pstest=1;
+            mfio=0;
+            skipprovision=0;
+            deletion=1;
+            emsname="ps-$disktype-elfs";
+            enodename="ps-$disktype-elfs-elfs"; 
+            testvmname="ps-elfs-$disktype";
+            cluster=ps-$disktype-elfs
+        ;;
+        *-cleanup-* ) 
+            echo "prepare to cleanup all resources used by testing"; 
+            cleanup=1
+        ;;
+        *-demo-*-single* ) 
+            echo "prepare to run io on demo lssd instance";
+            iotest=1;
+            emsname="demo-$disktype-vm";
+            enodename="demo-$disktype-vm-elfs"; 
+            testvmname="demo-vm-$disktype";
+            iotest=1;
+            clients=4;
+            demotest=1;
+            mfio=1
+        ;;
+        *-demo-*-scale* ) 
+            echo "prepare to run io on demo lssd instance";
+            iotest=1;
+            emsname="demo-$disktype-vm";
+            enodename="demo-$disktype-vm-elfs"; 
+            testvmname="demo-vm-$disktype";
+            iotest=1;
+            clients=16;
+            demotest=1;
+            mfio=1
+        ;;
+        * ) echo "Error..."
+        ;;
+    esac
+    cd gcp-automation/
+    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
+    gcloud auth activate-service-account --key-file elastifile.json
+    echo `pwd`
+    echo $disktype
+    disktype_check $disktype
     retval=$?
     if [ $retval -ne 0 ]; then
-        exit -1
+        echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
+        return -1
     fi
-fi
+}   
+ 
+ cleanup_test () {
+     echo "start cleanup resource"
+     cleanup $emsname 
+     cleanup $testvmname
+ }   
 
-echo "provision done" $enodename $mfio $disktype
-if [ "$mfio" == "0" ] ; then
-     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
-else
-     export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
-fi
+pre_cleanup() {
+    echo "delete traffic VMs........"
+    delete_vm $testvmname
 
-echo "nfs servers:" $nfs_server_ip
-
-vhead_count=0
-for i in nfs_server_ips
-do
-    vhead_count=$((vhead_count+1))
-done
-
-if [ $vhead_count -eq 0 ]; then
-   echo "no enode available"
-   exit -1
-fi
-
-clients=$((clients*vhead_count))
-
-
-echo $nfs_server_ips $vhead_count
-delaytime=$(($clients+2))
-export now=`date +"%s"`
-echo $now  "wait for this minutes:" $delaytime
-export timer=`date -d "+ $delaytime minutes" +"%s"`
-echo `date -d "+ $delaytime minutes" +"%s"`
+    
+    if [ $deletion -eq 1 ]; then
+        echo "delete elfs nodes........"
+        delete_vm $emsname
+    fi
+}
 
 
 
+prepare_io_test () {
+    if [ "$mfio" == "0" ] ; then
+         export nfs_server_ips=`gcloud compute instances list --project=$project --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
+    else
+          export nfs_server_ips=`gcloud compute instances list --project=$project --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
+   fi
+   echo "nfs servers:" $nfs_server_ip
+
+   vhead_count=0
+   for i in nfs_server_ips
+   do
+       vhead_count=$((vhead_count+1))
+   done
+
+   if [ $vhead_count -eq 0 ]; then
+       echo "no enode available"
+       return -1 
+   fi
+
+   clients=$((clients*vhead_count))
 
 
+   echo $nfs_server_ips $vhead_count
+   delaytime=$(($clients+2))
+   export now=`date +"%s"`
+   echo $now  "wait for this minutes:" $delaytime
+   export timer=`date -d "+ $delaytime minutes" +"%s"`
+   echo `date -d "+ $delaytime minutes" +"%s"`
+   return 0
 }
 
 
 provision_elastifile() {
     #cd gcp-automation/
+    curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
+    cp terraform.tfvars.$disktype terraform.tfvars
+    cat terraform.tfvars
+    # temporarily disable load-balancing
+    sed -i 's/true/false/' terraform.tfvars
+    sed -i "s/testzone/${zone}/" terraform.tfvars
+    sed -i "s/testproject/${project}/" terraform.tfvars
+    sed -i "s/testcluster/${cluster}/" terraform.tfvars
+    echo "terraform.tfvars used in this test"
+    cat terraform.tfvars
+
     echo "iotest ?"  $iotest
     if [ $iotest -eq 1 ]; then
         return 0
@@ -278,7 +368,7 @@ provision_elastifile() {
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
     status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
     echo "process = $process, status=$status"
-
+    echo "provision done" $enodename $mfio $disktype
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
 
@@ -525,25 +615,26 @@ if [ "$io_data_done" == "0" ]; then
 fi 
 }
 
-# --------------
+# ----------------------------------------------------
 # Start here
-# ./elfse2e.sh phdd 0 1 300 elfs-daily-e2e-phdd'
-# --------------
+# example: ./elfse2e.sh phdd  300 elfs-daily-e2e-phdd
+#          phdd --- persistent hdd
+#          300  --- io test run time
+#          elfs-daily-e2e-phdd -- testname
+# ----------------------------------------------------
 disktype=$1
 ioruntime=$2
 testname=$3
-echo  $disktype $ioruntime $testname
+echo "disktype is $disktype,  io run time is $ioruntime, testname is $testname"
 
 emsname="test-$disktype-elfs"
 enodename="test-$disktype-elfs-elfs"
 testvmname="test-elfs-$disktype"
-
 echo $emsname, $enodename, $testvmname
+
 project=''
-newelfs=''
 zone=''
 region=''
-edisk=''
 initialization
 echo "disktype = $disktype, storage_in_terraform = $edisk"
 echo "project = $project"
@@ -567,8 +658,13 @@ diskfailure=0
 io_data_done=0
 io_integrity_done=0
 
-
-
+if [ $skipprovision -eq 0 ]; then
+    provision_elastifile
+    retval=$?
+    if [ $retval -ne 0 ]; then
+        exit -1
+    fi
+fi
 
 
 
