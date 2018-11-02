@@ -12,7 +12,6 @@ testduration=$4
 testname=$5
 nfs_data_container='DC01'
 ping_retry=30
-repeat=1
 interval=60
 sudo apt-get update
 sudo apt-get git
@@ -26,7 +25,6 @@ gcloud auth activate-service-account --key-file  elastifile.json
 
 start_fio() 
 {
-    
       disktype=$1
       nfsserver=$2
       testduration=$3
@@ -45,8 +43,6 @@ start_fio()
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
       sudo rm -rf /mnt/elastifile/*.*
 }
-
-disktypes=('lssd-elfs' 'pssd-elfs' 'phdd-elfs')
       
 export nfs_server_reachable=`ping $nfs_server -c 5 | grep "0% packet loss"`
 check_result=${#nfs_server_reachable}
@@ -69,37 +65,14 @@ then
       echo "Start fio on Elastifile datacontainer."
       sudo mount -o nolock $nfs_server:/$nfs_data_container/root /mnt/elastifile
       #cd /mnt/elastifile
-   
-      number=0
+  
       export now=` date +"%s"`
       while [ "$fio_start" != "$now" ]; do  
           export now=` date +"%s"`
 	  echo $now "=?" $fio_start
 	  sleep 1; 
       done
-      testno=1
-      while [ $number -lt $repeat ] 
-      do 
-         start_fio  $testtype $nfs_server $testduration $testname
-	 export current=`date +"%s"`
-	 echo $current, $fio_start
-	 delta=$((current-fio_start))
-	 testgap=$(($testduration+30))
-	 expected_gap=$(($testgap*testno))
-	 while [ $delta -lt $expected_gap ]
-	 do 
-	        sleep 1
-		export current=`date +"%s"`
-		delta=$((current-fio_start))
-		echo $current, $fio_start,  "<===>" $delta, $expected_gap
-         done
-	 testno=$((testno+1))
-        
-         echo $number
-         number=$((number+1))
-         sleep $interval
-         echo $number
-      done
+      start_fio  $testtype $nfs_server $testduration $testname 
 else
       echo "Can not reach NFS server."
 fi
