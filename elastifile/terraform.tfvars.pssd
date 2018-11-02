@@ -2,7 +2,7 @@
 
 # "small" "medium" "large" "standard" "small standard" "local" "small local" "custom"
 #TEMPLATE_TYPE = "custom"
-
+TEMPLATE_TYPE = "testtemplate"
 # number of vheads exlusive of EMS
 NUM_OF_VMS = "4"
 # <cpucores>_<ram> default: 4_42
@@ -23,7 +23,6 @@ SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
 
 
 IMAGE = "testimage"
-TEMPLATE_TYPE = "testtemplate"
 CLUSTER_NAME = "testcluster"
 ZONE = "testzone"
 PROJECT = "testproject"
