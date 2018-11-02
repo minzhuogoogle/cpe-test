@@ -429,12 +429,12 @@ echo "delete traffic VMs........"
 delete_vm $testvmname
 
 echo "delete elfs nodes........"
-if [ "$deletion" == "1" ]; then
+if [ $deletion peq 1 ]; then
     echo "delete elfs nodes........"
     delete_vm $emsname
 fi
 
-if [ "$skipprovision" == "0" ]; then
+if [ $skipprovision -eq 0 ]; then
     provision_elastifile
     retval=$?
     if [ $retval -ne 0 ]; then
@@ -442,7 +442,7 @@ if [ "$skipprovision" == "0" ]; then
     fi
 fi
 
-echo $enodename $mfio $disktype
+echo "provision done" $enodename $mfio $disktype
 if [ "$mfio" == "0" ] ; then
      export nfs_server_ips=`gcloud compute instances list --project=cpe-performance-storage --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" | head -n 1`
 else
