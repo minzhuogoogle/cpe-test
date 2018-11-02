@@ -589,7 +589,7 @@ logfiles_uploaded() {
 
 test_result() {
     count=0
-    no_of_logfile=0
+    no_of_logfiles=0
     logfiles_uploaded
     no_of_logfiles=$?
     echo $no_of_logfiles
@@ -598,6 +598,7 @@ test_result() {
     else
         expect_logfile=$((clients*6))
     fi	
+    echo $no_of_logfiles "-ge" $expected_logfile 
     if [ $no_of_logfiles -ge $expected_logfile ]; then
        io_data_done=1
     fi
