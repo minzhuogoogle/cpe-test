@@ -645,6 +645,12 @@ if [ $cleanup -eq 1 ]; then
     exit 0
 fi    
 
+pre_cleanup
+retval=$?
+if [ $retval -ne 0 ]; then
+    exit -1
+fi
+
 if [ $skipprovision -eq 0 ]; then
     provision_elastifile
     retval=$?
@@ -652,13 +658,6 @@ if [ $skipprovision -eq 0 ]; then
         exit -1
     fi
 fi
-
-pre_cleanup
-retval=$?
-if [ $retval -ne 0 ]; then
-    exit -1
-fi
-
 
 run_test
 retval=$?
