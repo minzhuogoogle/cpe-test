@@ -500,7 +500,7 @@ start_vm() {
 
 inject_node_failure_to_clustervm() {
     enode=$1
-    gcloud compute instances stop $enode  --project=$project  --zone=$zone
+    gcloud compute instances delete $enode  --project=$project  --zone=$zone -q
     retval=$?
     if [ $retval -ne 0 ]; then
          return -1
