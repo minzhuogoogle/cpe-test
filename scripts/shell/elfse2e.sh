@@ -583,6 +583,14 @@ inject_failure_into_cluster() {
 logfiles_uploaded() {
    export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio | wc -l`
    export filelists=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio`
+   if [ $hatest -eq 1 ]; then
+       echo $filelists
+       for i in $filelists
+       do 
+          echo "this is file:" $i
+          gsutil cat $i
+       done
+   fi
    return $number_logfiles
 }
 
