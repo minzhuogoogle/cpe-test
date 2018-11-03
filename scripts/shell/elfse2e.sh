@@ -593,11 +593,14 @@ test_result() {
     logfiles_uploaded
     no_of_logfiles=$?
     echo $no_of_logfiles
+    echo "hatest" $hatest
+    echo "no_of_file=" $no_of_logfiles
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
     else
-        expect_logfile=$((clients*6))
+        expected_logfile=$((clients*6))
     fi	
+    echo "expected_logfile:" $expected_logfile
     echo $no_of_logfiles "-ge" $expected_logfile 
     if [ $no_of_logfiles -ge $expected_logfile ]; then
        io_data_done=1
