@@ -443,7 +443,7 @@ run_test() {
     echo "delaytime: " $delaytime "ioruntime:" $ioruntime
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
-    echo $now "wait for this minutes to start traffic on testing vm" $delaytime $timer
+    echo $now "wait for this minutes to start traffic on testing vm" $delaytime "min" $timer
     running_clients=0
     if [ $hatest -eq 0 ]; then
         while [ $running_clients -lt $clients ]
