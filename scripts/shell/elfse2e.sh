@@ -575,6 +575,13 @@ logfiles_uploaded() {
 
 test_result() {
     count=0
+    if [ $hatest -eq 1 ]; then
+        maxcount=30
+    else
+        maxcount=30
+    fi 	
+    waittime=$((ioruntime+delaytime*60))
+    sleep $waittime	
     no_of_logfiles=0
     logfiles_uploaded
     no_of_logfiles=$?
@@ -582,6 +589,7 @@ test_result() {
     echo "hatest" $hatest
     echo "no_of_file=" $no_of_logfiles
     echo "count: " $count
+    
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
     else
@@ -597,7 +605,7 @@ test_result() {
        io_data_done=1
     fi
     count=0
-    while [[ $io_data_done -eq 0  &&  $count -lt 60 ]]
+    while [[ $io_data_done -eq 0  &&  $count -lt $maxcount ]]
     do
       echo "sleep to check logfile" "done?"  $io_date_done "count="  $count 
       sleep 60
