@@ -128,6 +128,7 @@ initialization() {
     iotest=0
     hatest=0
     demotest=0
+    scaletest=0
     nodefailure=0
     diskfailure=0
     project=cpe-performance-storage
@@ -180,8 +181,9 @@ initialization() {
             echo "prepare scability test";
             clients=384;
             iotest=1;
-            mfio=1
-        ;;
+	    scaletest=1;
+            mfio=1;
+	;;
         *elfs-ha-*-node* ) 
             echo "prepare ha test for node failure";
             hatest=1;
@@ -248,8 +250,9 @@ initialization() {
             enodename="demo-$disktype-vm-elfs"; 
             testvmname="demo-vm-$disktype";
             iotest=1;
-            clients=8;
+            clients=16;
             demotest=1;
+	    scaletest=1;
             mfio=1
         ;;
         * ) echo "Error..."
@@ -430,7 +433,7 @@ run_test() {
         return -1
     fi
     delaytime=$((clients+2))
-    if [ $delaytime -gt 256 ]; then
+    if [ $scaletest -eq 1 ]; then
         delaytime=$((vhead_count*4))
 	ioruntime=$((clients*60+120))
     fi
@@ -596,6 +599,8 @@ test_result() {
     
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
+    elseif [ $scaletest -eq 1 ]; then
+        expected_logfile=$clients
     else
         expected_logfile=$((clients*6))
     fi	
