@@ -215,8 +215,8 @@ initialization() {
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
-            skipprovision=1
-            deletion=0
+            skipprovision=0
+            deletion=1
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
@@ -543,7 +543,6 @@ inject_storage_failure_to_vm() {
 }
 
 inject_failure_into_cluster() {
-    return 0
     echo "info:" $project $enodename
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1"
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1"
