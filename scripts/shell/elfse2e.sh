@@ -527,7 +527,7 @@ inject_failure_into_cluster() {
     export failure_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
     export traffic_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     echo "ha nodes:" $failure_node $traffic_node
-    delaytime=0
+    delaytime=1
     export now=`date +"%s"`
     echo $now  "......wait for this minutes:" $delaytime
     export timer=`date -d "+ $delaytime minutes" +"%s"`
@@ -535,7 +535,10 @@ inject_failure_into_cluster() {
     if [ $nodefailure -eq 1 ]; then
         echo "prepare to inject failure in enode";
         echo "vm to inject failre: $failure_node, $project, $zone"
-        start_vm $traffic_node $delaytime $testname
+	for nfs_server in $nfs_server_ips
+	do
+            start_vm $nfs_server $timer $ioruntime $testname
+	done     
         inject_node_failure_to_clustervm $failure_node
         retval=$?
         if [ $retval -ne 0 ]; then
@@ -545,7 +548,10 @@ inject_failure_into_cluster() {
     if [ $diskfailure -eq 1 ]; then
          echo "preppare to inject failure in storage on enode";
          echo "vm to inject failure $failure_node, $project, $zone"
-         start_vm $traffic_node $delaytime $testname
+	 for nfs_server in $nfs_server_ips
+	 do
+             start_vm $nfs_server $timer $ioruntime $testname
+	 done
          inject_storage_failure_to_vm $failure_node
          retval=$?
          if [ $retval -ne 0 ]; then
