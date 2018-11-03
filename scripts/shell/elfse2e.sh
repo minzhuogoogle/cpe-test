@@ -622,16 +622,18 @@ test_result() {
     count=0
     while [[ $io_date_done -eq 0  &&  $count -lt 60 ]]
     do
-      echo "sleep to check logfile"
+      echo "sleep to check logfile" "done?"  $io_date_done "count="  $count 
       sleep 60
       logfiles_uploaded
       no_of_logfiles=$?
       echo "no of logfiles : " $no_of_logfiles "expected logfile: " $expected_logfile
-      #if [ $no_of_logfiles -ge $expected_logfile ]; then
-      if (($no_of_logfiles < $expected_logfile )); then
-         io_data_done=0
-      else
+      if [ $no_of_logfiles -ge $expected_logfile ]; then
+      #if (($no_of_logfiles < $expected_logfile )); then
+         echo "set test done"
          io_data_done=1
+      else
+         echo "set test not done"
+         io_data_done=0
       fi
        #   echo "yes. we got file"
        #   io_date_done=1
