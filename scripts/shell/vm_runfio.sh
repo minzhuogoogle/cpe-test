@@ -67,7 +67,7 @@ then
       declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
       number=0
       export now=` date +"%s"`
-      while [ "$fio_start" != "$now" ]; do  
+      while [ $fio_start -gt $now ]; do  
           export now=` date +"%s"`
 	  echo $now "=?" $fio_start
 	  sleep 1; 
