@@ -595,11 +595,13 @@ test_result() {
     echo $no_of_logfiles
     echo "hatest" $hatest
     echo "no_of_file=" $no_of_logfiles
+    echo "count: " $count
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
     else
         expected_logfile=$((clients*6))
     fi	
+    io_data_done=0
     echo "expected_logfile:" $expected_logfile
     echo $no_of_logfiles "-ge" $expected_logfile 
     if [ $no_of_logfiles -ge $expected_logfile ]; then
