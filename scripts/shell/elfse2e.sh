@@ -5,12 +5,12 @@ delete_vm() {
     echo $name
     for i in `gcloud compute instances list --project $project --filter=$name  | grep -v NAME |  cut -d ' ' -f1`;
     do
-       echo "vm to be deleted: $i, $project, $zone"
-       gcloud compute instances delete $i --project $project --zone $zone -q;
-       retval=$?
-       if [ $retval -ne 0 ]; then
-          return -1
-       fi
+        echo "vm to be deleted: $i, $project, $zone"
+        gcloud compute instances delete $i --project $project --zone $zone -q;
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            return -1
+        fi
     done
     return 0
 }
@@ -20,45 +20,40 @@ delete_address() {
     region=$2
     for i in `gcloud compute addresses list --project $project --filter=$region | grep $name |  cut -d ' ' -f1`
     do
-       echo "addess to be deleted: $i, $project, $region"
-       gcloud compute addresses delete $i --project $project --region $region -q;
-          retval=$?
-       if [ $retval -ne 0 ]; then
-          return -1
-       fi
-
+         echo "addess to be deleted: $i, $project, $region"
+         gcloud compute addresses delete $i --project $project --region $region -q;
+         retval=$?
+         if [ $retval -ne 0 ]; then
+             return -1
+         fi
     done
-
 }
 
 delete_subnet() {
-    name=$1
-    region=$2
-    for i in `gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1`;
-    do
-       echo "subnet to be deleted: $i, $project, $region"
-       gcloud compute  networks subnets delete $i --project $project --region $region -q;
-          retval=$?
-       if [ $retval -ne 0 ]; then
-          return -1
-       fi
-
-    done
+     name=$1
+     region=$2
+     for i in `gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1`;
+     do
+         echo "subnet to be deleted: $i, $project, $region"
+         gcloud compute  networks subnets delete $i --project $project --region $region -q;
+         retval=$?
+         if [ $retval -ne 0 ]; then
+             return -1
+         fi
+     done
 }
 
 delete_route() {
     name=$1
     region=$2
-
     for i in `gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1`;
     do
-       echo "route to be deleted: $i, $project, $region"
-       gcloud compute  routes delete $i --project $project -q;
-       retval=$?
-       if [ $retval -ne 0 ]; then
-          return -1
-       fi
-
+        echo "route to be deleted: $i, $project, $region"
+        gcloud compute  routes delete $i --project $project -q;
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            return -1
+        fi
      done
 }
 
@@ -67,13 +62,12 @@ delete_network() {
     region=$2
     for i in `gcloud compute networks list --project $project  --filter=$region | grep $name | cut -d ' ' -f1`;
     do
-       echo "network to be deleted: $i, $project, $region"
-
-       gcloud compute networks  delete $i --project $project -q;
-       retval=$?
-       if [ $retval -ne 0 ]; then
-          return -1
-       fi
+        echo "network to be deleted: $i, $project, $region"
+        gcloud compute networks  delete $i --project $project -q;
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            return -1
+        fi
      done
 }
 
@@ -82,13 +76,12 @@ delete_firewall() {
     region=$2
     for i in `gcloud compute firewall-rules list --project $project  --filter="NAME:$name"  --format="table(NAME)" | grep -v NAME |  cut -d ' ' -f1`;
     do
-       echo "firewall to be deleted: $i, $project, $region"
-
-       gcloud compute firewall-rules delete $i --project $project -q;
-       retval=$?
-       if [ $retval -ne 0 ]; then
-          return -1
-       fi
+        echo "firewall to be deleted: $i, $project, $region"
+        gcloud compute firewall-rules delete $i --project $project -q;
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            return -1
+        fi
      done
 }
 
@@ -97,18 +90,17 @@ cleanup_test() {
     delete_vm $name
     for i in `gcloud compute regions list  | cut -d ' ' -f1`
     do
-       echo $i
-       if [[ $i =~ "NAME" ]]; then
-           echo "skip"
-           continue
-       fi
-       delete_address $name $i
-       delete_subnet $name $i
-       delete_route $name $i
-       delete_network $name $i
+        echo $i
+        if [[ $i =~ "NAME" ]]; then
+            echo "skip"
+            continue
+        fi
+        delete_address $name $i
+        delete_subnet $name $i
+        delete_route $name $i
+        delete_network $name $i
     done
     delete_firewall $name
-
 }
 
 disktype_check() {
@@ -117,9 +109,9 @@ disktype_check() {
     retVal=-1
     for x in "${valid[@]}"
     do
-         if [ "$disktype" == "$x" ]; then
-             retVal=0
-         fi
+        if [ "$disktype" == "$x" ]; then
+            retVal=0
+        fi
     done
     return $retVal
 }
@@ -158,12 +150,9 @@ initialization() {
         ;;
     esac
     
-   
-
     io_data_done=0
     io_integrity_done=0
 
-    
     emsname="test-$disktype-elfs"
     enodename="test-$disktype-elfs-elfs"
     testvmname="test-elfs-$disktype"
@@ -189,12 +178,12 @@ initialization() {
         ;; 
         *-scalability-* ) 
             echo "prepare scability test";
-            clients=1;
+            clients=8;
             iotest=1;
             mfio=1
         ;;
         *elfs-ha-*-node* ) 
-            echo "prepare ha test";
+            echo "prepare ha test for node failure";
             hatest=1;
             mfio=0;
             nodefailure=1;
@@ -208,7 +197,7 @@ initialization() {
             cluster=ha-$disktype-elfs
         ;;
         *elfs-ha-*-disk* ) 
-            echo "prepare ha test";
+            echo "prepare ha test for disk failure";
             hatest=1;
             mfio=0;
             diskfailure=1;
@@ -248,7 +237,7 @@ initialization() {
             enodename="demo-$disktype-vm-elfs"; 
             testvmname="demo-vm-$disktype";
             iotest=1;
-            clients=4;
+            clients=1;
             demotest=1;
             mfio=1
         ;;
@@ -259,7 +248,7 @@ initialization() {
             enodename="demo-$disktype-vm-elfs"; 
             testvmname="demo-vm-$disktype";
             iotest=1;
-            clients=16;
+            clients=8;
             demotest=1;
             mfio=1
         ;;
@@ -289,7 +278,6 @@ pre_cleanup() {
     echo "delete traffic VMs........"
     delete_vm $testvmname
 
-    
     if [ $deletion -eq 1 ]; then
         echo "delete elfs nodes........"
         delete_vm $emsname
@@ -297,15 +285,12 @@ pre_cleanup() {
 }
 
 post_cleanup() {
-    if [ "$io_date_done" == "1" ]; then
+    if [ $io_data_done -eq 1 ]; then
         delete_vm $testvmname 
+	if [[ $hatest -eq 1 || $pstest -eq 1 ]]; then
+	    delete_vm $emsname
+	fi
     fi	
-    if [ "$pstest" == "1" ]; then
-        delete_vm $emsname
-    fi
-    if [ "$io_integrity_done" == "1" ]; then
-        delete_vm $emsname
-    fi
 }	
 
 prepare_io_test () {
@@ -334,7 +319,6 @@ prepare_io_test () {
 
 
 provision_elastifile() {
-    #cd gcp-automation/
     curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
     cp terraform.tfvars.$disktype terraform.tfvars
     cat terraform.tfvars
@@ -395,7 +379,7 @@ provision_elastifile() {
     done
 
     if [ $count -eq $maxcount ] && [ $ret -eq 1 ]; then
-        echo -ne " failed to stop!! "
+        echo "failed to stop!! "
         retval=-1
     else
         echo "finished"
@@ -409,33 +393,32 @@ provision_elastifile() {
     echo "process = $process, status=$status"
     echo "provision done" $enodename $mfio $disktype
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
-       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
+        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
 
-       cat terraform.tfvars >> output.txt
-       if  [ -f "create_vheads.log" ]; then
-          cat create_vheads.log >> output.txt
-       fi
-       logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
-       gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
-       echo $logfile
-       name=$disktype-elfs
-       return -1
+        cat terraform.tfvars >> output.txt
+        if [ -f "create_vheads.log" ]; then
+            cat create_vheads.log >> output.txt
+        fi
+        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
+        gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
+        echo $logfile
+        name=$disktype-elfs
+        return -1
     fi
 
-    if  [ -f "create_vheads.log" ]; then
-       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-       cat terraform.tfvars >> output.txt
-       cat create_vheads.log >> output.txt
-       logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
-       gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
-       echo $logfile
-       return 0
+    if [ -f "create_vheads.log" ]; then
+        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
+        cat terraform.tfvars >> output.txt
+        cat create_vheads.log >> output.txt
+        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
+        gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
+        echo $logfile
+        return 0
     else
-       return -1
+        return -1
     fi
 
 }
-
 
 run_test() {
     prepare_io_test
@@ -456,8 +439,7 @@ run_test() {
             do
                 export now=`date +"%s"`
                 newtimer=`date -d "+ 1minutes" +"%s"`
-                echo "Now: ", $now, $newtimer
-                echo "Wait until:" $timer
+                
                 if [ $timer > $newtimer ]; then
                    start_vm $nfs_server $timer $ioruntime $testname
                 else
@@ -494,7 +476,6 @@ start_vm() {
      test_name=$4
      echo "project = $project"
      echo "zone = $zone"
-     #zone="us-east1-b"
      machine_type='n1-standard-1'
 
      echo $testvmname
@@ -514,8 +495,6 @@ start_vm() {
 
 
 inject_node_failure_to_clustervm() {
-# gcloud compute instances describe test-lssd-elfs-elfs-1d391f3b  --format="text(disks[0].deviceName)"
-# gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef    --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
     enode=$1
     gcloud compute instances stop $enode  --project=$project  --zone=$zone
     retval=$?
@@ -526,8 +505,6 @@ inject_node_failure_to_clustervm() {
 
 
 inject_storage_failure_to_vm() {
-# gcloud compute instances describe test-lssd-elfs-elfs-1d391f3b  --format="text(disks[0].deviceName)"
-# gcloud compute instances detach-disk   test-pssd-elfs-elfs-08e6beef	 --disk=test-pssd-elfs-elfs-08e6beef-external-ssd-01
     echo "detaching disk" 
     enode=$1
     export diskindex=`gcloud compute instances describe $enode --project=$project  --zone=$zone --format="text(disks[].index)"   |  tail -n 1 |  cut -d ' ' -f2`
