@@ -620,7 +620,7 @@ test_result() {
        io_data_done=1
     fi
     count=0
-    while [[ $io_date_done -eq 0  &&  $count -lt 60 ]]
+    while [[ $io_data_done -eq 0  &&  $count -lt 60 ]]
     do
       echo "sleep to check logfile" "done?"  $io_date_done "count="  $count 
       sleep 60
