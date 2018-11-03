@@ -543,6 +543,7 @@ inject_storage_failure_to_vm() {
 }
 
 inject_failure_into_cluster() {
+    return 0
     echo "info:" $project $enodename
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1"
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1"
