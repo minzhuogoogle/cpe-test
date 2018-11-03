@@ -165,26 +165,26 @@ initialization() {
     echo "disktype = $disktype"
  
     case "$testname" in
-        *elfs*-daily-e2e* ) 
+        elfs-daily-e2e* ) 
             echo "prepare daily e2e test";
             mfio=0;
             skipprovision=0;
             deletion=1
         ;;
-        *elfs*-perf-* ) 
+        elfs-perf-* ) 
             echo "preppare perf test";
             skipprovision=1;
             iotest=1;
             mfio=1
         ;; 
-        *elfs*-scalability-* ) 
+        elfs-scalability-* ) 
             echo "prepare scability test";
             clients=384;
             iotest=1;
 	    scaletest=1;
             mfio=1;
 	;;
-        *elfs-ha-*-node* ) 
+        elfs-ha-*-node* ) 
             echo "prepare ha test for node failure";
             hatest=1;
             mfio=0;
@@ -198,7 +198,7 @@ initialization() {
 	    region=us-central1;
             cluster=ha-$disktype-elfs
         ;;
-        *elfs-ha-*-disk* ) 
+        elfs-ha-*-disk* ) 
             echo "prepare ha test for disk failure";
             hatest=1;
             mfio=0;
@@ -212,12 +212,12 @@ initialization() {
 	    region=us-central1;
             cluster=ha-$disktype-elfs
         ;;
-        *elfs*-io-* ) 
+        elfs-daily-io-* ) 
             echo "prepare io only test";
             iotest=1;
             mfio=1
         ;;
-        *elfs*-ps-* ) 
+        elfs-ps-* ) 
             echo "prepare postsubmit sanity test"; 
             pstest=1;
             mfio=0;
@@ -228,11 +228,11 @@ initialization() {
             testvmname="ps-elfs-$disktype";
             cluster=ps-$disktype-elfs
         ;;
-        *elfs*-cleanup-* ) 
+        elfs-cleanup-* ) 
             echo "prepare to cleanup all resources used by testing"; 
             cleanup=1
         ;;
-        *-demo-*-single* ) 
+        elfs-demo-*-single* ) 
             echo "prepare to run io on demo lssd instance";
             iotest=1;
             emsname="demo-$disktype-vm";
@@ -243,7 +243,7 @@ initialization() {
             demotest=1;
             mfio=1
         ;;
-        *-demo-*-scalability* ) 
+        elfs-demo-*-scalability* ) 
             echo "prepare to run io on demo lssd instance";
             iotest=1;
             emsname="demo-$disktype-vm";
@@ -302,7 +302,7 @@ prepare_io_test () {
     else
         export nfs_server_ips=`gcloud compute instances list --project=$project --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
     fi
-    echo "nfs servers:" $nfs_server_ip
+    echo "nfs servers:" $nfs_server_ips
 
     vhead_count=0
     for i in nfs_server_ips
@@ -340,7 +340,7 @@ provision_elastifile() {
     cat terraform.tfvars
 
     echo "iotest ?"  $iotest
-    if [ $iotest -eq 1 ]; then
+    if [[ $iotest -eq 1 || $demotest -eq 1 ]]; then
         return 0
     fi
     terraform init
@@ -349,16 +349,16 @@ provision_elastifile() {
        return -1
     fi
     echo "run terraform apply to start elfs instance"
-    if  [ $pstest -eq 1 ]; then
-        echo "set number of node"
-        sed -i "s/test-${disktype}/ps-${disktype}/g" terraform.tfvars
-    fi
-    if  [ $hatest -eq 1 ]; then
-        echo "set number of node"
-        sed -i "s/test-${disktype}/ha-${disktype}/g" terraform.tfvars
-        sed -i "s/us-east1-b/us-central1-f/g" terraform.tfvars
-        zone='us-central1-f'
-    fi
+    #if  [ $pstest -eq 1 ]; then
+    #    echo "set number of node"
+    #    sed -i "s/test-${disktype}/ps-${disktype}/g" terraform.tfvars
+    #fi
+    #if  [ $hatest -eq 1 ]; then
+    #    echo "set number of node"
+    #    sed -i "s/test-${disktype}/ha-${disktype}/g" terraform.tfvars
+    #    sed -i "s/us-east1-b/us-central1-f/g" terraform.tfvars
+    #    zone='us-central1-f'
+    #fi
     echo "==== new terraform.tfvars====="
     cat terraform.tfvars
 
