@@ -63,8 +63,15 @@ if [ $count -lt $ping_retry ]
 then
       echo "Start fio on Elastifile datacontainer."
       sudo mount -o nolock $nfs_server:/$nfs_data_container/root /mnt/elastifile
-      #cd /mnt/elastifile
-      declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
+     
+      case "$testname" in
+          *scalability* ) 
+	  declare -a iotype=('randrwbw' 'randrwiops')
+	  ;;
+          * )    
+	  declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
+          ;;
+      esac
       number=0
       export now=` date +"%s"`
       while [ $fio_start -gt $now ]; do  
