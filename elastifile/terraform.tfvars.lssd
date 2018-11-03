@@ -22,7 +22,7 @@ SUBNETWORK = "default"
 CREDENTIALS = "elastifile.json"
 SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
 
-
+IMAGE = "testimage"
 CLUSTER_NAME = "testcluster"
 ZONE = "testzone"
 PROJECT = "testproject"
