@@ -608,7 +608,7 @@ test_result() {
        io_data_done=1
     fi
     count=0
-    while [[ "$io_date_done" == "0"  &&  $count -lt 60 ]]
+    while [[ $io_date_done -eq 0  &&  $count -lt 60 ]]
     do
       sleep 60
       logfiles_uploaded
