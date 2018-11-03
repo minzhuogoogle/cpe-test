@@ -309,14 +309,16 @@ prepare_io_test () {
     do
         vhead_count=$((vhead_count+1))
     done
+    
+    echo "found vhead_count:" $vhead_count
 
     if [ $vhead_count -eq 0 ]; then
         echo "no enode available"
         return -1 
     fi
-
+    echo "clients :" $clients "for enode: " $vhead_count
     clients=$((clients*vhead_count))
-    
+    echo "clients :" $clients
     echo "total clients:" $clients "for enode: " $vhead_count
 
     return 0
