@@ -633,7 +633,6 @@ initialization
 echo "cleanup ? $cleanup"
 echo "skip provision ? $skipprovision"
 
-
 if [ $cleanup -eq 1 ]; then
     cleanup_test "d-elfs"
     exit 0
@@ -659,13 +658,11 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-
 test_result
 retval=$?
 if [ $retval -ne 0 ]; then
     exit -1
 fi
-
 
 post_cleanup
 retval=$?
