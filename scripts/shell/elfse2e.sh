@@ -531,7 +531,7 @@ inject_failure_into_cluster() {
     export failure_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
     export traffic_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     echo "ha nodes:" $failure_node $traffic_node
-    delaytime=1
+    delaytime=2
     export now=`date +"%s"`
     echo $now  "......wait for this minutes:" $delaytime
     export timer=`date -d "+ $delaytime minutes" +"%s"`
