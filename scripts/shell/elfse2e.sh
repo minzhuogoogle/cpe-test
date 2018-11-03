@@ -690,8 +690,8 @@ if [ $retval -ne 0 ]; then
 fi
 
 
-post_cleanup
-retval=$?
-if [ $retval -ne 0 ]; then
-    exit -1
-fi
+#post_cleanup
+#retval=$?
+#if [ $retval -ne 0 ]; then
+#    exit -1
+#fi
