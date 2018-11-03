@@ -318,7 +318,7 @@ prepare_io_test () {
     fi
     echo "clients :" $clients "for enode: " $vhead_count
     clients=$((clients*vhead_count))
-    echo "clients :" $clients
+    echo "new clients :" $clients
     echo "total clients:" $clients "for enode: " $vhead_count
 
     return 0
@@ -656,7 +656,7 @@ testname=$3
 echo "disktype is $disktype"  
 echo "io run time is $ioruntime"
 echo "testname is $testname"
-clients=0
+
 
 initialization
 
