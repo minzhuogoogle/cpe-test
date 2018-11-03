@@ -1,12 +1,12 @@
 [global]
-size=64G
+size=32G
 iodepth=16
 direct=1
 numjobs=1
 randrepeat=0
 ioengine=libaio
 verify=crc32c
-runtime=600
+runtime=1200
 filename=/mnt/elastifile/fio.verify.data
 
 [integrity.data]
