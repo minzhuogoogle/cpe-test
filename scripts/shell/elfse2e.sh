@@ -473,7 +473,7 @@ run_test() {
         inject_failure_into_cluster
 	retval=$?
         if [ $retval -ne 0 ]; then
-            echo "Fail to create test vm."
+            echo "Fail to inject failure into cluster."
 	    return -1 
         fi 
     fi
