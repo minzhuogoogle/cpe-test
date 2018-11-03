@@ -449,35 +449,36 @@ run_test() {
     export timer=`date -d "+ $delaytime minutes" +"%s"`
     echo $now "wait for this minutes to start traffic on testing vm" $delaytime $timer
     running_clients=0
-    while [ $running_clients -lt $clients ]
-    do
-        for nfs_server in $nfs_server_ips
+    if [ $hatest -eq 0 ]; then
+        while [ $running_clients -lt $clients ]
         do
-            export now=`date +"%s"`
-            newtimer=`date -d "+ 1minutes" +"%s"`
-            echo "Now: ", $now, $newtimer
-            echo "Wait until:" $timer
-            if [ $timer > $newtimer ]; then
-                start_vm $nfs_server $timer $ioruntime $testname
-            else
-                start_vm $nfs_server $newtimer $ioruntime $testname
-            fi
+            for nfs_server in $nfs_server_ips
+            do
+                export now=`date +"%s"`
+                newtimer=`date -d "+ 1minutes" +"%s"`
+                echo "Now: ", $now, $newtimer
+                echo "Wait until:" $timer
+                if [ $timer > $newtimer ]; then
+                   start_vm $nfs_server $timer $ioruntime $testname
+                else
+                   start_vm $nfs_server $newtimer $ioruntime $testname
+                fi
  		    
-            retval=$?
-            if [ $retval -ne 0 ]; then
-                echo "Fail to create test vm."
-                delete_vm $testvmname
-                exit -1 
-            fi 
+                retval=$?
+                if [ $retval -ne 0 ]; then
+                   echo "Fail to create test vm."
+                   delete_vm $testvmname
+                   return -1 
+                fi 
            
-            export now=`date +"%s"`
-            echo "Now:", $now
-            running_clients=$((running_clients+1))
+                export now=`date +"%s"`
+                echo "Now:", $now
+                running_clients=$((running_clients+1))
+            done
         done
-    done
-    if [ $hatest -eq 1 ]; then
+    else	
         inject_failure_into_cluster
-        retval=$?
+	retval=$?
         if [ $retval -ne 0 ]; then
             echo "Fail to create test vm."
 	    return -1 
@@ -547,7 +548,7 @@ inject_failure_into_cluster() {
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1"
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1"
     export failure_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
-    #export traffic_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
+    export traffic_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1`
     echo "ha nodes:" $failure_node $traffic_node
     delaytime=0
     export now=`date +"%s"`
@@ -557,7 +558,7 @@ inject_failure_into_cluster() {
     if [ $nodefailure -eq 1 ]; then
         echo "prepare to inject failure in enode";
         echo "vm to inject failre: $failure_node, $project, $zone"
-        #start_vm $traffic_node $delaytime $testname
+        start_vm $traffic_node $delaytime $testname
         inject_node_failure_to_clustervm $failure_node
         retval=$?
         if [ $retval -ne 0 ]; then
@@ -567,15 +568,13 @@ inject_failure_into_cluster() {
     if [ $diskfailure -eq 1 ]; then
          echo "preppare to inject failure in storage on enode";
          echo "vm to inject failure $failure_node, $project, $zone"
-         #start_vm $traffic_node $delaytime $testname
+         start_vm $traffic_node $delaytime $testname
          inject_storage_failure_to_vm $failure_node
-                 #gcloud compute instances delete $failure_node --project $project --zone $zone -q
          retval=$?
          if [ $retval -ne 0 ]; then
               return -1
          fi
     fi    
-   
     return 0
 }
 
@@ -583,14 +582,6 @@ inject_failure_into_cluster() {
 logfiles_uploaded() {
    export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio | wc -l`
    export filelists=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio`
-   if [ $hatest -eq 1 ]; then
-       echo $filelists
-       for i in $filelists
-       do 
-          echo "this is file:" $i
-          gsutil cat $i
-       done
-   fi
    return $number_logfiles
 }
 
