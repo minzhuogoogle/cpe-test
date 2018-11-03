@@ -39,7 +39,8 @@ start_fio()
       HOSTNAME=$(hostname)
       logfile=$testname.fio.failover.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
-      sudo fio fio.data.verify --refill_buffers --norandommap  --output-format=json --output $logfile
+      #sudo fio fio.data.verify --refill_buffers --norandommap  --output-format=json --output $logfile
+      sudo fio fio.data.verify --refill_buffers --norandommap --time_based --output-format=json --output $logfile
       gsutil cp $logfile gs://cpe-performance-storage/test_result/$logfile
       sudo rm -rf /mnt/elastifile/*.*
 }
