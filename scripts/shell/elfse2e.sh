@@ -313,6 +313,8 @@ prepare_io_test () {
     fi
 
     clients=$((clients*vhead_count))
+    
+    echo "total clients:" $clients "for enode: " $vhead_count
 
     return 0
 }
@@ -432,6 +434,8 @@ run_test() {
         delaytime=$((vhead_count*4))
 	ioruntime=$((clients*60+120))
     fi
+    
+    echo "delaytime: " $delaytime "ioruntime:" $ioruntime
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
     echo $now "wait for this minutes to start traffic on testing vm" $delaytime $timer
@@ -444,10 +448,10 @@ run_test() {
                 export now=`date +"%s"`
                 newtimer=`date -d "+ 3minutes" +"%s"`
                 
-                if [ $timer > $newtimer ]; then
-                   start_vm $nfs_server $timer $ioruntime $testname
+                if [ $timer -gt $newtimer ]; then
+                    start_vm $nfs_server $timer $ioruntime $testname
                 else
-                   start_vm $nfs_server $newtimer $ioruntime $testname
+                    start_vm $nfs_server $newtimer $ioruntime $testname
                 fi
  		    
                 retval=$?
@@ -458,7 +462,7 @@ run_test() {
                 fi 
            
                 export now=`date +"%s"`
-                echo "Now:", $now
+                echo "Now:" $now
                 running_clients=$((running_clients+1))
             done
         done
@@ -645,6 +649,7 @@ testname=$3
 echo "disktype is $disktype"  
 echo "io run time is $ioruntime"
 echo "testname is $testname"
+clients=0
 
 initialization
 
