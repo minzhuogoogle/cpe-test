@@ -653,6 +653,8 @@ test_result() {
 disktype=$1
 ioruntime=$2
 testname=$3
+clients=0
+delaytime=0
 echo "disktype is $disktype"  
 echo "io run time is $ioruntime"
 echo "testname is $testname"
