@@ -58,11 +58,13 @@ then
       echo "Start fio on Elastifile datacontainer."
       sudo mount -o nolock $nfs_server:/$nfs_data_container/root /mnt/elastifile
       export now=` date +"%s"`
-      while [ "$fio_start" != "$now" ]; do  
+     
+      while [ $fio_start -gt $now ]; do  
           export now=` date +"%s"`
 	  echo $now "=?" $fio_start
 	  sleep 1; 
       done
+      
       start_fio  $testtype $nfs_server $testduration $testname 
 else
       echo "Can not reach NFS server."
