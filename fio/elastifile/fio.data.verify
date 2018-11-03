@@ -1,14 +1,13 @@
 [global]
-size=4G
-directory=/mnt/elastifile/
+size=64G
 iodepth=16
 direct=1
 numjobs=1
 randrepeat=0
 ioengine=libaio
 verify=crc32c
-filename=/mnt/elastifile/test.verify.data
+filename=/mnt/elastifile/fio.verify.data
 
-[data-integrity]
+[integrity.data]
 rw=randwrite
 blocksize=16k
