@@ -6,7 +6,7 @@ numjobs=1
 randrepeat=0
 ioengine=libaio
 verify=crc32c
-runtime=1200
+runtime=1800
 filename=/mnt/elastifile/fio.verify.data
 
 [integrity.data]
