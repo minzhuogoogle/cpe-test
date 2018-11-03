@@ -178,7 +178,7 @@ initialization() {
         ;; 
         *-scalability-* ) 
             echo "prepare scability test";
-            clients=8;
+            clients=384;
             iotest=1;
             mfio=1
         ;;
@@ -427,7 +427,10 @@ run_test() {
 	echo "Failure in retrieve Elastifile enode"    
         return -1
     fi
-    delaytime=$(($clients+2))
+    delaytime=$((clients+2))
+    if [ $delaytime -gt 256 ]; then
+        delaytime=$((vhead_count*4))
+    fi
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
     echo $now "wait for this minutes to start traffic on testing vm" $delaytime $timer
@@ -438,7 +441,7 @@ run_test() {
             for nfs_server in $nfs_server_ips
             do
                 export now=`date +"%s"`
-                newtimer=`date -d "+ 1minutes" +"%s"`
+                newtimer=`date -d "+ 3minutes" +"%s"`
                 
                 if [ $timer > $newtimer ]; then
                    start_vm $nfs_server $timer $ioruntime $testname
