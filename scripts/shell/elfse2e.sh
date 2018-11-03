@@ -165,19 +165,19 @@ initialization() {
     echo "disktype = $disktype"
  
     case "$testname" in
-        *-daily-e2e* ) 
+        *elfs*-daily-e2e* ) 
             echo "prepare daily e2e test";
             mfio=0;
             skipprovision=0;
             deletion=1
         ;;
-        *-perf-* ) 
+        *elfs*-perf-* ) 
             echo "preppare perf test";
             skipprovision=1;
             iotest=1;
             mfio=1
         ;; 
-        *-scalability-* ) 
+        *elfs*-scalability-* ) 
             echo "prepare scability test";
             clients=384;
             iotest=1;
@@ -212,12 +212,12 @@ initialization() {
 	    region=us-central1;
             cluster=ha-$disktype-elfs
         ;;
-        *-io-* ) 
+        *elfs*-io-* ) 
             echo "prepare io only test";
             iotest=1;
             mfio=1
         ;;
-        *-ps-* ) 
+        *elfs*-ps-* ) 
             echo "prepare postsubmit sanity test"; 
             pstest=1;
             mfio=0;
@@ -228,7 +228,7 @@ initialization() {
             testvmname="ps-elfs-$disktype";
             cluster=ps-$disktype-elfs
         ;;
-        *-cleanup-* ) 
+        *elfs*-cleanup-* ) 
             echo "prepare to cleanup all resources used by testing"; 
             cleanup=1
         ;;
@@ -243,7 +243,7 @@ initialization() {
             demotest=1;
             mfio=1
         ;;
-        *-demo-*-scale* ) 
+        *-demo-*-scalability* ) 
             echo "prepare to run io on demo lssd instance";
             iotest=1;
             emsname="demo-$disktype-vm";
