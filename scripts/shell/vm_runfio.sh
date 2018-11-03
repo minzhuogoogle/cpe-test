@@ -1,9 +1,4 @@
 #!/bin/bash
-#gcloud compute --project=$project instances create $vminstance  --zone=$zone --machine-type=$machine_type
-#--scopes=https://www.googleapis.com/auth/devstorage.read_write --metadata=startup-script=
-#sudo\ curl\ -OL\ https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/vm_runfio.sh\;\ 
-#sudo\ chmod\ 777\ vm_runfio.sh\;\ sudo\ ./vm_runfio.sh\
-#$disktype\ $nfs_server\ $fio_start\ $test_duration\ $test_name
    
 testtype=$1
 nfs_server=$2
@@ -20,7 +15,6 @@ sudo apt-get iputils-ping
 sudo apt install fio -y
 sudo apt install nfs-common -y
 sudo mkdir -p /mnt/elastifile
-#gsutil cp gs://cpe-performance-storage-data/elastifile.json elastifile.json
 gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
 gcloud auth activate-service-account --key-file  elastifile.json
 
