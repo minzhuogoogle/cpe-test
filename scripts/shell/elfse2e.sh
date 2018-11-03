@@ -215,8 +215,8 @@ initialization() {
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
-            skipprovision=0
-            deletion=1
+            skipprovision=1
+            deletion=0
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
