@@ -430,7 +430,7 @@ run_test() {
     delaytime=$((clients+2))
     if [ $delaytime -gt 256 ]; then
         delaytime=$((vhead_count*4))
-	ioruntime=$$(clients*60+120))
+	ioruntime=$((clients*60+120))
     fi
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
