@@ -104,14 +104,14 @@ cleanup_test() {
     for i in `gcloud compute regions list  | cut -d ' ' -f1`
     do
         echo $i
-        if [[ $i =~ "NAME" ]]; then
-            echo "skip"
-            continue
-        fi
-        delete_address $name $i
-        delete_subnet $name $i
-        delete_route $name $i
-        delete_network $name $i
+        if [[ $zone =~ $i ]]; then
+           echo "zone $zone in region $i "
+           delete_address $name $i
+           delete_subnet $name $i
+           delete_route $name $i
+           delete_network $name $i
+	   continue
+	fi   
     done
     delete_firewall $name
 }
