@@ -680,10 +680,10 @@ if [ $cleanup -eq 1 ]; then
     for j in "${elfsname[@]}"
     do
         case "$i" in 
-        *ha* )
+        ha* )
 	    zone="us-central1-f"
 	    ;;
-	*demo* )
+	demo* )
 	    zone="us-east1-b"
 	    ;;
 	* )
