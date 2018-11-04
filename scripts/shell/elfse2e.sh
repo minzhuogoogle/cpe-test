@@ -661,6 +661,10 @@ echo "testname is $testname"
 
 
 initialization
+retval=$?
+if [ $retval -ne 0 ]; then
+    exit -1
+fi
 
 echo "cleanup ? $cleanup "
 echo "skip provision ? $skipprovision "
