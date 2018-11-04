@@ -80,6 +80,7 @@ then
 	  sleep 1; 
       done
       testno=1
+      testgap=$((testduration+30))
       while [ $number -lt $repeat ] 
       do 
          for j in "${iotype[@]}"
@@ -89,8 +90,7 @@ then
 	     export current=`date +"%s"`
 	     echo $current, $fio_start
 	     delta=$((current-fio_start))
-	     testgap=$(($testduration+30))
-	     expected_gap=$(($testgap*testno))
+	     expected_gap=$((testgap*testno))
 	     while [ $delta -lt $expected_gap ]
 	     do 
 	        sleep 1
@@ -100,7 +100,6 @@ then
              done
 	     testno=$((testno+1))
          done
-         echo $number
          number=$((number+1))
          sleep $interval
          echo $number
