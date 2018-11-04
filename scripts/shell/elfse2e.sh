@@ -681,7 +681,7 @@ if [ $cleanup -eq 1 ]; then
     do
         case "$i" in 
         *ha* )
-	    zone="us-central1-f	"
+	    zone="us-central1-f"
 	    ;;
 	*demo* )
 	    zone="us-east1-b"
