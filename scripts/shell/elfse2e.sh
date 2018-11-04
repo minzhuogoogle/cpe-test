@@ -617,11 +617,11 @@ test_result() {
     count=0
     while [[ $io_data_done -eq 0  &&  $count -lt $maxcount ]]
     do
-      echo "sleep to check logfile" "done?"  $io_date_done "count="  $count 
+      echo "sleep to check logfile done?  $io_date_done count=  $count "
       sleep 60
       logfiles_uploaded
       no_of_logfiles=$?
-      echo "no of logfiles : " $no_of_logfiles "expected logfile: " $expected_logfile
+      echo "no of logfiles :  $no_of_logfiles expected logfile:  $expected_logfile"
       if [ $no_of_logfiles -ge $expected_logfile ]; then
      
          echo "set test done"
@@ -662,8 +662,8 @@ echo "testname is $testname"
 
 initialization
 
-echo "cleanup ?” $cleanup
-echo "skip provision ?“ $skipprovision
+echo "cleanup ? $cleanup "
+echo "skip provision ? $skipprovision "
 
 if [ $cleanup -eq 1 ]; then
     cleanup_test ”phdd-elfs“
