@@ -667,6 +667,7 @@ echo "skip provision ? $skipprovision"
 
 if [ $cleanup -eq 1 ]; then
     cleanup_test phdd-elfs
+    cleanup_test pssd-elfs
     exit 0
 fi    
 
