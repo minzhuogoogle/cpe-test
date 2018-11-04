@@ -679,7 +679,7 @@ declare -a elfsname=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'phdd-elfs' 't
 if [ $cleanup -eq 1 ]; then
     for j in "${elfsname[@]}"
     do
-        case "$i" in 
+        case "$j" in 
         ha* )
 	    zone="us-central1-f"
 	    ;;
