@@ -438,7 +438,7 @@ run_test() {
     echo "clients:" $clients
     delaytime=$((clients+2))
     if [ $scaletest -eq 1 ]; then
-        delaytime=$((vhead_count*4))
+        delaytime=$((enodecount*4))
 	ioruntime=$((clients*60+120))
     fi
     
