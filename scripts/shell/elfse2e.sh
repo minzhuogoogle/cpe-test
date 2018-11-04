@@ -39,7 +39,7 @@ delete_subnet() {
      region=$2
      echo "delete_subnet $name $region"
      echo "cmd: gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1"
-     for i in `gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1`;
+     for i in `gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1`
      do
          echo "subnet to be deleted: $i, $project, $region"
          gcloud compute  networks subnets delete $i --project $project --region $region -q;
@@ -55,7 +55,7 @@ delete_route() {
     region=$2
     echo "delete_route $name $region"
     echo "cmd: gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1"
-    for i in `gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1`;
+    for i in `gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1`
     do
         echo "route to be deleted: $i, $project, $region"
         gcloud compute  routes delete $i --project $project -q;
@@ -71,7 +71,7 @@ delete_network() {
     region=$2
     echo "delete_network $name $region"
     echo "cmd: gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1"
-    for i in `gcloud compute networks list --project $project  --filter=$region | grep $name | cut -d ' ' -f1`;
+    for i in `gcloud compute networks list --project $project  --filter=$region | grep $name | cut -d ' ' -f1`
     do
         echo "network to be deleted: $i, $project, $region"
         gcloud compute networks  delete $i --project $project -q;
@@ -87,7 +87,7 @@ delete_firewall() {
     region=$2
     echo "delete_firewall $name $region"
     echo "cmd: gcloud compute firewall-rules list --project $project  --filter="NAME:$name"  --format="table(NAME)" | grep -v NAME |  cut -d ' ' -f1"
-    for i in `gcloud compute firewall-rules list --project $project  --filter="NAME:$name"  --format="table(NAME)" | grep -v NAME |  cut -d ' ' -f1`;
+    for i in `gcloud compute firewall-rules list --project $project  --filter="NAME:$name"  --format="table(NAME)" | grep -v NAME |  cut -d ' ' -f1`
     do
         echo "firewall to be deleted: $i, $project, $region"
         gcloud compute firewall-rules delete $i --project $project -q;
