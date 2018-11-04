@@ -302,26 +302,19 @@ prepare_io_test () {
         export nfs_server_ips=`gcloud compute instances list --project=$project --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
     fi
     echo "nfs servers:" $nfs_server_ips
-
     
     for i in $nfs_server_ips
     do
-        echo $i
-	echo $enodecount
         enodecount=$((enodecount+1))
     done
-    
-    echo "found vhead_count:" $enodecount
-
+   
     if [ $enodecount -eq 0 ]; then
         echo "no enode available"
         return -1 
     fi
-    echo "clients :" $clients "for enode: " $enodecount
+    
     clients=$((clients*enodecount))
-    echo "new clients :" $clients
-    echo "total clients:" $clients "for enode: " $enodecount
-
+    echo "Total clients:" $clients " for " $enodecount " enodes."
     return 0
 }
 
@@ -432,20 +425,20 @@ run_test() {
     prepare_io_test
     retval=$?
     if [ $retval -ne 0 ]; then
-	echo "Failure in retrieve Elastifile enode"    
+	echo "Failure in retrieve Elastifile enode."    
         return -1
     fi
-    echo "clients:" $clients
+    
     delaytime=$((clients+2))
     if [ $scaletest -eq 1 ]; then
         delaytime=$((enodecount*4))
 	ioruntime=$((clients*60+120))
     fi
     
-    echo "delaytime: " $delaytime "ioruntime:" $ioruntime
+    echo "delaytime: " $delaytime " minutes, ioruntime: " $ioruntime " seconds".
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
-    echo $now "wait for this minutes to start traffic on testing vm" $delaytime "min" $timer
+    echo "timestamp: $now "; traffic start timestamp:"  $timer
     running_clients=0
     if [ $hatest -eq 0 ]; then
         while [ $running_clients -lt $clients ]
