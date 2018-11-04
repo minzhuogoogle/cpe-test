@@ -11,10 +11,10 @@ delete_vm() {
     do
         echo "vm to be deleted: $i, $project, $zone"
         gcloud compute instances delete $i --project $project --zone $zone -q;
-        retval=$?
-        if [ $retval -ne 0 ]; then
-            return -1
-        fi
+        #retval=$?
+        #if [ $retval -ne 0 ]; then
+        #    return -1
+        #fi
     done
     return 0
 }
