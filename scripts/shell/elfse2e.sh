@@ -424,11 +424,14 @@ run_test() {
 	echo "Failure in retrieve Elastifile enode."    
         return -1
     fi
-    
-    delaytime=$((clients+2))
-    if [ $scaletest -eq 1 ]; then
-        delaytime=$((enodecount*8))
-	ioruntime=$((clients*60+120))
+    if [ $mfio -eq 0 ]; then
+        delaytime=2
+    else
+        delaytime=$((clients+2))
+        if [ $scaletest -eq 1 ]; then
+            delaytime=$((enodecount*8))
+	    ioruntime=$((clients*60+120))
+        fi
     fi
     
     echo "delaytime=$delaytime minutes, ioruntime=$ioruntime seconds".
