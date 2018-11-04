@@ -2,7 +2,7 @@
 
 SCALE_VM=16
 PERF_VM=4
-declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
+declare -a ELFSNAME=( 'test-elfs' 'ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
 
 delete_vm() {
     name=$1
@@ -366,7 +366,7 @@ provision_elastifile() {
 
     while [ $count -lt $maxcount ] && [ $ret -eq 1 ]; do
         num_terraform_proc=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
-        echo "terraform processs is $num_terrform_proc. counter = $count"
+        echo "terraform processs is $num_terrform_proc . counter=$count"
         if [ $num_terraform_proc -gt 0 ]; then
             echo "terraform still running"
             ret=1
