@@ -21,6 +21,8 @@ delete_vm() {
 delete_address() {
     name=$1
     region=$2
+    echo "delete_address $name $region"
+    echo "cmd: gcloud compute addresses list --project $project --filter=$region | grep $name |  cut -d ' ' -f1"
     for i in `gcloud compute addresses list --project $project --filter=$region | grep $name |  cut -d ' ' -f1`
     do
          echo "addess to be deleted: $i, $project, $region"
@@ -35,6 +37,8 @@ delete_address() {
 delete_subnet() {
      name=$1
      region=$2
+     echo "delete_subnet $name $region"
+     echo "cmd: gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1"
      for i in `gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1`;
      do
          echo "subnet to be deleted: $i, $project, $region"
@@ -49,6 +53,8 @@ delete_subnet() {
 delete_route() {
     name=$1
     region=$2
+    echo "delete_route $name $region"
+    echo "cmd: gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1"
     for i in `gcloud compute routes list --project $project  --filter=$region | grep $name  | cut -d ' ' -f1`;
     do
         echo "route to be deleted: $i, $project, $region"
@@ -63,6 +69,8 @@ delete_route() {
 delete_network() {
     name=$1
     region=$2
+    echo "delete_network $name $region"
+    echo "cmd: gcloud compute  networks subnets  list --project $project   --filter=$region | grep $name  | cut -d ' ' -f1"
     for i in `gcloud compute networks list --project $project  --filter=$region | grep $name | cut -d ' ' -f1`;
     do
         echo "network to be deleted: $i, $project, $region"
@@ -77,6 +85,8 @@ delete_network() {
 delete_firewall() {
     name=$1
     region=$2
+    echo "delete_firewall $name $region"
+    echo "cmd: gcloud compute firewall-rules list --project $project  --filter="NAME:$name"  --format="table(NAME)" | grep -v NAME |  cut -d ' ' -f1"
     for i in `gcloud compute firewall-rules list --project $project  --filter="NAME:$name"  --format="table(NAME)" | grep -v NAME |  cut -d ' ' -f1`;
     do
         echo "firewall to be deleted: $i, $project, $region"
