@@ -232,7 +232,7 @@ initialization() {
             testvmname="ps-elfs-$disktype";
             cluster=ps-$disktype-elfs
         ;;
-        elfs-cleanup-* ) 
+        elfs-cleanup ) 
             echo "prepare to cleanup all resources used by testing"; 
             cleanup=1
         ;;
