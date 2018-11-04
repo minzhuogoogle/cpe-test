@@ -663,7 +663,7 @@ echo "testname is $testname"
 initialization
 
 echo "cleanup ? $cleanup "
-echo "skip provision ? $skipprovision "
+#echo "skip provision ? $skipprovision "
 
 if [ $cleanup -eq 1 ]; then
     cleanup_test ”phdd-elfs“
