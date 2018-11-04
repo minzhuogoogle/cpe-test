@@ -665,11 +665,11 @@ fi
 echo "cleanup ? $cleanup "
 echo "skip provision ? $skipprovision "
 
-declare -a elfsname=('phdd-elfs' 'pssd-elfs')
+declare -a elfsname=('phdd-elfs' 'pssd-elfs' 'phdd-elfs')
 if [ $cleanup -eq 1 ]; then
     for j in "${elfsname[@]}"
     do
-        cleanup_test $j
+        echo "Cleaning up all resources with name $j"
         cleanup_test $j
     done
 
