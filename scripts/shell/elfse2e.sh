@@ -690,7 +690,7 @@ if [ $cleanup -eq 1 ]; then
 	   zone="us-east1-b"
         ;;
         esac
-        echo "Cleaning up all resources with name $j"
+        echo "Cleaning up all resources with name $j in zone $zone"
         cleanup_test $j
     done
 
