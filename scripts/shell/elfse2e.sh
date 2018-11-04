@@ -304,7 +304,7 @@ prepare_io_test () {
     echo "nfs servers:" $nfs_server_ips
 
     
-    for i in nfs_server_ips
+    for i in $nfs_server_ips
     do
         echo $i
 	echo $enodecount
