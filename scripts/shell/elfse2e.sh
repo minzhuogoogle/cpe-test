@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCALE_VM=16
+PERF_VM=4
+
 delete_vm() {
     name=$1
     echo $name
@@ -175,11 +178,12 @@ initialization() {
             echo "preppare perf test";
             skipprovision=1;
             iotest=1;
-            mfio=1
+            mfio=1;
+	    clients=$PERF_VM;
         ;; 
         elfs-scalability-* ) 
             echo "prepare scability test";
-            clients=384;
+            clients=$SCALE_VM;
             iotest=1;
 	    scaletest=1;
             mfio=1;
@@ -249,7 +253,7 @@ initialization() {
             enodename="demo-$disktype-vm-elfs"; 
             testvmname="demo-vm-$disktype";
             iotest=1;
-            clients=16;
+            clients=$PERF_VM;
             demotest=1;
 	    scaletest=1;
             mfio=1
