@@ -6,7 +6,7 @@ PERF_VM=4
 delete_vm() {
     name=$1
     echo $name
-    for i in `gcloud compute instances list --project $project --filter=$name  | grep -v NAME |  cut -d ' ' -f1`;
+    for i in `gcloud compute instances list --project $project --zone $zone --filter=$name  | grep -v NAME |  cut -d ' ' -f1`;
     do
         echo "vm to be deleted: $i, $project, $zone"
         gcloud compute instances delete $i --project $project --zone $zone -q;
