@@ -442,7 +442,7 @@ run_test() {
     echo "delaytime: " $delaytime " minutes, ioruntime: " $ioruntime " seconds".
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
-    echo "timestamp: $now "; traffic start timestamp:"  $timer
+    echo "timestamp: $now ; traffic start timestamp:"  $timer
     running_clients=0
     if [ $hatest -eq 0 ]; then
         while [ $running_clients -lt $clients ]
