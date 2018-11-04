@@ -232,6 +232,7 @@ initialization() {
             testvmname="ps-elfs-$disktype";
             cluster=ps-$disktype-elfs
         ;;
+	#./elfse2e.sh elfs-cleanup'
         elfs-cleanup ) 
             echo "prepare to cleanup all resources used by testing"; 
             cleanup=1
@@ -274,11 +275,6 @@ initialization() {
     fi
 }   
  
-cleanup_test () {
-    echo "start cleanup resource"
-    cleanup $emsname 
-    cleanup $testvmname
-}   
 
 pre_cleanup() {
     echo "delete traffic VMs........"
