@@ -675,10 +675,21 @@ fi
 echo "cleanup ? $cleanup "
 echo "skip provision ? $skipprovision "
 
-declare -a elfsname=( 'phdd-elfs' 'test-elfs' 'elfs-elfs' )
+declare -a elfsname=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'phdd-elfs' 'test-elfs' 'elfs-elfs'  'ha-elfs' )
 if [ $cleanup -eq 1 ]; then
     for j in "${elfsname[@]}"
     do
+        case "$i" in 
+        *ha* )
+	    zone="us-central1-f	"
+	    ;;
+	*demo* )
+	    zone="us-east1-b"
+	    ;;
+	* )
+	   zone="us-east1-b"
+        ;;
+        esac
         echo "Cleaning up all resources with name $j"
         cleanup_test $j
     done
