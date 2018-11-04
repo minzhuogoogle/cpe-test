@@ -2,6 +2,7 @@
 
 SCALE_VM=16
 PERF_VM=4
+declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
 
 delete_vm() {
     name=$1
@@ -144,49 +145,26 @@ initialization() {
     scaletest=0
     nodefailure=0
     diskfailure=0
+    
     project=cpe-performance-storage
     zone=us-east1-b
     region=us-east1
     cluster=test-$disktype-elfs
     elfsimage=elastifile-storage-2-7-5-12-ems
     
-    case "$disktype" in 
-        lssd )
-	    elfstemplate=custom
-	    ;;
-	pssd )
-	    elfstemplate=medium
-	    ;;
-	phdd )
-	    elfstemplate=small
-	    ;;
-	* ) echo "Error..."
-        ;;
-    esac
-    
-    io_data_done=0
-    io_integrity_done=0
-
     emsname="test-$disktype-elfs"
     enodename="test-$disktype-elfs-elfs"
     testvmname="test-elfs-$disktype"
-    echo $emsname, $enodename, $testvmname
-
-    echo "disktype = $disktype"
-    echo "project = $project"
-    echo "zone = $zone"
-    echo "disktype = $disktype"
- 
+    
+    
     case "$testname" in
         elfs-daily-e2e* ) 
             echo "prepare daily e2e test";
-            mfio=0;
             skipprovision=0;
             deletion=1
         ;;
         elfs-perf-* ) 
-            echo "preppare perf test";
-            skipprovision=1;
+            echo "prepare perf test";
             iotest=1;
             mfio=1;
 	    clients=$PERF_VM;
@@ -201,7 +179,6 @@ initialization() {
         elfs-ha-*-node* ) 
             echo "prepare ha test for node failure";
             hatest=1;
-            mfio=0;
             nodefailure=1;
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
@@ -215,7 +192,6 @@ initialization() {
         elfs-ha-*-disk* ) 
             echo "prepare ha test for disk failure";
             hatest=1;
-            mfio=0;
             diskfailure=1;
             emsname="ha-$disktype-elfs";
             enodename="ha-$disktype-elfs-elfs"; 
@@ -234,18 +210,12 @@ initialization() {
         elfs-ps-* ) 
             echo "prepare postsubmit sanity test"; 
             pstest=1;
-            mfio=0;
             skipprovision=0;
             deletion=1;
             emsname="ps-$disktype-elfs";
             enodename="ps-$disktype-elfs-elfs"; 
             testvmname="ps-elfs-$disktype";
             cluster=ps-$disktype-elfs
-        ;;
-	#./elfse2e.sh elfs-cleanup'
-        elfs-cleanup ) 
-            echo "prepare to cleanup all resources used by testing"; 
-            cleanup=1
         ;;
         elfs-demo-*-single* ) 
             echo "prepare to run io on demo lssd instance";
@@ -269,20 +239,53 @@ initialization() {
 	    scaletest=1;
             mfio=1
         ;;
+	elfs-cleanup ) 
+            echo "prepare to cleanup all resources used by testing"; 
+            cleanup=1;
+	    return 0
+        ;;
         * ) echo "Error..."
         ;;
     esac
-
-    cd gcp-automation/
-    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
-    gcloud auth activate-service-account --key-file elastifile.json
-    echo `pwd`
+    
     disktype_check $disktype
     retval=$?
     if [ $retval -ne 0 ]; then
         echo "Disktype $disktype provided is not supported, please select one of: lssd, pssd or phdd."
         return -1
     fi
+   
+    case "$disktype" in 
+        lssd )
+	    elfstemplate=custom
+	    ;;
+	pssd )
+	    elfstemplate=medium
+	    ;;
+	phdd )
+	    elfstemplate=small
+	    ;;
+	* ) echo "Error..."
+        ;;
+    esac
+    
+    io_data_done=0
+    io_integrity_done=0
+
+    echo "disktype = $disktype"
+    echo "project = $project"
+    echo "region = $region"
+    echo "zone = $zone"
+    echo "testname = $testname"
+    echo "ioruntime = $ioruntime"
+ 
+    echo "Elastifile Cluster name = $emsname"
+    echo "Elastifile node name = $enodename"
+    echo "Elastifile test vm name = $testvmname"
+    
+    cd gcp-automation/
+    gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
+    gcloud auth activate-service-account --key-file elastifile.json
 }   
  
 
@@ -311,7 +314,7 @@ prepare_io_test () {
     else
         export nfs_server_ips=`gcloud compute instances list --project=$project --filter=$enodename  --format="value(networkInterfaces[0].networkIP)" `
     fi
-    echo "nfs servers:" $nfs_server_ips
+    echo "nfs servers: $nfs_server_ips"
     
     for i in $nfs_server_ips
     do
@@ -319,12 +322,12 @@ prepare_io_test () {
     done
    
     if [ $enodecount -eq 0 ]; then
-        echo "no enode available"
+        echo "No enode available."
         return -1 
     fi
     
     clients=$((clients*enodecount))
-    echo "Total clients:" $clients " for " $enodecount " enodes."
+    echo "Total clients: $clients for $enodecount enodes."
     return 0
 }
 
@@ -342,88 +345,71 @@ provision_elastifile() {
     sed -i "s/testproject/${project}/g" terraform.tfvars
     sed -i "s/testcluster/${cluster}/g" terraform.tfvars
 
-    echo "terraform.tfvars used in this test"
+    echo "==== new terraform.tfvars====="
     cat terraform.tfvars
 
-    echo "iotest ?"  $iotest
     if [[ $iotest -eq 1 || $demotest -eq 1 ]]; then
         return 0
     fi
+    
     terraform init
     retval=$?
     if [ $retval -ne 0 ]; then
        return -1
     fi
-    echo "run terraform apply to start elfs instance"
-    #if  [ $pstest -eq 1 ]; then
-    #    echo "set number of node"
-    #    sed -i "s/test-${disktype}/ps-${disktype}/g" terraform.tfvars
-    #fi
-    #if  [ $hatest -eq 1 ]; then
-    #    echo "set number of node"
-    #    sed -i "s/test-${disktype}/ha-${disktype}/g" terraform.tfvars
-    #    sed -i "s/us-east1-b/us-central1-f/g" terraform.tfvars
-    #    zone='us-central1-f'
-    #fi
-    echo "==== new terraform.tfvars====="
-    cat terraform.tfvars
 
     terraform apply --auto-approve | tee -a output.txt &
 
-    maxcount=20
+    maxcount=15
     count=0
     ret=1
 
     while [ $count -lt $maxcount ] && [ $ret -eq 1 ]; do
         num_terraform_proc=$(ps -ef | grep "terraform apply"  | grep -v workspace | grep -v grep | wc -l)
-        echo "processs is $num_terrform_proc"
+        echo "terraform processs is $num_terrform_proc. counter = $count"
         if [ $num_terraform_proc -gt 0 ]; then
-            echo "still running"
+            echo "terraform still running"
             ret=1
-            sleep 30
+            sleep 60
         else
-            echo "stopped"
+            echo "terraform stopped"
             ret=0
         fi
-        let count=count+1
-        echo "count = $count"
+        count=$((count+1))
     done
 
     if [ $count -eq $maxcount ] && [ $ret -eq 1 ]; then
-        echo "failed to stop!! "
+        echo "Terraform failed to stop!! "
         retval=-1
     else
-        echo "finished"
+        echo "Terraform finished"
         retval=0
     fi
 
-    echo "retval=$retval"
-    echo $(tail -5 create_vheads.log )
     process=$( grep Failed create_vheads.log | cut -d ' ' -f1 )
     status=$( grep Failed create_vheads.log | cut -d ' ' -f2 )
-    echo "process = $process, status=$status"
-    echo "provision done" $enodename $mfio $disktype
+    echo "process=$process, status=$status"
     if [ $retval -eq -1 ] || [ "$status" = "Failed." ] ; then
-        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-
+        currenttime=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
+	echo $currenttime >> output.txt
         cat terraform.tfvars >> output.txt
         if [ -f "create_vheads.log" ]; then
             cat create_vheads.log >> output.txt
         fi
-        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
+        logfile=$testname.terraform.provision.$(hostname).$currenttime.$disktype.txt
         gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
-        echo $logfile
-        name=$disktype-elfs
+        echo "$logfile is uploaded to gcs bucket."
         return -1
     fi
 
     if [ -f "create_vheads.log" ]; then
-        NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
+        currenttime=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
+	echo $currenttime >> output.txt
         cat terraform.tfvars >> output.txt
         cat create_vheads.log >> output.txt
-        logfile=$testname.terraform.provision.$(hostname).$NOW.$disktype.txt
+        logfile=$testname.terraform.provision.$(hostname).$currenttime.$disktype.txt
         gsutil cp output.txt gs://cpe-performance-storage/test_result/$logfile
-        echo $logfile
+        echo "$logfile is uploaded to gcs bucket."
         return 0
     else
         return -1
@@ -441,37 +427,33 @@ run_test() {
     
     delaytime=$((clients+2))
     if [ $scaletest -eq 1 ]; then
-        delaytime=$((enodecount*4))
+        delaytime=$((enodecount*8))
 	ioruntime=$((clients*60+120))
     fi
     
-    echo "delaytime: " $delaytime " minutes, ioruntime: " $ioruntime " seconds".
+    echo "delaytime=$delaytime minutes, ioruntime=$ioruntime seconds".
     export now=`date +"%s"`
     export timer=`date -d "+ $delaytime minutes" +"%s"`
-    echo "timestamp: $now ; traffic start timestamp:"  $timer
+    echo "current timestamp: $now; traffic starting timestamp:$timer"
     running_clients=0
     if [ $hatest -eq 0 ]; then
         while [ $running_clients -lt $clients ]
         do
             for nfs_server in $nfs_server_ips
             do
-                export now=`date +"%s"`
                 newtimer=`date -d "+ 3minutes" +"%s"`
-                
                 if [ $timer -gt $newtimer ]; then
                     start_vm $nfs_server $timer $ioruntime $testname
                 else
                     start_vm $nfs_server $newtimer $ioruntime $testname
                 fi
- 		    
-                retval=$?
+ 		retval=$?
                 if [ $retval -ne 0 ]; then
                    echo "Fail to create test vm."
                    delete_vm $testvmname
                    return -1 
                 fi 
-           
-                export now=`date +"%s"`
+                export now=`date`
                 echo "Now:" $now
                 running_clients=$((running_clients+1))
             done
@@ -523,13 +505,12 @@ inject_node_failure_to_clustervm() {
 
 
 inject_storage_failure_to_vm() {
-    echo "detaching disk" 
     enode=$1
+    echo "Detaching disk from Enode $enode." 
     export diskindex=`gcloud compute instances describe $enode --project=$project  --zone=$zone --format="text(disks[].index)"   |  tail -n 1 |  cut -d ' ' -f2`
     diskindex=$((diskindex-1))
     export diskname=`gcloud compute instances describe $enode  --project=$project  --zone=$zone  --format="text(disks[$diskindex].deviceName)" | grep $disktype-elfs-elfs | cut -d ' ' -f2 `
-    echo $diskname
-    echo "this is disk to be detached from $enode: $diskname"
+    echo "This is disk $diskname to be detached from $enode."
     echo "cmd: gcloud compute instances detach-disk  $enode  --disk=$diskname   --zone=$zone  -q"
     gcloud compute instances detach-disk  $enode  --disk=$diskname   --zone=$zone  -q
     retval=$?
@@ -539,21 +520,18 @@ inject_storage_failure_to_vm() {
 }
 
 inject_failure_into_cluster() {
-    echo "info:" $project $enodename
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1"
     echo "cmd==gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1"
     export failure_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | tail -n 1`
     export traffic_node=`gcloud compute instances list --project $project --filter=$enodename | grep -v NAME | cut -d ' ' -f1 | head -n 1`
-    echo "ha nodes:" $failure_node $traffic_node
+    echo "failured to be injected: $failure_node, traffic node: $traffic_node"
     delaytime=2
     export now=`date +"%s"`
-    echo $now  "......wait for this minutes:" $delaytime
     export timer=`date -d "+ $delaytime minutes" +"%s"`
-    echo `date -d "+ $delaytime minutes" +"%s"`
+    echo "Wait for this minutes: $delaytime, $timer since $now"
     if [ $nodefailure -eq 1 ]; then
         echo "prepare to inject failure in enode";
-        echo "vm to inject failre: $failure_node, $project, $zone"
-	for nfs_server in $nfs_server_ips
+        for nfs_server in $nfs_server_ips
 	do
             start_vm $nfs_server $timer $ioruntime $testname
 	done     
@@ -565,8 +543,7 @@ inject_failure_into_cluster() {
     fi
     if [ $diskfailure -eq 1 ]; then
          echo "preppare to inject failure in storage on enode";
-         echo "vm to inject failure $failure_node, $project, $zone"
-	 for nfs_server in $nfs_server_ips
+         for nfs_server in $nfs_server_ips
 	 do
              start_vm $nfs_server $timer $ioruntime $testname
 	 done
@@ -590,19 +567,21 @@ logfiles_uploaded() {
 test_result() {
     count=0
     if [ $hatest -eq 1 ]; then
-        maxcount=30
+        maxcount=15
     else
         maxcount=30
     fi 	
+    export now=`date`
+    echo "clock :  $now"
     waittime=$((ioruntime+delaytime*60))
+    echo "wait for $waittime seconds"
     sleep $waittime	
+    export now=`date`
+    echo "clock :  $now"
     no_of_logfiles=0
     logfiles_uploaded
     no_of_logfiles=$?
     echo $no_of_logfiles
-    echo "hatest" $hatest
-    echo "no_of_file=" $no_of_logfiles
-    echo "count: " $count
     
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
@@ -611,9 +590,8 @@ test_result() {
     else
         expected_logfile=$((clients*6))
     fi	
-    io_data_done=0
+    
     echo "expected_logfile:" $expected_logfile
-    echo $no_of_logfiles "-ge" $expected_logfile 
    
     if (($no_of_logfiles < $expected_logfile )); then
        io_data_done=0
@@ -623,21 +601,20 @@ test_result() {
     count=0
     while [[ $io_data_done -eq 0  &&  $count -lt $maxcount ]]
     do
-      echo "sleep to check logfile done?  $io_date_done count=  $count "
-      sleep 60
-      logfiles_uploaded
-      no_of_logfiles=$?
-      echo "no of logfiles :  $no_of_logfiles expected logfile:  $expected_logfile"
-      if [ $no_of_logfiles -ge $expected_logfile ]; then
-     
-         echo "set test done"
-         io_data_done=1
-      else
-         echo "set test not done"
-         io_data_done=0
-      fi
+        echo "sleep to check logfile done?  $io_date_done count=  $count "
+        sleep 60
+        logfiles_uploaded
+        no_of_logfiles=$?
+        echo "no of logfiles:  $no_of_logfiles; expected logfile:  $expected_logfile"
+        if [ $no_of_logfiles -ge $expected_logfile ]; then
+            echo "set test done"
+            io_data_done=1
+        else
+            echo "set test not done"
+            io_data_done=0
+        fi
       
-      count=$((count+1))
+        count=$((count+1))
     done
 
     if [ $io_data_done -eq 0 ]; then
@@ -655,16 +632,13 @@ test_result() {
 #          300  --- io test run time
 #          elfs-daily-e2e-phdd -- testname
 # ----------------------------------------------------
-disktype=$1
-ioruntime=$2
-testname=$3
+testname=$1
+disktype=$2
+ioruntime=$3
+
 clients=1
 delaytime=0
 enodecount=0
-echo "disktype is $disktype"  
-echo "io run time is $ioruntime"
-echo "testname is $testname"
-
 
 initialization
 retval=$?
@@ -672,13 +646,8 @@ if [ $retval -ne 0 ]; then
     exit -1
 fi
 
-echo "cleanup ? $cleanup "
-echo "skip provision ? $skipprovision "
-
-
-declare -a elfsname=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
 if [ $cleanup -eq 1 ]; then
-    for j in "${elfsname[@]}"
+    for j in "${ELFSNAME[@]}"
     do
         case "$j" in 
         ha* )
