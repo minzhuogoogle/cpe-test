@@ -628,9 +628,9 @@ test_result() {
 # ----------------------------------------------------
 # Start here
 # example: ./elfse2e.sh phdd  300 elfs-daily-e2e-phdd
+#          elfs-daily-e2e-phdd -- testname
 #          phdd --- persistent hdd
 #          300  --- io test run time
-#          elfs-daily-e2e-phdd -- testname
 # ----------------------------------------------------
 testname=$1
 disktype=$2
