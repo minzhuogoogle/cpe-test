@@ -241,7 +241,6 @@ initialization() {
             iotest=1;
             clients=1;
             demotest=1;
-            mfio=1
         ;;
         elfs-demo-*-scalability* ) 
             echo "prepare to run io on demo lssd instance";
@@ -304,22 +303,24 @@ prepare_io_test () {
     fi
     echo "nfs servers:" $nfs_server_ips
 
-    vhead_count=0
+    
     for i in nfs_server_ips
     do
-        vhead_count=$((vhead_count+1))
+        echo $i
+	echo $enodecount
+        enodecount=$((enodecount+1))
     done
     
-    echo "found vhead_count:" $vhead_count
+    echo "found vhead_count:" $enodecount
 
-    if [ $vhead_count -eq 0 ]; then
+    if [ $enodecount -eq 0 ]; then
         echo "no enode available"
         return -1 
     fi
-    echo "clients :" $clients "for enode: " $vhead_count
-    clients=$((clients*vhead_count))
+    echo "clients :" $clients "for enode: " $enodecount
+    clients=$((clients*enodecount))
     echo "new clients :" $clients
-    echo "total clients:" $clients "for enode: " $vhead_count
+    echo "total clients:" $clients "for enode: " $enodecount
 
     return 0
 }
@@ -434,6 +435,7 @@ run_test() {
 	echo "Failure in retrieve Elastifile enode"    
         return -1
     fi
+    echo "clients:" $clients
     delaytime=$((clients+2))
     if [ $scaletest -eq 1 ]; then
         delaytime=$((vhead_count*4))
@@ -653,8 +655,9 @@ test_result() {
 disktype=$1
 ioruntime=$2
 testname=$3
-clients=0
+clients=1
 delaytime=0
+enodecount=0
 echo "disktype is $disktype"  
 echo "io run time is $ioruntime"
 echo "testname is $testname"
