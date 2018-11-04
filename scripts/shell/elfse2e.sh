@@ -666,7 +666,7 @@ echo "cleanup ? $cleanup"
 echo "skip provision ? $skipprovision"
 
 if [ $cleanup -eq 1 ]; then
-    cleanup_test "d-elfs"
+    cleanup_test phdd-elfs
     exit 0
 fi    
 
