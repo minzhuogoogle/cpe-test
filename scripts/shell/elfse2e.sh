@@ -568,12 +568,16 @@ test_result() {
     count=0
     if [ $hatest -eq 1 ]; then
         maxcount=15
+	waittime=$((ioruntime+delaytime*60))
+    elif [ $scaletest -eq 1 ]; then
+        maxcount=30
+	waittime=$((ioruntime*2+delaytime*60))
     else
         maxcount=30
+        waittime=$((ioruntime*6+delaytime*60))
     fi 	
     export now=`date`
     echo "clock :  $now"
-    waittime=$((ioruntime+delaytime*60))
     echo "wait for $waittime seconds"
     sleep $waittime	
     export now=`date`
