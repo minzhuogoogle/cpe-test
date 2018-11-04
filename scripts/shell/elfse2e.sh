@@ -560,6 +560,7 @@ inject_failure_into_cluster() {
 logfiles_uploaded() {
    export number_logfiles=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio | wc -l`
    export filelists=`gsutil ls gs://cpe-performance-storage/test_result/** | grep $(hostname) | grep $testname | grep fio`
+   echo $filelists
    return $number_logfiles
 }
 
