@@ -663,11 +663,16 @@ echo "testname is $testname"
 initialization
 
 echo "cleanup ? $cleanup "
-#echo "skip provision ? $skipprovision "
+echo "skip provision ? $skipprovision "
 
+declare -a elfsname=('phdd-elfs' 'pssd-elfs')
 if [ $cleanup -eq 1 ]; then
-    cleanup_test ”phdd-elfs“
-    cleanup_test ”pssd-elfs“
+    for j in "${elfsname[@]}"
+    do
+        cleanup_test $j
+        cleanup_test $j
+    done
+
     exit 0
 fi    
 
