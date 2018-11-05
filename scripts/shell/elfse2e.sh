@@ -2,7 +2,7 @@
 
 SCALE_VM=16
 PERF_VM=4
-declare -a ELFSNAME=( 'test-elfs' 'ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
+declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
 
 delete_vm() {
     name=$1
@@ -11,10 +11,10 @@ delete_vm() {
     do
         echo "vm to be deleted: $i, $project, $zone"
         gcloud compute instances delete $i --project $project --zone $zone -q;
-        #retval=$?
-        #if [ $retval -ne 0 ]; then
-        #    return -1
-        #fi
+        retval=$?
+        if [ $retval -ne 0 ]; then
+            return -1
+        fi
     done
     return 0
 }
@@ -209,8 +209,7 @@ initialization() {
         ;;
         elfs-ps-* ) 
             echo "prepare postsubmit sanity test"; 
-	    mfio=1;
-            pstest=1;
+	    pstest=1;
             skipprovision=0;
             deletion=1;
             emsname="ps-$disktype-elfs";
