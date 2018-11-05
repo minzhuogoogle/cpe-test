@@ -577,6 +577,7 @@ test_result() {
     maxcount=10
     if [ $hatest -eq 1 ]; then
         waittime=$ioruntime
+	maxcount=60
     elif [ $scaletest -eq 1 ]; then
 	waittime=$((ioruntime*2))
     else
