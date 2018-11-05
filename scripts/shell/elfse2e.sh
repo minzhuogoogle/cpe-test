@@ -428,9 +428,9 @@ run_test() {
         delaytime=2
     else
         delaytime=$((clients+2))
-        if [ $scaletest -eq 1 ]; then
+        if [[ $scaletest -eq 1 && $delaytime -gt 64 ]]; then
             delaytime=$((enodecount*4))
-	    ioruntime=$((clients*60+120))
+	    ioruntime=$((clients*60+600))
         fi
     fi
     
@@ -570,19 +570,17 @@ logfiles_uploaded() {
 
 test_result() {
     count=0
+    maxcount=10
     if [ $hatest -eq 1 ]; then
-        maxcount=15
-	waittime=$((ioruntime+delaytime*60))
+        waittime=$ioruntime
     elif [ $scaletest -eq 1 ]; then
-        maxcount=30
-	waittime=$((ioruntime*2+delaytime*60))
+	waittime=$((ioruntime*2))
     else
-        maxcount=30
-        waittime=$((ioruntime*6+delaytime*60))
+        waittime=$((ioruntime*6))
     fi 	
     export now=`date`
     echo "clock :  $now"
-    echo "wait for $waittime seconds"
+    echo "wait for $waittime seconds......"
     sleep $waittime	
     export now=`date`
     echo "clock :  $now"
