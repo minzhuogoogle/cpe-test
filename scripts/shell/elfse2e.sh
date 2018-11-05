@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCALE_VM=16
+SCALE_VM=8
 PERF_VM=4
 declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
 
@@ -429,7 +429,7 @@ run_test() {
     else
         delaytime=$((clients+2))
         if [ $scaletest -eq 1 ]; then
-            delaytime=$((enodecount*8))
+            delaytime=$((enodecount*4))
 	    ioruntime=$((clients*60+120))
         fi
     fi
