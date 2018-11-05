@@ -2,7 +2,7 @@
 
 SCALE_VM=8
 PERF_VM=4
-declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ha-elfs' 'test-elfs')
+declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ps-lssd-elfs' 'ps-pssd-elfs' 'ps-phdd-elfs' 'ha-elfs' 'test-elfs' 'ps-elfs')
 
 delete_vm() {
     name=$1
@@ -46,6 +46,7 @@ delete_subnet() {
          gcloud compute  networks subnets delete $i --project $project --region $region -q;
          retval=$?
          if [ $retval -ne 0 ]; then
+	     echo "delete vm $name fails."
              return -1
          fi
      done
@@ -62,6 +63,7 @@ delete_route() {
         gcloud compute  routes delete $i --project $project -q;
         retval=$?
         if [ $retval -ne 0 ]; then
+	    echo "delete route $name fails."
             return -1
         fi
      done
@@ -78,6 +80,7 @@ delete_network() {
         gcloud compute networks  delete $i --project $project -q;
         retval=$?
         if [ $retval -ne 0 ]; then
+	    echo "delete network $name fails."
             return -1
         fi
      done
@@ -94,6 +97,7 @@ delete_firewall() {
         gcloud compute firewall-rules delete $i --project $project -q;
         retval=$?
         if [ $retval -ne 0 ]; then
+	    echo "delete firewall $name fails."
             return -1
         fi
      done
