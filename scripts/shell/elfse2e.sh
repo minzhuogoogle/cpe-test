@@ -209,6 +209,7 @@ initialization() {
         ;;
         elfs-ps-* ) 
             echo "prepare postsubmit sanity test"; 
+	    mfio=1;
             pstest=1;
             skipprovision=0;
             deletion=1;
