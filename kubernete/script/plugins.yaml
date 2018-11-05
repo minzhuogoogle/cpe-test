@@ -1,3 +1,7 @@
+triggers:
+- repos:
+  - minzhuogoogle/storage-performance
+
 plugins:
   minzhuogoogle/storage-performance:
   - size

@@ -1,7 +1,7 @@
 periodics:
 - cron: '0 7 * * *'
   agent: kubernetes
-  name: daily-e2e-lssd
+  name: elfs-daily-e2e-lssd
   spec:
     containers:
     - image: gcr.io/cpe-performance-storage/elastifile:latest
@@ -11,7 +11,7 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 300 elfs-daily-e2e-lssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-daily-e2e-lssd lssd 30'
 
 - cron: '0 7 * * *'
   agent: kubernetes
@@ -25,11 +25,11 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 300 elfs-daily-e2e-pssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-daily-e2e-pssd pssd 30'
 
 - cron: '0 7 * * *'
   agent: kubernetes
-  name: daily-e2e-phdd
+  name: elfs-daily-e2e-phdd
   spec:
     containers:
     - image: gcr.io/cpe-performance-storage/elastifile:latest
@@ -39,11 +39,11 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd  300 elfs-daily-e2e-phdd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-daily-e2e-phdd phdd 30'
 
 
-- cron: '0 12,17,22,3 * * 1,2,3,4,5,6'
-  agent: kubernete
+- cron: '0 14,22 * * *'
+  agent: kubernetes
   name: elfs-daily-io-lssd
   spec:
     containers:
@@ -54,9 +54,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd  300 elfs-daily-io-lssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-daily-io-lssd lssd  300'
 
-- cron: '0 12,17,22,3 * * 1,2,3,4,5,6'
+- cron: '0 14,22 * * *'
   agent: kubernetes
   name: elfs-daily-io-pssd
   spec:
@@ -68,9 +68,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 300 elfs-daily-io-pssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-daily-io-pssd pssd 300'
 
-- cron: '0 12,17,22,3 * * 1,2,3,4,5,6'
+- cron: '0 14,22 * * *'
   agent: kubernetes
   name: elfs-daily-io-phdd
   spec:
@@ -82,10 +82,10 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 300 elfs-daily-io-phdd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-daily-io-phdd phdd 300'
 
 
-- cron: '0 9 * * 0'
+- cron: '0 8 * * *'
   agent: kubernetes
   name: elfs-perf-lssd
   spec:
@@ -97,9 +97,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd  600 elfs-perf-lssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-perf-lssd lssd  600'
 
-- cron: '0 9 * * 0'
+- cron: '0 8 * * *'
   agent: kubernetes
   name: elfs-perf-pssd
   spec:
@@ -111,9 +111,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  600 elfs-perf-pssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-perf-pssd  pssd  600'
 
-- cron: '0 9 * * 0'
+- cron: '0 8 * * *'
   agent: kubernetes
   name: elfs-perf-phdd
   spec:
@@ -125,9 +125,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd  600 elfs-perf-phdd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-perf-phdd phdd  600'
 
-- cron: '0 11 * * 0'
+- cron: '0 10 * * *'
   agent: kubernetes
   name: elfs-scalability-lssd
   spec:
@@ -139,10 +139,10 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 600 elfs-scalability-lssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-scalability-lssd lssd 600'
 
 
-- cron: '0 11  * * 0'
+- cron: '0 10  * * *'
   agent: kubernetes
   name: elfs-scalability-pssd
   spec:
@@ -154,9 +154,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 600 elfs-scalability-pssd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-scalability-pssd pssd 600'
 
-- cron: '0 11 * * 0'
+- cron: '0 10 * * *'
   agent: kubernetes
   name: elfs-scalability-phdd
   spec:
@@ -168,10 +168,10 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd  600 elfs-scalability-phdd'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-scalability-phdd phdd  600'
 
 
-- cron: '0 15 * * 0'
+- cron: '0 9 * * *'
   agent: kubernetes
   name: elfs-ha-lssd-node
   spec:
@@ -183,9 +183,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 60 elfs-ha-lssd-node'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ha-lssd-node lssd 600'
 
-- cron: '0 15 * * 0'
+- cron: '0 9 * * *'
   agent: kubernetes
   name: elfs-ha-pssd-node
   spec:
@@ -197,9 +197,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 60 elfs-ha-pssd-node'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ha-pssd-node pssd 600'
 
-- cron: '0 15 * * 0'
+- cron: '0 9 * * *'
   agent: kubernetes
   name: elfs-ha-phdd-node
   spec:
@@ -211,10 +211,10 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd  60 elfs-ha-phdd-node'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ha-phdd-node phdd  600'
 
 
-- cron: '0 18 * * 0'
+- cron: '0 0 1 1 *'
   agent: kubernetes
   name: elfs-ha-lssd-disk
   spec:
@@ -226,9 +226,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 60 elfs-ha-lssd-disk'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ha-lssd-disk lssd 60'
 
-- cron: '0 18 * * 0'
+- cron: '0 9 * * *'
   agent: kubernetes
   name: elfs-ha-pssd-disk
   spec:
@@ -240,9 +240,9 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 60 elfs-ha-pssd-disk'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ha-pssd-disk pssd 60'
 
-- cron: '0 18 * * 0'
+- cron: '0 9 * * *'
   agent: kubernetes
   name: elfs-ha-phdd-disk
   spec:
@@ -254,11 +254,11 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd  60 elfs-ha-phdd-disk'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ha-phdd-disk phdd  60'
 
 
 
-- cron: '0 5 * * 0'
+- cron: '0 5 * * 1'
   agent: kubernetes
   name: elfs-cleanup
   spec:
@@ -273,9 +273,9 @@ periodics:
       - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-cleanup'
 
 
-- cron: '0 3 * * 0'
+- cron: '0 11 * * *'
   agent: kubernetes
-  name: elfs-demo-lssd-scale
+  name: elfs-demo-lssd-single
   spec:
     containers:
     - image: gcr.io/cpe-performance-storage/elastifile:latest
@@ -285,11 +285,11 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd  600 elfs-demo-lssd-scale'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh  elfs-demo-lssd-single lssd  600'
 
-- cron: '0 3 * * 0'
+- cron: '0 11 * * *'
   agent: kubernetes
-  name:  elfs-demo-pssd-scale
+  name:  elfs-demo-pssd-single
   spec:
     containers:
     - image: gcr.io/cpe-performance-storage/elastifile:latest
@@ -299,11 +299,11 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd  600  elfs-demo-pssd-scale'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-demo-pssd-single pssd  600'
 
-- cron: '0 3 * * 0'
+- cron: '0 11 * * *'
   agent: kubernetes
-  name: elfs-demo-phdd-scale
+  name: elfs-demo-phdd-single
   spec:
     containers:
     - image: gcr.io/cpe-performance-storage/elastifile:latest
@@ -313,8 +313,49 @@ periodics:
       - /bin/bash
       - -c
       args:
-      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd  600 elfs-demo-phdd-scale'
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-demo-phdd-single phdd  600'
 
+- cron: '0 13 * * *'
+  agent: kubernetes
+  name: elfs-demo-lssd-scalability
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-demo-lssd-scalability lssd  600'
+
+- cron: '0 13 * * *'
+  agent: kubernetes
+  name:  elfs-demo-pssd-scalability
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-demo-pssd-scalability pssd  600'
+
+- cron: '0 13 * * *'
+  agent: kubernetes
+  name: elfs-demo-phdd-scalability
+  spec:
+    containers:
+    - image: gcr.io/cpe-performance-storage/elastifile:latest
+      tty: true
+      stdin: true
+      command:
+      - /bin/bash
+      - -c
+      args:
+      - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-demo-phdd-scalability phdd  600'
 
 
 postsubmits:
@@ -331,8 +372,7 @@ postsubmits:
         - /bin/bash
         - -c
         args:
-        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh lssd 120 elfs-ps-lssd'
-
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ps-pssd lssd 30'
 
   - name: elfs-ps-pssd
     max_concurrency: 1
@@ -346,11 +386,10 @@ postsubmits:
         - /bin/bash
         - -c
         args:
-        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh pssd 120 elfs-ps-pssd'
-
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ps-pssd pssd 30'
 
   - name: elfs-ps-phdd
-    max_concurrency: 0
+    max_concurrency: 1
     agent: kubernetes
     spec:
       containers:
@@ -361,4 +400,4 @@ postsubmits:
         - /bin/bash
         - -c
         args:
-        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh phdd 120 elfs-ps-phdd'
+        - 'curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/scripts/shell/elfse2e.sh; chmod 777 elfse2e.sh; ./elfse2e.sh elfs-ps-phdd phdd 30'
