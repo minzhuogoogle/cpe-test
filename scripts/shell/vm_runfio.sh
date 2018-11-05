@@ -66,7 +66,7 @@ then
      
       case "$testname" in
           *scalability* ) 
-	  declare -a iotype=('randrwbw' 'randrwiops')
+	  declare -a iotype=('readbw' 'writebw')
 	  ;;
           * )    
 	  declare -a iotype=('readbw' 'readiops' 'writebw' 'writeiops' 'randrwbw' 'randrwiops')
