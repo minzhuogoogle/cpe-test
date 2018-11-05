@@ -1,5 +1,5 @@
 [global]
-size=32G
+size=16G
 iodepth=16
 direct=1
 numjobs=1
@@ -11,4 +11,4 @@ filename=/mnt/elastifile/fio.verify.data
 
 [integrity.data]
 rw=randwrite
-blocksize=16k
+blocksize=64k
