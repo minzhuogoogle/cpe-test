@@ -221,7 +221,7 @@ initialization() {
             testvmname="ps-elfs-$disktype";
             cluster=ps-$disktype-elfs
         ;;
-        elfs-demo-*-single* ) 
+        *longivity-*-single* ) 
             echo "prepare to run io on demo lssd instance";
             iotest=1;
             emsname="demo-$disktype-vm";
@@ -231,7 +231,7 @@ initialization() {
             clients=1;
             demotest=1;
         ;;
-        elfs-demo-*-scalability* ) 
+       *longivity-*-scalability* ) 
             echo "prepare to run io on demo lssd instance";
             iotest=1;
             emsname="demo-$disktype-vm";
