@@ -1,7 +1,7 @@
 #!/bin/bash
 
-SCALE_VM=16
-PERF_VM=4
+SCALE_VM=64
+PERF_VM=8
 declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ps-lssd-elfs' 'ps-pssd-elfs' 'ps-phdd-elfs' 'ha-elfs' 'test-elfs' 'ps-elfs')
 
 delete_vm() {
@@ -574,7 +574,7 @@ logfiles_uploaded() {
 
 test_result() {
     count=0
-    maxcount=10
+    maxcount=15
     if [ $hatest -eq 1 ]; then
         waittime=$ioruntime
 	maxcount=60
