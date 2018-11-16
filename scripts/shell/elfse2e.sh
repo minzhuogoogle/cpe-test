@@ -339,7 +339,7 @@ prepare_io_test () {
 provision_elastifile() {
     curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/elastifile/terraform.tfvars.$disktype
     cp terraform.tfvars.$disktype terraform.tfvars
-    cat terraform.tfvars
+    # cat terraform.tfvars
     # temporarily disable load-balancing
     sed -i 's/true/false/' terraform.tfvars
 
