@@ -162,10 +162,14 @@ initialization() {
     
     
     case "$testname" in
-        elfs-daily-e2e* ) 
-            echo "prepare daily e2e test";
+        elfs-e2e-provision-* ) 
+            echo "prepare daily provision test";
             skipprovision=0;
-            deletion=1
+            deletion=1;
+        ;;
+	elfs-e2e-io-* )
+	    echo "prepare daily io test following provision";
+	    iotest=1;
         ;;
         elfs-perf-* ) 
             echo "prepare perf test";
