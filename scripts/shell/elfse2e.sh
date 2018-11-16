@@ -616,12 +616,12 @@ test_result() {
         sleep 60
         logfiles_uploaded
         no_of_logfiles=$?
-        echo "no of logfiles:  $no_of_logfiles; expected logfile:  $expected_logfile"
+        echo "no of logfiles: $no_of_logfiles; expected logfile:  $expected_logfile"
         if [ $no_of_logfiles -ge $expected_logfile ]; then
-            echo "set test done"
+            echo "IO test done."
             io_data_done=1
         else
-            echo "set test not done"
+            echo "IO test not done."
             io_data_done=0
         fi
       
@@ -629,7 +629,7 @@ test_result() {
     done
 
     if [ $io_data_done -eq 0 ]; then
-        echo "io testing might have problem."
+        echo "IO testing timeout."
         return -1
     fi 
 
@@ -708,5 +708,4 @@ fi
 #if [ $retval -ne 0 ]; then
 #    exit -1
 #fi
-
 exit 0
