@@ -705,11 +705,10 @@ test_result
 retval=$?
 if [ $retval -ne 0 ]; then
     exit -1
-fi
-
-#post_cleanup
-#retval=$?
-#if [ $retval -ne 0 ]; then
-#    exit -1
-#fi
+else
+    post_cleanup
+    retval=$?
+    if [ $retval -ne 0 ]; then
+        exit -1
+    fi
 exit 0
