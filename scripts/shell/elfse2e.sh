@@ -232,7 +232,7 @@ initialization() {
             enodename="demo-$disktype-vm-elfs"; 
             testvmname="demo-vm-$disktype";
             iotest=1;
-            clients=1;
+            clients=$PERF_VM;
             demotest=1;
         ;;
        *longivity-*-scalability* ) 
@@ -242,7 +242,7 @@ initialization() {
             enodename="demo-$disktype-vm-elfs"; 
             testvmname="demo-vm-$disktype";
             iotest=1;
-            clients=$PERF_VM;
+            clients=$SCALE_VM;
             demotest=1;
 	    scaletest=1;
             mfio=1
