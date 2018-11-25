@@ -27,7 +27,7 @@ start_fio()
       testname=$5
       testseq = $6
       HOSTNAME=$(hostname)
-      fiofile=$iotype.$nfsserver.$HOSTNAME
+      fiofile=$iotype.$nfsserver.$HOSTNAME.$testseq
       #cd /mnt/elastifile
       echo $iotype $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
@@ -35,7 +35,6 @@ start_fio()
       sudo sed -i "s/${iotype}/${fiofile}/" fio.$iotype
       cat fio.$iotype
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-      HOSTNAME=$(hostname)
       logfile=$testname.fio.$iotype.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
       sudo fio fio.$iotype --refill_buffers --norandommap --time_based --output-format=json --output $logfile
