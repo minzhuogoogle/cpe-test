@@ -25,7 +25,8 @@ start_fio()
       nfsserver=$3
       testduration=$4
       testname=$5
-      fiofile=$iotype.$nfsserver
+      testseq = $6
+      fiofile=$iotype.$nfsserver.$testseq
       #cd /mnt/elastifile
       echo $iotype $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.$iotype
@@ -86,7 +87,7 @@ then
          for j in "${iotype[@]}"
          do 
 	     echo $j     
-             start_fio $j $testtype $nfs_server $testduration $testname
+             start_fio $j $testtype $nfs_server $testduration $testname $testno
 	     export current=`date +"%s"`
 	     echo $current, $fio_start
 	     delta=$((current-fio_start))
