@@ -601,7 +601,7 @@ test_result() {
     if [ $hatest -eq 1 ]; then
         expected_logfile=1
     elif [ $scaletest -eq 1 ]; then
-        expected_logfile=$((clients*2))
+        expected_logfile=$((clients*1))
     else
         expected_logfile=$((clients*6))
     fi	
