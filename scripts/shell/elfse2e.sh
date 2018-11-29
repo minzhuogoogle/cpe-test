@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCALE_VM=64
+SCALE_VM=16
 PERF_VM=4
 declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ps-lssd-elfs' 'ps-pssd-elfs' 'ps-phdd-elfs' 'ha-elfs' 'test-elfs' 'ps-elfs')
 
