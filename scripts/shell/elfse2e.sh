@@ -310,7 +310,7 @@ pre_cleanup() {
 post_cleanup() {
     if [ $io_data_done -eq 1 ]; then
         delete_vm $testvmname 
-	if [[ $hatest -eq 1 || $pstest -eq 1 ]]; then
+	if [[ [ $hatest -eq 1 && $nodefailure -eq 1 ] || $pstest -eq 1 ]]; then
 	    delete_vm $emsname
 	fi
     fi	
