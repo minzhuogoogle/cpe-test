@@ -23,13 +23,15 @@ start_fio()
       nfsserver=$2
       testduration=$3
       testname=$4
-      fiofile=$iotype.$nfsserver
+      
+      HOSTNAME=$(hostname)
+      fiofile=$iotype.$nfsserver.$HOSTNAME
       echo  $disktype $nfsserver
       sudo curl -OL https://raw.githubusercontent.com/minzhuogoogle/cpe-test/master/fio/elastifile/fio.data.verify
       
       cat fio.data.verify
       NOW=`TZ=UTC+7 date +%m.%d.%Y.%H.%M.%S`
-      HOSTNAME=$(hostname)
+
       logfile=$testname.fio.failover.$HOSTNAME.$NOW.$disktype.txt
       echo $logfile
       sudo fio fio.data.verify --refill_buffers --norandommap --time_based --output-format=json --output $logfile
