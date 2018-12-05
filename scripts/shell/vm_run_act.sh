@@ -1,6 +1,6 @@
 #!/bin/bash
-   git clone https://github.com/aerospike/act.git; 
-   sudo apt-get install make gcc libc6-dev libssl-dev zlib1g-dev python -y; cd act; make; make -f Makesalt
+   
+   
 testtype=$1
 nfs_server=$2
 fio_start=$3
@@ -17,9 +17,10 @@ sudo apt install fio -y
 sudo apt install nfs-common -y
 sudo apt-get install make gcc libc6-dev libssl-dev zlib1g-dev python -y
 sudo git clone https://github.com/aerospike/act.git
+cd act; make; make -f Makesalt
 sudo mkdir -p /mnt/elastifile
-gsutil cp gs://cpe-performance-storage/cpe-performance-storage-b13c1a7348ad.json elastifile.json
-gcloud auth activate-service-account --key-file  elastifile.json
+gsutil cp gs://cpe-performance-storage/aerospike.computer.json aerospike.json
+gcloud auth activate-service-account --key-file  aerospike.json
 
 start_fio() 
 {
