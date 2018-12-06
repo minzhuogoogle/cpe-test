@@ -19,4 +19,4 @@ cd act; make; make -f Makesalt
 gsutil cp gs://cpe-performance-storage/aerospike.computer.json aerospike.json
 gcloud auth activate-service-account --key-file  aerospike.json
 
-
+sleep 10000
