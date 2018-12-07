@@ -20,7 +20,7 @@ MIN_CLUSTER = "3"
 SUBNETWORK = "default"
 # GCP service account credential filename
 CREDENTIALS = "elastifile.json"
-SERVICE_EMAIL = "storage@cpe-performance-storage.iam.gserviceaccount.com"
+SERVICE_EMAIL = "automation@cpe-performance-storage.iam.gserviceaccount.com"
 
 IMAGE = "testimage"
 CLUSTER_NAME = "testcluster"
