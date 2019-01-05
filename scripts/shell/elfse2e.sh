@@ -1,6 +1,6 @@
 #!/bin/bash
 
-SCALE_VM=16
+SCALE_VM=8
 PERF_VM=4
 declare -a ELFSNAME=('ha-lssd-elfs' 'ha-pssd-elfs' 'ha-phdd-elfs' 'test-lssd-elfs' 'test-pssd-elfs' 'test-phdd-elfs' 'ps-lssd-elfs' 'ps-pssd-elfs' 'ps-phdd-elfs' 'ha-elfs' 'test-elfs' 'ps-elfs')
 
@@ -205,7 +205,7 @@ initialization() {
             enodename="ha-$disktype-elfs-elfs"; 
             testvmname="ha-elfs-$disktype";
             skipprovision=0
-            deletion=1
+            deletion=0
             zone=us-central1-f;
 	    region=us-central1;
             cluster=ha-$disktype-elfs
