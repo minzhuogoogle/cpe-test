@@ -154,7 +154,7 @@ initialization() {
     zone=us-east1-b
     region=us-east1
     cluster=test-$disktype-elfs
-    elfsimage=elastifile-storage-2-7-5-12-ems
+    elfsimage=elastifile-storage-3-0-1-4-ems
     
     emsname="test-$disktype-elfs"
     enodename="test-$disktype-elfs-elfs"
