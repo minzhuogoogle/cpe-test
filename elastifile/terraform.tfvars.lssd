@@ -5,7 +5,7 @@ PROJECT="testproject"
 # Efaas Name
 NAME="prow-efaas"
 # Efaas Description
-DESCRIPTION="prow-cluster"
+DESCRIPTION="prow-cluster-lssd"
 # Efaas Region
 REGION="us-central1"
 # Efaas Zone
