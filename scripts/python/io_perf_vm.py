@@ -434,8 +434,6 @@ def check_act_run(vm_name, vm_zone, vm_machine_type, actlogfile, actsummaryfile,
     owner = 'mzhuo'
     cli = "ps -eaf|grep act |grep sudo"
     output=send_cmd_and_get_output(vm_name, vm_zone, cli)
-    # print "output :\n"
-    # print output
     print "***len", len(output), '\n'
     if len(output) < ACT_RUN_OUPUT_LENGTH:
         temp = 'No act is running on {} in zone.'.format(vm_name, vm_zone)
@@ -462,9 +460,6 @@ def check_act_run(vm_name, vm_zone, vm_machine_type, actlogfile, actsummaryfile,
            time.sleep(2)
            cli = "ls -latr | grep actcfg | grep {}_{} ".format(vm_name, vm_zone)
            output=' '.join(send_cmd_and_get_output(vm_name, vm_zone, cli).splitlines())
-           # print "output :\n"
-           # print output
-           # print "***\n", len(output)
            if match_act_log_file.match(output):
                actlogfile.write('\n\nACT result for VM {} in Zone {}.\n'.format(vm_name, vm_zone))
                actlogfile.write('===============================================================================================================================================================================================\n')
@@ -554,11 +549,11 @@ def check_act_run(vm_name, vm_zone, vm_machine_type, actlogfile, actsummaryfile,
             acterrorlog.write('\n')
 
     if not check_done:
-    #    install_act_on_vm(vm_name, vm_zone)
-    #    download_script_to_vm(vm_name, vm_zone)
-    #    act_run(vm_name, vm_zone, False)
+        install_act_on_vm(vm_name, vm_zone)
+        download_script_to_vm(vm_name, vm_zone)
+        act_run(vm_name, vm_zone, False)
         print "make act run"
-#        time.sleep(100)
+
 
 def create_vm(project, machine_type, ssdnumber, zone, sequence):
     return True
@@ -569,11 +564,11 @@ def create_vm(project, machine_type, ssdnumber, zone, sequence):
     print vm_name
     cmd2createvm = "{} {} --machine-type {} --zone {} --image-family=ubuntu-1804-lts --image-project=ubuntu-os-cloud  {}".format(VM_CREATE_SUFFIX, vm_name, machine_type, zone, ssd_cfg_string)
     print cmd2createvm
-#    cmd2checkvm = "gcloud compute  instances  reset  {} --zone {}".format(vm_name, zone)
-#    print cmd2checkvm
-#    output = subprocess.check_output(cmd2checkvm.split())
-#    return
-#    cmd2createvm = "{} {} --machine-type {} --zone {} --image-family=ubuntu-1804-lts --image-project=ubuntu-os-cloud  {}".format(VM_CREATE_SUFFIX, vm_name, machine_type, zone, ssd_cfg_string)
+    cmd2checkvm = "gcloud compute  instances  reset  {} --zone {}".format(vm_name, zone)
+    print cmd2checkvm
+    output = subprocess.check_output(cmd2checkvm.split())
+
+    cmd2createvm = "{} {} --machine-type {} --zone {} --image-family=ubuntu-1804-lts --image-project=ubuntu-os-cloud  {}".format(VM_CREATE_SUFFIX, vm_name, machine_type, zone, ssd_cfg_string)
     try:
        output = subprocess.check_output(cmd2createvm.split())
        print output
@@ -613,14 +608,14 @@ def create_vms(project, localssd_number_list, machine_type_list, zone_list, vmpe
 ###### test starts here
 
 ####### populate data for zone ####
-#all_zones = get_full_list_zones()
-## print all_zones;
+all_zones = get_full_list_zones()
+print all_zones;
 
-#all_machine_types = get_full_list_machine_type()
-## print all_machine_types;
+all_machine_types = get_full_list_machine_type()
+print all_machine_types;
 
 all_vms =  get_full_list_vm()
-# print all_vms
+print all_vms
 
 
 def reset_all_vms():
@@ -706,15 +701,14 @@ if args.createvm:
     for _vm in vm_list:
         install_fio_on_vm(_vm, zone_list[indexvm])
         run_fio_on_vm(_vm, zone_list[indexvm])
-#       install_act_on_vm(_vm, zone_list[indexvm])
-#       download_script_to_vm(_vm, zone_list[indexvm])
-#       prepare_act_cfg_on_vm(_vm, zone_list[indexvm], args.actwriteload, args.actreadload, args.runtime)
+        install_act_on_vm(_vm, zone_list[indexvm])
+        download_script_to_vm(_vm, zone_list[indexvm])
+        prepare_act_cfg_on_vm(_vm, zone_list[indexvm], args.actwriteload, args.actreadload, args.runtime)
         indexvm += 1
-#       time.sleep(120)
+        time.sleep(120)
      
-    time.sleep(9999999999999)
 
-    indexvm = 234
+    indexvm = 0
     for _vm in vm_list:
         init_ssd(_vm, zone_list[indexvm])
         indexvm += 1
